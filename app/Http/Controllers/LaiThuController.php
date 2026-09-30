@@ -18,26 +18,32 @@ class LaiThuController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'ho_ten' => 'required|string|max:150',
-            'sdt' => 'required|string|max:20',
-            'email' => 'nullable|email|max:150',
-            'ten_xe' => 'required|string|max:150',
+            'ho_ten'   => 'required|string|max:150',
+            'sdt'      => 'required|string|max:20',
+            'email'    => 'nullable|email|max:150',
+            'ten_xe'   => 'required|string|max:150',
             'showroom' => 'required|string|max:150',
             'thoi_gian' => 'required|string',
-            'ghi_chu' => 'nullable|string',
+            'ghi_chu'  => 'nullable|string',
         ]);
+
+        // Normalize datetime-local format (HTML5 gửi "2026-10-01T09:00", MySQL cần "2026-10-01 09:00:00")
+        $thoiGian = str_replace('T', ' ', $validated['thoi_gian']);
+        if (strlen($thoiGian) === 16) {
+            $thoiGian .= ':00'; // Thêm giây nếu thiếu
+        }
 
         $code = 'TD-' . strtoupper(substr(uniqid(), -5));
 
         $testDrive = LaiThu::create([
-            'ma_lich' => $code,
-            'ho_ten' => $validated['ho_ten'],
-            'sdt' => $validated['sdt'],
-            'email' => $validated['email'] ?? 'N/A',
-            'ten_xe' => $validated['ten_xe'],
-            'showroom' => $validated['showroom'],
-            'thoi_gian' => $validated['thoi_gian'],
-            'ghi_chu' => $validated['ghi_chu'] ?? null,
+            'ma_lich'   => $code,
+            'ho_ten'    => $validated['ho_ten'],
+            'sdt'       => $validated['sdt'],
+            'email'     => $validated['email'] ?? 'N/A',
+            'ten_xe'    => $validated['ten_xe'],
+            'showroom'  => $validated['showroom'],
+            'thoi_gian' => $thoiGian,
+            'ghi_chu'   => $validated['ghi_chu'] ?? null,
             'trang_thai' => 'Đang chờ duyệt',
         ]);
 

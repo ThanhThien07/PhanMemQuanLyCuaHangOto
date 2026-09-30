@@ -56,9 +56,9 @@ class AuthController extends Controller
             ->orWhere('email', $account)
             ->first();
 
-        $custName = $customer->ho_ten ?? 'Nguyễn Văn A';
-        $custTier = $customer->tier->ten_hang ?? 'Diamond VIP';
-        $custPhone = $customer->sdt ?? ($account ?: '0901234567');
+        $custName  = $customer?->ho_ten ?? 'Nguyễn Văn A';
+        $custTier  = $customer?->tier?->ten_hang ?? 'Diamond VIP';
+        $custPhone = $customer?->sdt ?? ($account ?: '0901234567');
 
         session([
             'user' => [
