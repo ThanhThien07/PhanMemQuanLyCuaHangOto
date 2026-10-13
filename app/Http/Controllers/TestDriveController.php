@@ -11,7 +11,21 @@ class TestDriveController extends Controller
     {
         $cars = Car::getAllCars();
         $selectedCar = $request->query('car', '');
-        return view('test-drive', compact('cars', 'selectedCar'));
+
+        $existingBookings = [];
+        try {
+            $existingBookings = \App\Models\TestDrive::where('trang_thai', '!=', 'Đã hủy')
+                ->select('showroom', 'thoi_gian')
+                ->get()
+                ->map(function ($b) {
+                    return [
+                        'showroom' => $b->showroom,
+                        'thoi_gian' => substr($b->thoi_gian, 0, 16),
+                    ];
+                })->toArray();
+        } catch (\Throwable $e) {}
+
+        return view('test-drive', compact('cars', 'selectedCar', 'existingBookings'));
     }
 
     public function store(Request $request)
@@ -26,6 +40,11 @@ class TestDriveController extends Controller
             'ghi_chu' => 'nullable|string',
         ]);
 
+        $thoiGian = str_replace('T', ' ', $validated['thoi_gian']);
+        if (strlen($thoiGian) === 16) {
+            $thoiGian .= ':00';
+        }
+
         $code = 'TD-' . strtoupper(substr(uniqid(), -5));
 
         $testDrive = \App\Models\TestDrive::create([
@@ -35,7 +54,7 @@ class TestDriveController extends Controller
             'email' => $validated['email'] ?? 'N/A',
             'ten_xe' => $validated['ten_xe'],
             'showroom' => $validated['showroom'],
-            'thoi_gian' => $validated['thoi_gian'],
+            'thoi_gian' => $thoiGian,
             'ghi_chu' => $validated['ghi_chu'] ?? null,
             'trang_thai' => 'Đang chờ duyệt',
         ]);
@@ -48,6 +67,7 @@ class TestDriveController extends Controller
                 'name' => $testDrive->ho_ten,
                 'phone' => $testDrive->sdt,
                 'carName' => $testDrive->ten_xe,
+                'showroom' => $testDrive->showroom,
                 'date' => $testDrive->thoi_gian,
                 'status' => $testDrive->trang_thai,
             ]

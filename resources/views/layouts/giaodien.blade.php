@@ -68,6 +68,22 @@
                         </a>
                     </li>
 
+                    <!-- MENU DỊCH VỤ ĐẲNG CẤP (MERCEDES-BENZ STYLE) -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link nav-link-custom dropdown-toggle {{ Request::is('dich-vu*') || Request::is('dichvu*') || Request::is('services*') ? 'active' : '' }}" href="{{ url('/dich-vu') }}" role="button" data-bs-toggle="dropdown">
+                            <i class="fa-solid fa-wrench me-1 text-primary"></i> Dịch Vụ
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark shadow">
+                            <li><a class="dropdown-item fw-bold text-primary" href="{{ url('/dich-vu') }}"><i class="fa-solid fa-star me-2"></i> Tất Cả Dịch Vụ 5 Sao</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ url('/dich-vu#bao-tri') }}"><i class="fa-solid fa-oil-can me-2 text-warning"></i> Bảo Trì Định Kỳ (Service A/B)</a></li>
+                            <li><a class="dropdown-item" href="{{ url('/dich-vu#bao-hiem') }}"><i class="fa-solid fa-shield-halved me-2 text-info"></i> Bảo Hiểm Thân Vỏ PrimeLux</a></li>
+                            <li><a class="dropdown-item text-danger fw-bold" href="{{ url('/dich-vu#cuu-ho') }}"><i class="fa-solid fa-truck-medical me-2"></i> Cứu Hộ Khẩn Cấp 24/7</a></li>
+                            <li><a class="dropdown-item" href="{{ url('/dich-vu#sua-chua') }}"><i class="fa-solid fa-spray-can-sparkles me-2 text-success"></i> Sửa Chữa & Sơn Hấp Châu Âu</a></li>
+                            <li><a class="dropdown-item text-warning" href="{{ url('/dich-vu#uu-dai') }}"><i class="fa-solid fa-gift me-2"></i> Ưu Đãi Khách Hàng VIP</a></li>
+                        </ul>
+                    </li>
+
                     <li class="nav-item">
                         <a class="nav-link nav-link-custom" href="{{ url('/#distribution-system') }}">Showroom</a>
                     </li>
@@ -168,8 +184,12 @@
                                     class="fa-solid fa-chevron-right text-info me-2"></i> Tra Cứu Hóa Đơn (Khách Vãng Lai)</a></li>
                         <li class="mb-2"><a href="{{ url('/login?role=customer') }}" class="hover-white text-warning"><i
                                     class="fa-solid fa-crown text-warning me-2"></i> Đăng Nhập Khách Hàng (Tích Điểm VIP)</a></li>
-                        <li class="mb-2"><a href="{{ url('/login?role=admin') }}" class="hover-white"><i
-                                    class="fa-solid fa-chevron-right text-primary me-2"></i> Quản Trị Hệ Thống</a></li>
+                        <li class="mb-2"><a href="{{ url('/admin/dashboard.html') }}" class="hover-white"><i
+                                    class="fa-solid fa-chevron-right text-primary me-2"></i> Bảng Tổng Quan (admin/dashboard.html)</a></li>
+                        <li class="mb-2"><a href="{{ url('/admin/cars-management.html') }}" class="hover-white"><i
+                                    class="fa-solid fa-chevron-right text-success me-2"></i> Quản Lý Kho Xe (admin/cars-management.html)</a></li>
+                        <li class="mb-2"><a href="{{ url('/admin/test-drive-list.html') }}" class="hover-white"><i
+                                    class="fa-solid fa-chevron-right text-warning me-2"></i> Quản Lý Lịch Lái Thử (admin/test-drive-list.html)</a></li>
                     </ul>
                 </div>
             </div>

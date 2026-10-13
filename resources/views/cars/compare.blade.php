@@ -60,10 +60,12 @@
                 </div>
 
                 <div class="d-flex gap-3 align-items-center mb-3">
-                    <img src="{{ $car['image'] }}" alt="{{ $car['name'] }}" class="rounded-3 object-fit-cover border border-secondary" style="width: 130px; height: 85px;">
+                    <a href="{{ url('/cars/' . $car['id']) }}" title="Xem chi tiết {{ $car['name'] }}">
+                        <img src="{{ $car['image'] }}" alt="{{ $car['name'] }}" class="rounded-3 object-fit-cover border border-secondary" style="width: 130px; height: 85px;">
+                    </a>
                     <div>
                         <span class="badge bg-secondary mb-1">{{ $car['brand'] }}</span>
-                        <h4 class="fw-bold mb-1 text-white">{{ $car['name'] }}</h4>
+                        <h4 class="fw-bold mb-1 text-white"><a href="{{ url('/cars/' . $car['id']) }}" class="text-white text-decoration-none" title="Xem chi tiết {{ $car['name'] }}">{{ $car['name'] }}</a></h4>
                         <div class="small text-secondary">{{ $car['fuel'] }} • {{ $car['power'] }} • {{ $car['seats'] }} Chỗ</div>
                     </div>
                 </div>

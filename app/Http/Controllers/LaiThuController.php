@@ -12,7 +12,21 @@ class LaiThuController extends Controller
     {
         $cars = Xe::getAllCars();
         $selectedCar = $request->query('car', '');
-        return view('laithu', compact('cars', 'selectedCar'));
+
+        $existingBookings = [];
+        try {
+            $existingBookings = LaiThu::where('trang_thai', '!=', 'Đã hủy')
+                ->select('showroom', 'thoi_gian')
+                ->get()
+                ->map(function ($b) {
+                    return [
+                        'showroom' => $b->showroom,
+                        'thoi_gian' => substr($b->thoi_gian, 0, 16),
+                    ];
+                })->toArray();
+        } catch (\Throwable $e) {}
+
+        return view('laithu', compact('cars', 'selectedCar', 'existingBookings'));
     }
 
     public function store(Request $request)
@@ -55,6 +69,7 @@ class LaiThuController extends Controller
                 'name' => $testDrive->ho_ten,
                 'phone' => $testDrive->sdt,
                 'carName' => $testDrive->ten_xe,
+                'showroom' => $testDrive->showroom,
                 'date' => $testDrive->thoi_gian,
                 'status' => $testDrive->trang_thai,
             ]
@@ -63,7 +78,7 @@ class LaiThuController extends Controller
 
     public function updateStatus(Request $request, $id)
     {
-        $status = $request->input('trang_thai', 'Đã xác nhận');
+        $status = $request->input('trang_thai', 'Đã liên hệ');
         $drive = LaiThu::where('id', $id)->orWhere('ma_lich', $id)->first();
         if ($drive) {
             $drive->trang_thai = $status;
@@ -72,4 +87,15 @@ class LaiThuController extends Controller
         }
         return response()->json(['success' => false, 'message' => 'Không tìm thấy lịch lái thử'], 404);
     }
+
+    public function destroy($id)
+    {
+        $drive = LaiThu::where('id', $id)->orWhere('ma_lich', $id)->first();
+        if ($drive) {
+            $drive->delete();
+            return response()->json(['success' => true, 'message' => 'Đã xóa lịch lái thử thành công!']);
+        }
+        return response()->json(['success' => false, 'message' => 'Không tìm thấy lịch lái thử'], 404);
+    }
 }
+

@@ -397,5 +397,6 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $this->call(CarPriceSourceSeeder::class);
+        $this->call(ServiceSeeder::class);
     }
 }

@@ -168,8 +168,12 @@
                                     class="fa-solid fa-chevron-right text-info me-2"></i> Tra Cứu Hóa Đơn (Khách Vãng Lai)</a></li>
                         <li class="mb-2"><a href="{{ url('/login?role=customer') }}" class="hover-white text-warning"><i
                                     class="fa-solid fa-crown text-warning me-2"></i> Đăng Nhập Khách Hàng (Tích Điểm VIP)</a></li>
-                        <li class="mb-2"><a href="{{ url('/login?role=admin') }}" class="hover-white"><i
-                                    class="fa-solid fa-chevron-right text-primary me-2"></i> Quản Trị Hệ Thống</a></li>
+                        <li class="mb-2"><a href="{{ url('/admin/dashboard.html') }}" class="hover-white"><i
+                                    class="fa-solid fa-chevron-right text-primary me-2"></i> Bảng Tổng Quan (admin/dashboard.html)</a></li>
+                        <li class="mb-2"><a href="{{ url('/admin/cars-management.html') }}" class="hover-white"><i
+                                    class="fa-solid fa-chevron-right text-success me-2"></i> Quản Lý Kho Xe (admin/cars-management.html)</a></li>
+                        <li class="mb-2"><a href="{{ url('/admin/test-drive-list.html') }}" class="hover-white"><i
+                                    class="fa-solid fa-chevron-right text-warning me-2"></i> Quản Lý Lịch Lái Thử (admin/test-drive-list.html)</a></li>
                     </ul>
                 </div>
             </div>

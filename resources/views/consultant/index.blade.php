@@ -40,11 +40,39 @@
             border-radius: 14px;
             padding: 16px 20px;
             transition: all 0.25s ease;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
         }
 
         .stat-card-advisor:hover {
             transform: translateY(-2px);
             border-color: rgba(234, 179, 8, 0.4);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+        }
+
+        .stat-card-advisor.active-all {
+            border-color: #38bdf8 !important;
+            box-shadow: 0 0 18px rgba(56, 189, 248, 0.35);
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(15, 23, 42, 0.95));
+        }
+
+        .stat-card-advisor.active-pending {
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 18px rgba(239, 68, 68, 0.35);
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.18), rgba(15, 23, 42, 0.95));
+        }
+
+        .stat-card-advisor.active-progress {
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 18px rgba(59, 130, 246, 0.35);
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.18), rgba(15, 23, 42, 0.95));
+        }
+
+        .stat-card-advisor.active-resolved {
+            border-color: #10b981 !important;
+            box-shadow: 0 0 18px rgba(16, 185, 129, 0.35);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.18), rgba(15, 23, 42, 0.95));
         }
 
         .inquiry-card {
@@ -187,15 +215,6 @@
                         <span class="fw-bold fs-4 text-warning">PRIMELUX</span>
                         <span class="badge bg-primary text-white ms-2 px-2 py-1 fs-6">ADVISOR DESK</span>
                     </a>
-
-                    <!-- REALTIME ENGINE BADGE -->
-                    <span class="vue-framework-badge d-none d-md-inline-flex">
-                        <i class="fa-brands fa-vuejs fa-lg"></i> Vue.js 3 Realtime Engine
-                    </span>
-
-                    <span class="badge bg-dark border border-secondary text-light d-none d-lg-inline-flex align-items-center py-2 px-3">
-                        <span class="pulse-online"></span> Đang Kết Nối Realtime (Tự động cập nhật không cần tải lại trang)
-                    </span>
                 </div>
 
                 <div class="d-flex align-items-center gap-2 gap-md-3">
@@ -227,10 +246,16 @@
         <!-- MAIN WORKSPACE -->
         <div class="container-fluid px-3 px-md-4 py-4">
 
-            <!-- THỐNG KÊ REALTIME COMPUTED TỰ ĐỘNG CẬP NHẬT -->
+            <!-- THỐNG KÊ REALTIME COMPUTED TỰ ĐỘNG CẬP NHẬT (CLICK ĐỂ LỌC TRẠNG THÁI) -->
             <div class="row g-3 mb-4">
                 <div class="col-6 col-lg-3">
-                    <div class="stat-card-advisor d-flex align-items-center justify-content-between">
+                    <div :class="['stat-card-advisor d-flex align-items-center justify-content-between', { 'active-all': statusFilter === 'all' }]"
+                         @click="setFilter('all')"
+                         role="button"
+                         title="Nhấp để hiển thị tất cả yêu cầu">
+                        <span v-if="statusFilter === 'all'" class="badge bg-secondary position-absolute top-0 end-0 m-2" style="font-size: 9px;">
+                            <i class="fa-solid fa-check me-1"></i>Đang xem
+                        </span>
                         <div>
                             <div class="text-secondary small fw-bold text-uppercase">Tổng Câu Hỏi Nhận</div>
                             <div class="fs-2 fw-bold text-white">@{{ stats.total }}</div>
@@ -243,7 +268,14 @@
                 </div>
 
                 <div class="col-6 col-lg-3">
-                    <div class="stat-card-advisor d-flex align-items-center justify-content-between" style="border-left: 4px solid #ef4444;">
+                    <div :class="['stat-card-advisor d-flex align-items-center justify-content-between', { 'active-pending': statusFilter === 'Chờ phản hồi' }]"
+                         style="border-left: 4px solid #ef4444;"
+                         @click="setFilter('Chờ phản hồi')"
+                         role="button"
+                         title="Nhấp để chỉ hiển thị câu hỏi Chờ phản hồi gấp">
+                        <span v-if="statusFilter === 'Chờ phản hồi'" class="badge bg-danger position-absolute top-0 end-0 m-2" style="font-size: 9px;">
+                            <i class="fa-solid fa-filter me-1"></i>Đang lọc
+                        </span>
                         <div>
                             <div class="text-danger small fw-bold text-uppercase">Chờ Phản Hồi Gấp</div>
                             <div class="fs-2 fw-bold text-danger">@{{ stats.pending }}</div>
@@ -256,7 +288,14 @@
                 </div>
 
                 <div class="col-6 col-lg-3">
-                    <div class="stat-card-advisor d-flex align-items-center justify-content-between" style="border-left: 4px solid #3b82f6;">
+                    <div :class="['stat-card-advisor d-flex align-items-center justify-content-between', { 'active-progress': statusFilter === 'Đang tư vấn' }]"
+                         style="border-left: 4px solid #3b82f6;"
+                         @click="setFilter('Đang tư vấn')"
+                         role="button"
+                         title="Nhấp để chỉ hiển thị câu hỏi Đang tư vấn">
+                        <span v-if="statusFilter === 'Đang tư vấn'" class="badge bg-primary position-absolute top-0 end-0 m-2" style="font-size: 9px;">
+                            <i class="fa-solid fa-filter me-1"></i>Đang lọc
+                        </span>
                         <div>
                             <div class="text-info small fw-bold text-uppercase">Đang Tư Vấn</div>
                             <div class="fs-2 fw-bold text-info">@{{ stats.inProgress }}</div>
@@ -269,7 +308,14 @@
                 </div>
 
                 <div class="col-6 col-lg-3">
-                    <div class="stat-card-advisor d-flex align-items-center justify-content-between" style="border-left: 4px solid #10b981;">
+                    <div :class="['stat-card-advisor d-flex align-items-center justify-content-between', { 'active-resolved': statusFilter === 'Đã trả lời' }]"
+                         style="border-left: 4px solid #10b981;"
+                         @click="setFilter('Đã trả lời')"
+                         role="button"
+                         title="Nhấp để chỉ hiển thị câu hỏi Đã giải đáp xong">
+                        <span v-if="statusFilter === 'Đã trả lời'" class="badge bg-success position-absolute top-0 end-0 m-2" style="font-size: 9px;">
+                            <i class="fa-solid fa-filter me-1"></i>Đang lọc
+                        </span>
                         <div>
                             <div class="text-success small fw-bold text-uppercase">Đã Giải Đáp Xong</div>
                             <div class="fs-2 fw-bold text-success">@{{ stats.resolved }}</div>
@@ -285,16 +331,16 @@
             <!-- BỘ LỌC TRẠNG THÁI VÀ Ô TÌM KIẾM (TWO-WAY REACTIVE BINDING) -->
             <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
                 <div class="btn-group" role="group">
-                    <button type="button" @click="statusFilter = 'all'" :class="['btn btn-sm', statusFilter === 'all' ? 'btn-primary' : 'btn-dark border-secondary text-secondary']">
+                    <button type="button" @click="setFilter('all')" :class="['btn btn-sm', statusFilter === 'all' ? 'btn-primary' : 'btn-dark border-secondary text-secondary']">
                         <i class="fa-solid fa-list me-1"></i> Tất Cả (@{{ stats.total }})
                     </button>
-                    <button type="button" @click="statusFilter = 'Chờ phản hồi'" :class="['btn btn-sm', statusFilter === 'Chờ phản hồi' ? 'btn-danger' : 'btn-dark border-secondary text-secondary']">
+                    <button type="button" @click="setFilter('Chờ phản hồi')" :class="['btn btn-sm', statusFilter === 'Chờ phản hồi' ? 'btn-danger' : 'btn-dark border-secondary text-secondary']">
                         <i class="fa-solid fa-clock me-1"></i> Chờ Phản Hồi (@{{ stats.pending }})
                     </button>
-                    <button type="button" @click="statusFilter = 'Đang tư vấn'" :class="['btn btn-sm', statusFilter === 'Đang tư vấn' ? 'btn-info text-white' : 'btn-dark border-secondary text-secondary']">
+                    <button type="button" @click="setFilter('Đang tư vấn')" :class="['btn btn-sm', statusFilter === 'Đang tư vấn' ? 'btn-info text-white' : 'btn-dark border-secondary text-secondary']">
                         <i class="fa-solid fa-spinner me-1"></i> Đang Tư Vấn (@{{ stats.inProgress }})
                     </button>
-                    <button type="button" @click="statusFilter = 'Đã trả lời'" :class="['btn btn-sm', statusFilter === 'Đã trả lời' ? 'btn-success' : 'btn-dark border-secondary text-secondary']">
+                    <button type="button" @click="setFilter('Đã trả lời')" :class="['btn btn-sm', statusFilter === 'Đã trả lời' ? 'btn-success' : 'btn-dark border-secondary text-secondary']">
                         <i class="fa-solid fa-check-double me-1"></i> Đã Giải Đáp (@{{ stats.resolved }})
                     </button>
                 </div>
@@ -547,13 +593,26 @@
 
                 // TỰ ĐỘNG TRUY XUẤT CÂU HỎI ĐANG ĐƯỢC CHỌN
                 activeInquiry() {
-                    if (!this.activeInquiryId && this.inquiries.length > 0) {
-                        return this.inquiries[0];
+                    if (this.filteredInquiries.length === 0) {
+                        return null;
                     }
-                    return this.inquiries.find(i => i.ma_tin === this.activeInquiryId) || this.inquiries[0] || null;
+                    const found = this.filteredInquiries.find(i => i.ma_tin === this.activeInquiryId);
+                    return found || this.filteredInquiries[0];
                 }
             },
             methods: {
+                setFilter(status) {
+                    this.statusFilter = status;
+                    this.$nextTick(() => {
+                        if (this.filteredInquiries.length > 0) {
+                            const exists = this.filteredInquiries.some(i => i.ma_tin === this.activeInquiryId);
+                            if (!exists) {
+                                this.selectInquiry(this.filteredInquiries[0].ma_tin);
+                            }
+                        }
+                    });
+                },
+
                 selectInquiry(maTin) {
                     this.activeInquiryId = maTin;
                     this.replyText = '';

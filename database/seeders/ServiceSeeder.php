@@ -1,0 +1,229 @@
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+
+class ServiceSeeder extends Seeder
+{
+    public function run(): void
+    {
+        DB::table('dich_vu')->truncate();
+        DB::table('dich_vu')->insert([
+            // 1. BẢO TRÌ
+            [
+                'ma_dv' => 'SER-A',
+                'loai_dv' => 'bao_tri',
+                'ten_loai_dv' => 'Bảo Trì Định Kỳ',
+                'ten_dv' => 'Gói Bảo Trì Định Kỳ Tiêu Chuẩn',
+                'tieu_de' => 'Bảo dưỡng 10.000 km cho xe sang',
+                'gia_tham_khao' => 5500000,
+                'hinh_anh' => 'https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98?auto=format&fit=crop&w=800&q=80',
+                'mo_ta' => 'Thay nhớt tổng hợp cao cấp, lọc nhớt chính hãng & kiểm tra toàn diện 165 điểm an toàn.',
+                'quy_trinh' => "• Thay dầu động cơ cao cấp & lọc nhớt chính hãng\n• Kiểm tra hệ thống phanh & lốp xe\n• Chẩn đoán & xóa lỗi ECU",
+                'dac_quyen' => 'Rửa xe bọt tuyết & vệ sinh nội thất miễn phí.',
+                'trang_thai' => 'Đang hoạt động',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'ma_dv' => 'SER-B',
+                'loai_dv' => 'bao_tri',
+                'ten_loai_dv' => 'Bảo Trì Định Kỳ',
+                'ten_dv' => 'Gói Bảo Trì Chuyên Sâu',
+                'tieu_de' => 'Bảo dưỡng toàn diện 20.000 km - 40.000 km',
+                'gia_tham_khao' => 14800000,
+                'hinh_anh' => 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=800&q=80',
+                'mo_ta' => 'Bảo dưỡng chuyên sâu tối ưu công suất động cơ, hệ thống treo khí nén & phanh.',
+                'quy_trinh' => "• Toàn bộ hạng mục bảo trì tiêu chuẩn\n• Thay lọc gió động cơ & điều hòa PM2.5\n• Kiểm tra dầu phanh, thước lái & ắc quy",
+                'dac_quyen' => 'Tặng dung dịch vệ sinh kim phun đốt chính hãng.',
+                'trang_thai' => 'Đang hoạt động',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'ma_dv' => 'SER-DIAG',
+                'loai_dv' => 'bao_tri',
+                'ten_loai_dv' => 'Chẩn Đoán Điện Tử',
+                'ten_dv' => 'Chẩn Đoán & Đọc Lỗi Máy Tính',
+                'tieu_de' => 'Quét lỗi điện tử & phần mềm ECU',
+                'gia_tham_khao' => 2500000,
+                'hinh_anh' => 'https://images.unsplash.com/photo-1530046339160-ce3e530c7d2f?auto=format&fit=crop&w=800&q=80',
+                'mo_ta' => 'Quét toàn bộ cảm biến, phần mềm hộp số & hệ thống điện bằng thiết bị chuyên dụng.',
+                'quy_trinh' => "• Quét toàn bộ hộp ECU, ABS, ESP, Airbag\n• Đọc dữ liệu cảm biến thời gian thực\n• Cập nhật Software/Firmware mới nhất",
+                'dac_quyen' => 'Miễn phí 100% cho hội viên PrimeLux VIP Club.',
+                'trang_thai' => 'Đang hoạt động',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+
+            // 2. BẢO HIỂM
+            [
+                'ma_dv' => 'INS-PROT',
+                'loai_dv' => 'bao_hiem',
+                'ten_loai_dv' => 'Bảo Hiểm Vật Chất',
+                'ten_dv' => 'Gói Bảo Hiểm Thân Vỏ PrimeLux Shield',
+                'tieu_de' => 'Bảo vệ 100% cho siêu xe & xe sang',
+                'gia_tham_khao' => 25000000,
+                'hinh_anh' => 'https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=800&q=80',
+                'mo_ta' => 'Bảo hiểm thân vỏ cao cấp, miễn trừ 0% thủy kích ngập nước, thay phụ tùng chính hãng.',
+                'quy_trinh' => "• Giám định xe tận nơi trong 30 phút\n• Cấp đơn bảo hiểm điện tử siêu tốc\n• Hỗ trợ thủ tục bồi thường 24/7",
+                'dac_quyen' => 'Xe cứu hộ giao nhận miễn phí khi va chạm.',
+                'trang_thai' => 'Đang hoạt động',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'ma_dv' => 'INS-WARR',
+                'loai_dv' => 'bao_hiem',
+                'ten_loai_dv' => 'Gia Hạn Bảo Hành',
+                'ten_dv' => 'Gói Gia Hạn Bảo Hành Chính Hãng (+2 Năm)',
+                'tieu_de' => 'An tâm thêm 2 năm / 50.000 km',
+                'gia_tham_khao' => 35000000,
+                'hinh_anh' => 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=800&q=80',
+                'mo_ta' => 'Mở rộng bảo hành chính hãng lên 5 năm. Chi trả 100% chi phí sửa chữa cơ khí & điện tử.',
+                'quy_trinh' => "• Kiểm tra điều kiện xe tổng quát\n• Xác nhận lịch sử bảo dưỡng\n• Cấp chứng nhận bảo hành mở rộng",
+                'dac_quyen' => 'Chuyển nhượng bảo hành khi bán xe.',
+                'trang_thai' => 'Đang hoạt động',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+
+            // 3. CỨU HỘ & HỖ TRỢ
+            [
+                'ma_dv' => 'EMERG-247',
+                'loai_dv' => 'cuu_ho',
+                'ten_loai_dv' => 'Cứu Hộ Khẩn Cấp',
+                'ten_dv' => 'Cứu Hộ Giao Thông 24/7 Chuyên Dụng',
+                'tieu_de' => 'Xe sàn trượt bảo vệ gầm siêu xe',
+                'gia_tham_khao' => 1500000,
+                'hinh_anh' => 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=800&q=80',
+                'mo_ta' => 'Xe cứu hộ sàn trượt phẳng nghiêng 100%, bảo vệ an toàn tuyệt đối gầm xe thấp.',
+                'quy_trinh' => "• Định vị GPS xe & điều động xe gần nhất\n• Vận chuyển an toàn về trung tâm PrimeLux\n• Bố trí phương tiện di chuyển cho khách",
+                'dac_quyen' => 'Miễn phí 100km cho hội viên Platinum & Diamond.',
+                'trang_thai' => 'Đang hoạt động',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'ma_dv' => 'PICKUP-HOME',
+                'loai_dv' => 'cuu_ho',
+                'ten_loai_dv' => 'Hỗ Trợ Tận Nơi',
+                'ten_dv' => 'Giao Nhận Xe Bảo Dưỡng Tận Nhà (Door-to-Door)',
+                'tieu_de' => 'Tiết kiệm thời gian di chuyển',
+                'gia_tham_khao' => 800000,
+                'hinh_anh' => 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=800&q=80',
+                'mo_ta' => 'Chuyên viên tiếp nhận xe tại nhà hoặc cơ quan, bảo dưỡng & bàn giao lại tận nơi.',
+                'quy_trinh' => "• Đặt lịch hẹn giao nhận qua Hotline/Website\n• Lập biên bản bàn giao xe tại nhà\n• Giao xe sạch đẹp sau bảo dưỡng",
+                'dac_quyen' => 'Miễn phí trong bán kính 20km nội thành.',
+                'trang_thai' => 'Đang hoạt động',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+
+            // 4. SỬA CHỮA
+            [
+                'ma_dv' => 'REP-BODY',
+                'loai_dv' => 'sua_chua',
+                'ten_loai_dv' => 'Sửa Chữa Thân Vỏ',
+                'ten_dv' => 'Sửa Chữa Thân Vỏ & Sơn Hấp Châu Âu',
+                'tieu_de' => 'Phôi phục diện mạo như mới xuất xưởng',
+                'gia_tham_khao' => 8500000,
+                'hinh_anh' => 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&w=800&q=80',
+                'mo_ta' => 'Phòng sơn sấy hồng ngoại tiêu chuẩn Đức, pha màu vi tính chính xác theo mã sơn zin.',
+                'quy_trinh' => "• Nắn gò thân vỏ bằng kỹ thuật số\n• Sơn lót tĩnh điện & sơn phủ phòng kín\n• Đánh bóng Ceramic hoàn thiện",
+                'dac_quyen' => 'Bảo hành chất lượng màu sơn 3 năm.',
+                'trang_thai' => 'Đang hoạt động',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'ma_dv' => 'REP-PARTS',
+                'loai_dv' => 'sua_chua',
+                'ten_loai_dv' => 'Phụ Tùng Chính Hãng',
+                'ten_dv' => 'Thay Phụ Tùng & Phụ Kiện Chính Hãng',
+                'tieu_de' => '100% Phụ tùng chính hãng nhập khẩu',
+                'gia_tham_khao' => 12000000,
+                'hinh_anh' => 'https://images.unsplash.com/photo-1486006920555-c77dce18193b?auto=format&fit=crop&w=800&q=80',
+                'mo_ta' => 'Kho phụ tùng sẵn có hơn 10.000 chi tiết chính hãng cho các dòng xe cao cấp.',
+                'quy_trinh' => "• Kiểm tra mã phụ tùng OEM theo số khung\n• Báo giá công khai niêm yết\n• Bảo hành 24 tháng chính hãng",
+                'dac_quyen' => 'Miễn phí công lắp đặt cho khách VIP.',
+                'trang_thai' => 'Đang hoạt động',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+
+            // 5. ƯU ĐÃI KHÁCH HÀNG
+            [
+                'ma_dv' => 'PROMO-SUMMER',
+                'loai_dv' => 'uu_dai',
+                'ten_loai_dv' => 'Ưu Đãi Đặc Biệt',
+                'ten_dv' => 'Chương Trình Tri Ân Khách Hàng 2026',
+                'tieu_de' => 'Miễn phí kiểm tra 20 hạng mục & Giảm 15% Dầu máy',
+                'gia_tham_khao' => 0,
+                'hinh_anh' => 'https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=800&q=80',
+                'mo_ta' => 'Giảm 15% gói thay dầu động cơ, giảm 20% gói vệ sinh khoang máy & dán phim cách nhiệt.',
+                'quy_trinh' => "• Kiểm tra hệ thống điều hòa & nạp ga lạnh\n• Vệ sinh dàn lạnh công nghệ Ozone\n• Tặng quà lưu niệm thương hiệu PrimeLux",
+                'dac_quyen' => 'Cộng dồn cùng điểm thưởng thành viên VIP.',
+                'trang_thai' => 'Đang hoạt động',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'ma_dv' => 'PROMO-VIPCLUB',
+                'loai_dv' => 'uu_dai',
+                'ten_loai_dv' => 'Đặc Quyền Hội Viên VIP',
+                'ten_dv' => 'Đặc Quyền Dịch Vụ Hội Viên PrimeLux Club',
+                'tieu_de' => 'Chiết khấu đến 3% & Tặng gói Phủ Ceramic',
+                'gia_tham_khao' => 0,
+                'hinh_anh' => 'https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=800&q=80',
+                'mo_ta' => 'Hội viên Gold, Platinum & Diamond được ưu tiên đặt lịch không chờ đợi & phòng Lounge VIP.',
+                'quy_trinh' => "• Nhận diện hội viên tự động qua Biển số/SĐT\n• Phục vụ nước uống & Lounge VIP 5 sao\n• Tặng 100 điểm thưởng sau dịch vụ",
+                'dac_quyen' => 'Tặng 100 điểm thưởng tích lũy.',
+                'trang_thai' => 'Đang hoạt động',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        ]);
+
+        // ĐẶT LỊCH MẪU
+        DB::table('dat_lich_dich_vu')->truncate();
+        DB::table('dat_lich_dich_vu')->insert([
+            [
+                'ma_dat_lich' => 'SER-2026-001',
+                'ho_ten' => 'Nguyễn Văn A',
+                'sdt' => '0901234567',
+                'email' => 'khachhang@gmail.com',
+                'bien_so' => '51K-888.88',
+                'ten_xe' => 'Xe Sang PrimeLux S-Class',
+                'showroom' => 'Showroom TP. Hồ Chí Minh (Phạm Văn Chiêu)',
+                'loai_dich_vu' => 'Bảo Trì Định Kỳ',
+                'ten_dich_vu_cu_the' => 'Gói Bảo Trì Định Kỳ Tiêu Chuẩn',
+                'thoi_gian_hen' => '2026-10-02 09:30:00',
+                'vi_tri_cuu_ho' => null,
+                'ghi_chu' => 'Yêu cầu kiểm tra kỹ hệ thống treo khí nén & thay bộ lọc gió.',
+                'trang_thai' => 'Đã xác nhận',
+                'created_at' => now()->subHours(5),
+                'updated_at' => now()->subHours(2),
+            ],
+            [
+                'ma_dat_lich' => 'RES-2026-002',
+                'ho_ten' => 'Trần Thị Mai',
+                'sdt' => '0912987654',
+                'email' => 'mai.tran@gmail.com',
+                'bien_so' => '30H-999.68',
+                'ten_xe' => 'Porsche Taycan Turbo S',
+                'showroom' => 'Showroom Hà Nội (Vinhomes Riverside)',
+                'loai_dich_vu' => 'Cứu Hộ Khẩn Cấp 24/7',
+                'ten_dich_vu_cu_the' => 'Cứu Hộ Giao Thông 24/7 Chuyên Dụng',
+                'thoi_gian_hen' => '2026-09-30 14:00:00',
+                'vi_tri_cuu_ho' => 'Cao tốc Hà Nội - Hải Phòng, Km 45',
+                'ghi_chu' => 'Xe cán phải đinh nổ lốp rách, cần xe cứu hộ sàn trượt nâng gầm thấp.',
+                'trang_thai' => 'Đang xử lý',
+                'created_at' => now()->subMinutes(50),
+                'updated_at' => now()->subMinutes(20),
+            ]
+        ]);
+    }
+}
