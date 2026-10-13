@@ -13,12 +13,15 @@
             </h2>
             <p class="text-secondary small mb-0">Theo dõi doanh thu, kho xe, đơn hàng và tiến độ duyệt lịch lái thử thời gian thực</p>
         </div>
-        <div class="d-flex gap-2">
+        <div class="d-flex flex-wrap gap-2">
             <a href="{{ url('/admin/cars-management.html') }}" class="btn btn-outline-primary btn-sm">
                 <i class="fa-solid fa-boxes-stacked me-1"></i> Kho Xe (cars-management.html)
             </a>
             <a href="{{ url('/admin/test-drive-list.html') }}" class="btn btn-outline-warning btn-sm">
                 <i class="fa-solid fa-calendar-check me-1"></i> Lịch Lái Thử (test-drive-list.html)
+            </a>
+            <a href="{{ url('/admin/payments.html') }}" class="btn btn-outline-info btn-sm">
+                <i class="fa-solid fa-credit-card me-1 text-warning"></i> SePay Thanh Toán (payments.html)
             </a>
         </div>
     </div>

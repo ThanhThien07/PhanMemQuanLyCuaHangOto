@@ -197,6 +197,63 @@
             border: 1px solid rgba(16, 185, 129, 0.25);
             color: #34d399;
         }
+
+        /* SEPAY FLOATING PAYMENT TOAST POPUP (GÓC PHẢI MÀN HÌNH ADMIN) */
+        .sepay-floating-toast {
+            position: fixed;
+            right: 24px;
+            bottom: 24px;
+            z-index: 10050;
+            max-width: 390px;
+            width: calc(100vw - 36px);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .sepay-toast-card {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(8, 14, 26, 0.99));
+            border: 1.5px solid rgba(16, 185, 129, 0.6);
+            border-radius: 16px;
+            box-shadow: 0 16px 45px rgba(0, 0, 0, 0.75), 0 0 30px rgba(16, 185, 129, 0.25);
+            backdrop-filter: blur(16px);
+            overflow: hidden;
+            animation: slideInRightToast 0.45s ease-out forwards;
+        }
+
+        @keyframes slideInRightToast {
+            from {
+                transform: translateX(120%) scale(0.95);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .toast-header-bar {
+            background: linear-gradient(90deg, rgba(16, 185, 129, 0.18), rgba(245, 158, 11, 0.1));
+            border-bottom: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 10px 14px;
+        }
+
+        .toast-icon-pulse {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: rgba(16, 185, 129, 0.2);
+            border: 1.5px solid #10b981;
+            color: #34d399;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulseGreen 1.8s infinite;
+        }
+
+        @keyframes pulseGreen {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); }
+            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
     </style>
 </head>
 
@@ -243,6 +300,9 @@
                 <a href="{{ url('/admin/test-drive-list.html') }}" class="admin-nav-link {{ Request::is('admin/test*') ? 'active' : '' }}">
                     <i class="fa-solid fa-calendar-check me-2"></i> Quản Lý Lịch Lái Thử (test-drive-list.html)
                 </a>
+                <a href="{{ url('/admin/payments.html') }}" class="admin-nav-link {{ Request::is('admin/payment*') || Request::is('admin/sepay*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-credit-card me-2 text-warning"></i> Quản Lý Thanh Toán & SePay (payments.html)
+                </a>
             </div>
             <div class="text-secondary small d-none d-lg-block">
                 <i class="fa-solid fa-clock text-info me-1"></i> Hệ thống Showroom PrimeLux Auto 2026
@@ -255,8 +315,126 @@
         @yield('content')
     </main>
 
+    <!-- FORM THÔNG BÁO NHỎ Ở GÓC PHẢI MÀN HÌNH ADMIN (SEPAY PAYMENT NOTIFICATION TOAST) -->
+    <div id="sepayAdminPaymentToast" class="sepay-floating-toast d-none" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="sepay-toast-card">
+            <div class="toast-header-bar d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-success bg-opacity-25 text-success border border-success px-2 py-0.5" style="font-size: 11px;">
+                        <i class="fa-solid fa-circle-check me-1"></i> SePay Online
+                    </span>
+                    <strong class="text-white small mb-0"><i class="fa-solid fa-bell text-warning me-1"></i> Đã Thanh Toán Rồi!</strong>
+                </div>
+                <button type="button" class="btn btn-sm btn-link text-secondary p-0 text-decoration-none hover-white" onclick="closeAdminPaymentToast()" title="Đóng thông báo">
+                    <i class="fa-solid fa-xmark fs-5"></i>
+                </button>
+            </div>
+            <div class="p-3">
+                <div class="d-flex align-items-start gap-3 mb-2.5">
+                    <div class="toast-icon-pulse flex-shrink-0">
+                        <i class="fa-solid fa-money-bill-wave fs-5"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="text-success fw-bold fs-5 mb-0" id="toastAmount">+0 VNĐ</div>
+                        <div class="text-white small fw-bold mt-0.5" id="toastCustomer">Khách hàng: ...</div>
+                        <div class="text-secondary" style="font-size: 12px;" id="toastCar">Mẫu xe: ...</div>
+                    </div>
+                </div>
+                <div class="p-2 rounded-2 bg-black bg-opacity-40 border border-secondary border-opacity-30 mb-2.5 small">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="text-secondary" style="font-size: 11px;">Mã Đơn / GD:</span>
+                        <code class="text-warning fw-bold" id="toastCode">PLDP...</code>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-secondary" style="font-size: 11px;">Trạng Thái:</span>
+                        <span class="badge bg-success" style="font-size: 10px;">
+                            <i class="fa-solid fa-shield-check me-1"></i> Xác minh thành công
+                        </span>
+                    </div>
+                </div>
+                <div class="d-flex gap-2">
+                    <a id="toastDetailLink" href="{{ url('/admin/payments.html') }}" class="btn btn-warning btn-sm w-100 text-dark fw-bold py-1.5" style="font-size: 12px;">
+                        <i class="fa-solid fa-receipt me-1"></i> Xem Chi Tiết Giao Dịch
+                    </a>
+                    <button type="button" class="btn btn-outline-secondary btn-sm px-3" onclick="closeAdminPaymentToast()" style="font-size: 12px;">
+                        Đã Hiểu
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // XỬ LÝ FORM THÔNG BÁO NHỎ Ở GÓC PHẢI MÀN HÌNH ADMIN (SEPAY TOAST)
+        let currentNotifiedTransId = null;
+
+        function playPaymentNotificationSound() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = "sine";
+                osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
+                osc.frequency.setValueAtTime(880, ctx.currentTime + 0.12); // A5
+                gain.gain.setValueAtTime(0.18, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.65);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.7);
+            } catch (e) {
+                // AudioContext có thể bị chặn nếu chưa có tương tác người dùng
+            }
+        }
+
+        window.showAdminPaymentToast = function(tx) {
+            currentNotifiedTransId = tx.id;
+            document.getElementById("toastAmount").textContent = "+" + (tx.transfer_amount_formatted || tx.transfer_amount + " VNĐ");
+            document.getElementById("toastCustomer").textContent = "Khách hàng: " + (tx.customer_name || "Khách VIP") + (tx.customer_phone ? " (" + tx.customer_phone + ")" : "");
+            document.getElementById("toastCar").textContent = "Mẫu xe: " + (tx.car_name || "Mẫu xe sang PrimeLux");
+            document.getElementById("toastCode").textContent = tx.code || "PLDP...";
+            document.getElementById("toastDetailLink").href = "{{ url('/admin/payments.html') }}?keyword=" + encodeURIComponent(tx.code || '');
+
+            const toastEl = document.getElementById("sepayAdminPaymentToast");
+            toastEl.classList.remove("d-none");
+            playPaymentNotificationSound();
+        };
+
+        window.closeAdminPaymentToast = function() {
+            const toastEl = document.getElementById("sepayAdminPaymentToast");
+            toastEl.classList.add("d-none");
+
+            if (currentNotifiedTransId) {
+                fetch("{{ route('admin.payments.mark-notified') }}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                    },
+                    body: JSON.stringify({ id: currentNotifiedTransId })
+                }).catch(e => {});
+                currentNotifiedTransId = null;
+            }
+        };
+
+        // Polling thăm dò giao dịch mới mỗi 4 giây
+        function pollSepayPaymentNotifications() {
+            fetch("{{ route('admin.payments.latest-notification') }}")
+                .then(res => res.json())
+                .then(data => {
+                    if (data.has_new && data.transaction) {
+                        showAdminPaymentToast(data.transaction);
+                    }
+                })
+                .catch(err => {});
+        }
+
+        setInterval(pollSepayPaymentNotifications, 4000);
+        setTimeout(pollSepayPaymentNotifications, 1000);
+    </script>
     @stack('scripts')
 </body>
 
 </html>
+

@@ -6,7 +6,9 @@ use App\Http\Controllers\HoaDonController;
 use App\Http\Controllers\KhoaController;
 use App\Http\Controllers\LaiThuController;
 use App\Http\Controllers\QuanTriController;
+use App\Http\Controllers\SepayWebhookController;
 use App\Http\Controllers\SoSanhGiaController;
+use App\Http\Controllers\ThanhToanController;
 use App\Http\Controllers\TichDiemController;
 use App\Http\Controllers\TrangChuController;
 use App\Http\Controllers\TuVanVienController;
@@ -125,3 +127,24 @@ Route::get('/danhsachkhoa', function () {
     return view('layouts.app');
 });
 Route::get('/khoa', [KhoaController::class, 'index']);
+
+// 15. THANH TOÁN ONLINE CHO PHẦN TRẢ TRƯỚC (Down Payment Online Checkout - ID ba_0VXvtCFwZHBJL8Lb7GYukenOW9B)
+Route::get('/thanh-toan-tra-truoc', [ThanhToanController::class, 'traTruoc'])->name('thanhtoan.tratruoc');
+Route::get('/down-payment', [ThanhToanController::class, 'traTruoc'])->name('downpayment');
+Route::get('/tra-truoc', [ThanhToanController::class, 'traTruoc']);
+Route::post('/api/payment/create-downpayment', [ThanhToanController::class, 'apiCreateDownPayment'])->name('api.payment.downpayment');
+Route::post('/api/payment/check-status', [ThanhToanController::class, 'apiCheckPaymentStatus'])->name('api.payment.check');
+Route::post('/api/payment/verify-sepay', [ThanhToanController::class, 'apiVerifySepay'])->name('api.payment.verify-sepay');
+Route::get('/api/payment/gateway-info', [ThanhToanController::class, 'apiGetGatewayInfo'])->name('api.payment.gateway');
+
+// 16. QUẢN LÝ THANH TOÁN ADMIN & SEPAY WEBHOOK (Xác Thực Chuyển Khoản Tức Thì)
+Route::get('/admin/payments', [QuanTriController::class, 'payments'])->name('admin.payments');
+Route::get('/admin/payments.html', [QuanTriController::class, 'payments']);
+Route::get('/admin/sepay', [QuanTriController::class, 'payments']);
+Route::post('/hooks/sepay-payment', [SepayWebhookController::class, 'handleWebhook'])->name('sepay.webhook');
+Route::post('/api/sepay/webhook', [SepayWebhookController::class, 'handleWebhook']);
+Route::post('/webhook/sepay', [SepayWebhookController::class, 'handleWebhook']);
+Route::post('/admin/payments/simulate-webhook', [SepayWebhookController::class, 'simulateWebhook'])->name('admin.payments.simulate');
+Route::get('/admin/payments/latest-notification', [SepayWebhookController::class, 'getLatestVerifiedForAdmin'])->name('admin.payments.latest-notification');
+Route::post('/admin/payments/mark-notified', [SepayWebhookController::class, 'markNotified'])->name('admin.payments.mark-notified');
+Route::post('/admin/payments/sync-sepay', [SepayWebhookController::class, 'syncFromSepayApi'])->name('admin.payments.sync-sepay');

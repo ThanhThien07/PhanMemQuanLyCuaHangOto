@@ -9,6 +9,7 @@ use App\Models\KhachHang;
 use App\Models\LaiThu;
 use App\Models\LichSuDiem;
 use App\Models\NhatKyChat;
+use App\Models\SepayTransaction;
 use App\Models\Xe;
 use Illuminate\Http\Request;
 
@@ -93,13 +94,13 @@ class QuanTriController extends Controller
         // Dữ liệu biểu đồ doanh thu theo 12 tháng năm 2026 (Tỷ VNĐ)
         $monthlyRevenue = [
             'labels' => ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
-            'data'   => [18.5, 22.1, 15.8, 31.2, 28.6, 35.4, 42.0, 38.5, 52.8, 48.0, 56.5, 68.2],
+            'data' => [18.5, 22.1, 15.8, 31.2, 28.6, 35.4, 42.0, 38.5, 52.8, 48.0, 56.5, 68.2],
         ];
 
         // Dữ liệu tỷ trọng doanh số theo thương hiệu
         $brandDistribution = [
             'labels' => ['Mercedes-Benz', 'Porsche', 'BMW', 'Audi', 'Land Rover', 'Lexus'],
-            'data'   => [35, 25, 15, 10, 10, 5],
+            'data' => [35, 25, 15, 10, 10, 5],
         ];
 
         return view('quantri.dashboard', compact(
@@ -135,9 +136,9 @@ class QuanTriController extends Controller
         $cars = Xe::getAllCars();
 
         $totalCars = count($cars);
-        $inStockCount = collect($cars)->filter(fn($c) => in_array($c['status'] ?? '', ['Sẵn sàng giao', 'Sẵn hàng']))->count();
-        $inTransitCount = collect($cars)->filter(fn($c) => ($c['status'] ?? '') === 'Đang vận chuyển')->count();
-        $reservedCount = collect($cars)->filter(fn($c) => in_array($c['status'] ?? '', ['Đã đặt cọc', 'Tạm hết hàng']))->count();
+        $inStockCount = collect($cars)->filter(fn ($c) => in_array($c['status'] ?? '', ['Sẵn sàng giao', 'Sẵn hàng']))->count();
+        $inTransitCount = collect($cars)->filter(fn ($c) => ($c['status'] ?? '') === 'Đang vận chuyển')->count();
+        $reservedCount = collect($cars)->filter(fn ($c) => in_array($c['status'] ?? '', ['Đã đặt cọc', 'Tạm hết hàng']))->count();
         $totalWarehouseValue = array_sum(array_column($cars, 'price'));
 
         return view('admin.cars-management', compact(
@@ -162,10 +163,10 @@ class QuanTriController extends Controller
         }
 
         $totalDrives = $testDrives->count();
-        $pendingCount = $testDrives->filter(fn($d) => in_array($d->trang_thai, ['Đang chờ duyệt', 'Chờ duyệt']))->count();
-        $contactedCount = $testDrives->filter(fn($d) => $d->trang_thai === 'Đã liên hệ')->count();
-        $completedCount = $testDrives->filter(fn($d) => in_array($d->trang_thai, ['Đã hoàn thành', 'Đã xác nhận']))->count();
-        $cancelledCount = $testDrives->filter(fn($d) => $d->trang_thai === 'Đã hủy')->count();
+        $pendingCount = $testDrives->filter(fn ($d) => in_array($d->trang_thai, ['Đang chờ duyệt', 'Chờ duyệt']))->count();
+        $contactedCount = $testDrives->filter(fn ($d) => $d->trang_thai === 'Đã liên hệ')->count();
+        $completedCount = $testDrives->filter(fn ($d) => in_array($d->trang_thai, ['Đã hoàn thành', 'Đã xác nhận']))->count();
+        $cancelledCount = $testDrives->filter(fn ($d) => $d->trang_thai === 'Đã hủy')->count();
 
         return view('admin.test-drive-list', compact(
             'testDrives',
@@ -183,53 +184,53 @@ class QuanTriController extends Controller
     public function storeCar(Request $request)
     {
         $validated = $request->validate([
-            'ten_xe'       => 'required|string|max:150',
-            'ma_th'        => 'required|string|max:50',
-            'ma_loai'      => 'required|string|max:50',
+            'ten_xe' => 'required|string|max:150',
+            'ma_th' => 'required|string|max:50',
+            'ma_loai' => 'required|string|max:50',
             'gia_niem_yet' => 'required|numeric',
-            'nhien_lieu'   => 'nullable|string|max:100',
-            'cong_suat'    => 'nullable|string|max:100',
-            'so_cho'       => 'nullable|string|max:50',
-            'nam_sx'       => 'nullable|numeric',
-            'nhan_tag'     => 'nullable|string|max:50',
-            'hinh_anh'     => 'required|string',
-            'mo_ta'        => 'nullable|string',
+            'nhien_lieu' => 'nullable|string|max:100',
+            'cong_suat' => 'nullable|string|max:100',
+            'so_cho' => 'nullable|string|max:50',
+            'nam_sx' => 'nullable|numeric',
+            'nhan_tag' => 'nullable|string|max:50',
+            'hinh_anh' => 'required|string',
+            'mo_ta' => 'nullable|string',
             'so_luong_kho' => 'nullable|numeric',
-            'trang_thai'   => 'nullable|string|max:50',
+            'trang_thai' => 'nullable|string|max:50',
         ]);
 
-        $code = 'car-' . strtoupper(substr(uniqid(), -4));
+        $code = 'car-'.strtoupper(substr(uniqid(), -4));
 
         try {
             $newCar = Xe::create([
-                'ma_xe'        => $code,
-                'ten_xe'       => $validated['ten_xe'],
-                'ma_th'        => $validated['ma_th'],
-                'ma_loai'      => $validated['ma_loai'],
+                'ma_xe' => $code,
+                'ten_xe' => $validated['ten_xe'],
+                'ma_th' => $validated['ma_th'],
+                'ma_loai' => $validated['ma_loai'],
                 'gia_niem_yet' => $validated['gia_niem_yet'],
-                'gia_chu'      => number_format($validated['gia_niem_yet'], 0, ',', '.') . ' VNĐ',
-                'nhien_lieu'   => $validated['nhien_lieu'] ?? 'Xăng cao cấp',
-                'cong_suat'    => $validated['cong_suat'] ?? '400 Mã lực',
-                'so_cho'       => $validated['so_cho'] ?? '5 Chỗ',
-                'nam_sx'       => $validated['nam_sx'] ?? 2026,
-                'nhan_tag'     => $validated['nhan_tag'] ?? 'Mới Về',
-                'tag_class'    => 'tag-new',
-                'hinh_anh'     => $validated['hinh_anh'],
-                'mo_ta'        => $validated['mo_ta'] ?? '',
+                'gia_chu' => number_format($validated['gia_niem_yet'], 0, ',', '.').' VNĐ',
+                'nhien_lieu' => $validated['nhien_lieu'] ?? 'Xăng cao cấp',
+                'cong_suat' => $validated['cong_suat'] ?? '400 Mã lực',
+                'so_cho' => $validated['so_cho'] ?? '5 Chỗ',
+                'nam_sx' => $validated['nam_sx'] ?? 2026,
+                'nhan_tag' => $validated['nhan_tag'] ?? 'Mới Về',
+                'tag_class' => 'tag-new',
+                'hinh_anh' => $validated['hinh_anh'],
+                'mo_ta' => $validated['mo_ta'] ?? '',
                 'so_luong_kho' => $validated['so_luong_kho'] ?? 1,
-                'trang_thai'   => $validated['trang_thai'] ?? 'Sẵn sàng giao',
+                'trang_thai' => $validated['trang_thai'] ?? 'Sẵn sàng giao',
             ]);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Thêm mẫu xe mới vào kho thành công!',
-                'car'     => Xe::formatCar($newCar),
+                'car' => Xe::formatCar($newCar),
             ]);
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => true,
                 'message' => 'Lưu mẫu xe mới thành công (chế độ demo/local)!',
-                'car'     => array_merge($validated, ['id' => $code]),
+                'car' => array_merge($validated, ['id' => $code]),
             ]);
         }
     }
@@ -240,53 +241,54 @@ class QuanTriController extends Controller
     public function updateCar(Request $request, $id)
     {
         $validated = $request->validate([
-            'ten_xe'       => 'required|string|max:150',
-            'ma_th'        => 'required|string|max:50',
-            'ma_loai'      => 'required|string|max:50',
+            'ten_xe' => 'required|string|max:150',
+            'ma_th' => 'required|string|max:50',
+            'ma_loai' => 'required|string|max:50',
             'gia_niem_yet' => 'required|numeric',
-            'nhien_lieu'   => 'nullable|string|max:100',
-            'cong_suat'    => 'nullable|string|max:100',
-            'so_cho'       => 'nullable|string|max:50',
-            'nam_sx'       => 'nullable|numeric',
-            'nhan_tag'     => 'nullable|string|max:50',
-            'hinh_anh'     => 'required|string',
-            'mo_ta'        => 'nullable|string',
+            'nhien_lieu' => 'nullable|string|max:100',
+            'cong_suat' => 'nullable|string|max:100',
+            'so_cho' => 'nullable|string|max:50',
+            'nam_sx' => 'nullable|numeric',
+            'nhan_tag' => 'nullable|string|max:50',
+            'hinh_anh' => 'required|string',
+            'mo_ta' => 'nullable|string',
             'so_luong_kho' => 'nullable|numeric',
-            'trang_thai'   => 'nullable|string|max:50',
+            'trang_thai' => 'nullable|string|max:50',
         ]);
 
         try {
             $car = Xe::where('id', $id)->orWhere('ma_xe', $id)->first();
             if ($car) {
                 $car->update([
-                    'ten_xe'       => $validated['ten_xe'],
-                    'ma_th'        => $validated['ma_th'],
-                    'ma_loai'      => $validated['ma_loai'],
+                    'ten_xe' => $validated['ten_xe'],
+                    'ma_th' => $validated['ma_th'],
+                    'ma_loai' => $validated['ma_loai'],
                     'gia_niem_yet' => $validated['gia_niem_yet'],
-                    'gia_chu'      => number_format($validated['gia_niem_yet'], 0, ',', '.') . ' VNĐ',
-                    'nhien_lieu'   => $validated['nhien_lieu'] ?? $car->nhien_lieu,
-                    'cong_suat'    => $validated['cong_suat'] ?? $car->cong_suat,
-                    'so_cho'       => $validated['so_cho'] ?? $car->so_cho,
-                    'nam_sx'       => $validated['nam_sx'] ?? $car->nam_sx,
-                    'nhan_tag'     => $validated['nhan_tag'] ?? $car->nhan_tag,
-                    'hinh_anh'     => $validated['hinh_anh'],
-                    'mo_ta'        => $validated['mo_ta'] ?? $car->mo_ta,
+                    'gia_chu' => number_format($validated['gia_niem_yet'], 0, ',', '.').' VNĐ',
+                    'nhien_lieu' => $validated['nhien_lieu'] ?? $car->nhien_lieu,
+                    'cong_suat' => $validated['cong_suat'] ?? $car->cong_suat,
+                    'so_cho' => $validated['so_cho'] ?? $car->so_cho,
+                    'nam_sx' => $validated['nam_sx'] ?? $car->nam_sx,
+                    'nhan_tag' => $validated['nhan_tag'] ?? $car->nhan_tag,
+                    'hinh_anh' => $validated['hinh_anh'],
+                    'mo_ta' => $validated['mo_ta'] ?? $car->mo_ta,
                     'so_luong_kho' => $validated['so_luong_kho'] ?? $car->so_luong_kho,
-                    'trang_thai'   => $validated['trang_thai'] ?? $car->trang_thai,
+                    'trang_thai' => $validated['trang_thai'] ?? $car->trang_thai,
                 ]);
 
                 return response()->json([
                     'success' => true,
                     'message' => 'Cập nhật thông tin mẫu xe thành công!',
-                    'car'     => Xe::formatCar($car),
+                    'car' => Xe::formatCar($car),
                 ]);
             }
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) {
+        }
 
         return response()->json([
             'success' => true,
             'message' => 'Cập nhật thông tin xe thành công!',
-            'car'     => array_merge($validated, ['id' => $id]),
+            'car' => array_merge($validated, ['id' => $id]),
         ]);
     }
 
@@ -299,9 +301,11 @@ class QuanTriController extends Controller
             $car = Xe::where('id', $id)->orWhere('ma_xe', $id)->first();
             if ($car) {
                 $car->delete();
+
                 return response()->json(['success' => true, 'message' => 'Đã xóa mẫu xe khỏi kho!']);
             }
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) {
+        }
 
         return response()->json(['success' => true, 'message' => 'Đã xóa mẫu xe thành công!']);
     }
@@ -318,9 +322,11 @@ class QuanTriController extends Controller
             if ($car) {
                 $car->trang_thai = $status;
                 $car->save();
+
                 return response()->json(['success' => true, 'message' => 'Cập nhật trạng thái xe thành công!', 'status' => $status]);
             }
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) {
+        }
 
         return response()->json(['success' => true, 'message' => 'Cập nhật trạng thái thành công!', 'status' => $status]);
     }
@@ -331,11 +337,11 @@ class QuanTriController extends Controller
     public function adjustPoints(Request $request)
     {
         $custCode = $request->input('ma_kh');
-        $points   = (int) $request->input('so_diem');
-        $reason   = $request->input('ly_do', 'Quản trị viên điều chỉnh điểm');
+        $points = (int) $request->input('so_diem');
+        $reason = $request->input('ly_do', 'Quản trị viên điều chỉnh điểm');
 
         $customer = KhachHang::where('ma_kh', $custCode)->first();
-        if (!$customer) {
+        if (! $customer) {
             return response()->json(['success' => false, 'message' => 'Không tìm thấy khách hàng']);
         }
 
@@ -354,21 +360,66 @@ class QuanTriController extends Controller
         // Ghi lịch sử điểm
         try {
             LichSuDiem::create([
-                'ma_kh'     => $customer->ma_kh,
-                'ma_hd'     => null,
-                'so_diem'   => $points,
+                'ma_kh' => $customer->ma_kh,
+                'ma_hd' => null,
+                'so_diem' => $points,
                 'hanh_dong' => $reason,
-                'ngay_tao'  => now(),
+                'ngay_tao' => now(),
             ]);
         } catch (\Throwable $e) {
             // Bỏ qua nếu bảng chưa tồn tại
         }
 
         return response()->json([
-            'success'    => true,
-            'message'    => 'Cập nhật điểm thành công!',
+            'success' => true,
+            'message' => 'Cập nhật điểm thành công!',
             'new_points' => $customer->diem_tich_luy,
-            'new_tier'   => $customer->tier ? $customer->tier->ten_hang : $customer->ma_hang,
+            'new_tier' => $customer->tier ? $customer->tier->ten_hang : $customer->ma_hang,
         ]);
+    }
+
+    /**
+     * Quản lý các giao dịch thanh toán trực tuyến & SePay Webhook
+     */
+    public function payments(Request $request)
+    {
+        SepayTransaction::seedSampleTransactionsIfEmpty();
+
+        $query = SepayTransaction::query();
+
+        if ($request->filled('keyword')) {
+            $kw = $request->keyword;
+            $query->where(function ($q) use ($kw) {
+                $q->where('code', 'like', "%{$kw}%")
+                    ->orWhere('content', 'like', "%{$kw}%")
+                    ->orWhere('customer_phone', 'like', "%{$kw}%")
+                    ->orWhere('reference_code', 'like', "%{$kw}%");
+            });
+        }
+
+        $transactions = $query->orderBy('id', 'desc')->paginate(10)->withQueryString();
+
+        $totalRevenue = SepayTransaction::where('transfer_type', 'in')->sum('transfer_amount');
+        $totalTransactions = SepayTransaction::count();
+        $todayRevenue = SepayTransaction::where('transfer_type', 'in')->whereDate('created_at', today())->sum('transfer_amount');
+        $todayTransactions = SepayTransaction::whereDate('created_at', today())->count();
+
+        $gateway = config('payment.gateway', [
+            'id' => 'ba_0VXvtCFwZHBJL8Lb7GYukenOW9B',
+            'status' => true,
+        ]);
+        $sepayConfig = config('payment.sepay');
+        $webhookUrl = url('/hooks/sepay-payment');
+
+        return view('admin.payments', compact(
+            'transactions',
+            'totalRevenue',
+            'totalTransactions',
+            'todayRevenue',
+            'todayTransactions',
+            'gateway',
+            'sepayConfig',
+            'webhookUrl'
+        ));
     }
 }

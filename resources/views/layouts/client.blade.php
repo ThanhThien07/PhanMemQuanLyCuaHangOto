@@ -82,6 +82,13 @@
                             <i class="fa-solid fa-receipt me-1 text-info"></i> Tra Cứu HĐ
                         </a>
                     </li>
+
+                    <!-- THANH TOÁN ONLINE TRẢ TRƯỚC -->
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom {{ Request::is('thanh-toan-tra-truoc*') || Request::is('down-payment*') || Request::is('tra-truoc*') ? 'active' : '' }}" href="{{ url('/thanh-toan-tra-truoc') }}" title="Cổng thanh toán online tiền trả trước & đặt cọc xe">
+                            <i class="fa-solid fa-credit-card me-1 text-warning"></i> Trả Trước Online
+                        </a>
+                    </li>
                 </ul>
 
                 <div class="d-flex align-items-center gap-2 ms-lg-2 navbar-auth-section">
@@ -166,6 +173,8 @@
                                     class="fa-solid fa-chevron-right text-primary me-2"></i> Đăng Ký Lái Thử</a></li>
                         <li class="mb-2"><a href="{{ url('/invoices') }}" class="hover-white"><i
                                     class="fa-solid fa-chevron-right text-info me-2"></i> Tra Cứu Hóa Đơn (Khách Vãng Lai)</a></li>
+                        <li class="mb-2"><a href="{{ url('/thanh-toan-tra-truoc') }}" class="hover-white text-warning"><i
+                                    class="fa-solid fa-credit-card text-warning me-2"></i> Thanh Toán Online Trả Trước (ba_0VXvtCFwZHBJL8Lb7GYukenOW9B)</a></li>
                         <li class="mb-2"><a href="{{ url('/login?role=customer') }}" class="hover-white text-warning"><i
                                     class="fa-solid fa-crown text-warning me-2"></i> Đăng Nhập Khách Hàng (Tích Điểm VIP)</a></li>
                         <li class="mb-2"><a href="{{ url('/admin/dashboard.html') }}" class="hover-white"><i
