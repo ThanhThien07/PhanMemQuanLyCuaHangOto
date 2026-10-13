@@ -291,7 +291,7 @@
     <div class="admin-subbar py-2 px-3 px-md-4">
         <div class="container-fluid px-0 d-flex flex-wrap align-items-center justify-content-between gap-2">
             <div class="d-flex flex-wrap gap-1 gap-md-2 overflow-auto py-1">
-                <a href="{{ url('/admin') }}" class="admin-nav-link {{ Request::is('admin') || Request::is('admin/dashboard*') || Request::is('quantri*') && !Request::is('admin/cars*') && !Request::is('admin/test*') && !Request::is('admin/payment*') ? 'active' : '' }}">
+                <a href="{{ url('/admin') }}" class="admin-nav-link {{ Request::is('admin') || Request::is('admin/dashboard*') || Request::is('quantri*') && !Request::is('admin/cars*') && !Request::is('admin/test*') && !Request::is('admin/payment*') && !Request::is('admin/trade-in*') && !Request::is('admin/audit*') ? 'active' : '' }}">
                     <i class="fa-solid fa-chart-line me-2"></i> Tổng Quan
                 </a>
                 <a href="{{ url('/admin/cars-management') }}" class="admin-nav-link {{ Request::is('admin/cars*') ? 'active' : '' }}">
@@ -302,6 +302,12 @@
                 </a>
                 <a href="{{ url('/admin/payments') }}" class="admin-nav-link {{ Request::is('admin/payment*') || Request::is('admin/sepay*') ? 'active' : '' }}">
                     <i class="fa-solid fa-credit-card me-2 text-warning"></i> Thanh Toán & SePay
+                </a>
+                <a href="{{ url('/admin/trade-in') }}" class="admin-nav-link {{ Request::is('admin/trade-in*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-arrows-rotate me-2 text-info"></i> Thu Cũ Đổi Mới
+                </a>
+                <a href="{{ url('/admin/audit-logs') }}" class="admin-nav-link {{ Request::is('admin/audit*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-shield-halved me-2 text-danger"></i> Nhật Ký & 2FA
                 </a>
             </div>
             <div class="text-secondary small d-none d-lg-block">

@@ -10,9 +10,12 @@ use App\Http\Controllers\SepayWebhookController;
 use App\Http\Controllers\SoSanhGiaController;
 use App\Http\Controllers\ThanhToanController;
 use App\Http\Controllers\TichDiemController;
+use App\Http\Controllers\TradeInController;
 use App\Http\Controllers\TrangChuController;
 use App\Http\Controllers\TuVanVienController;
 use App\Http\Controllers\XeController;
+use App\Services\AiConsultantService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -148,3 +151,35 @@ Route::post('/admin/payments/simulate-webhook', [SepayWebhookController::class, 
 Route::get('/admin/payments/latest-notification', [SepayWebhookController::class, 'getLatestVerifiedForAdmin'])->name('admin.payments.latest-notification');
 Route::post('/admin/payments/mark-notified', [SepayWebhookController::class, 'markNotified'])->name('admin.payments.mark-notified');
 Route::post('/admin/payments/sync-sepay', [SepayWebhookController::class, 'syncFromSepayApi'])->name('admin.payments.sync-sepay');
+
+// 17. THẨM ĐỊNH XE CŨ & THU CŨ ĐỔI MỚI (Trade-In Program - Chức năng 7)
+Route::get('/trade-in', [TradeInController::class, 'index'])->name('tradein.index');
+Route::get('/thu-cu-doi-moi', [TradeInController::class, 'index'])->name('tradein.vietnamese');
+Route::post('/trade-in', [TradeInController::class, 'store'])->name('tradein.store');
+Route::post('/api/trade-in/calculate', [TradeInController::class, 'calculateValuation'])->name('api.tradein.calculate');
+Route::get('/admin/trade-in', [TradeInController::class, 'adminList'])->name('admin.tradein.index');
+Route::post('/admin/trade-in/{id}/update', [TradeInController::class, 'updateStatus'])->name('admin.tradein.update');
+
+// 18. SỔ BẢO HÀNH ĐIỆN TỬ THEO SỐ KHUNG VIN (E-Warranty - Chức năng 6)
+Route::get('/api/dich-vu/so-bao-hanh-vin', [DichVuController::class, 'traCuuVin'])->name('api.dichvu.vin-warranty');
+
+// 19. TRỢ LÝ ẢO AI TƯ VẤN 24/7 (LLM RAG - Chức năng 4)
+Route::post('/api/ai/ask', function (Request $request) {
+    $q = $request->input('question', '');
+    $phone = $request->input('phone');
+    $name = $request->input('name');
+    if (empty($q)) {
+        return response()->json(['success' => false, 'message' => 'Vui lòng nhập câu hỏi!'], 400);
+    }
+    $res = AiConsultantService::ask($q, $phone, $name);
+
+    return response()->json($res);
+})->name('api.ai.ask');
+
+// 20. BÁO CÁO BI & XUẤT FILE EXCEL / CSV (Chức năng 8)
+Route::get('/admin/export/cars', [QuanTriController::class, 'exportCars'])->name('admin.export.cars');
+Route::get('/admin/export/test-drives', [QuanTriController::class, 'exportTestDrives'])->name('admin.export.testdrives');
+Route::get('/admin/export/invoices', [QuanTriController::class, 'exportInvoices'])->name('admin.export.invoices');
+
+// 21. NHẬT KÝ KIỂM TOÁN & PHÂN QUYỀN RBAC (Chức năng 9)
+Route::get('/admin/audit-logs', [QuanTriController::class, 'auditLogs'])->name('admin.audit.logs');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AuditLog;
 use App\Models\DatLichDichVu;
 use App\Models\HangThanhVien;
 use App\Models\HoaDon;
@@ -10,6 +11,7 @@ use App\Models\LaiThu;
 use App\Models\LichSuDiem;
 use App\Models\NhatKyChat;
 use App\Models\SepayTransaction;
+use App\Models\ThongBaoDaKenh;
 use App\Models\Xe;
 use Illuminate\Http\Request;
 
@@ -421,5 +423,160 @@ class QuanTriController extends Controller
             'sepayConfig',
             'webhookUrl'
         ));
+    }
+
+    /**
+     * Xuất danh sách kho xe tồn kho ra file Excel/CSV
+     */
+    public function exportCars()
+    {
+        $cars = Xe::getAllCars();
+        $filename = 'PrimeLux_Kho_Xe_Ton_Kho_'.date('Ymd_His').'.csv';
+
+        try {
+            AuditLog::create([
+                'user_name' => session('user.name', 'Quản trị viên'),
+                'user_role' => session('user.role', 'Quản lý bán hàng'),
+                'action' => 'Xuất báo cáo Kho xe Excel/CSV',
+                'details' => 'Đã xuất toàn bộ danh sách kho xe ('.count($cars).' mẫu xe) ra file CSV/Excel.',
+                'ip_address' => request()->ip(),
+            ]);
+        } catch (\Throwable $e) {
+        }
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ];
+
+        $callback = function () use ($cars) {
+            $handle = fopen('php://output', 'w');
+            // Write UTF-8 BOM for Excel compatibility
+            fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
+            fputcsv($handle, ['Mã Xe', 'Tên Mẫu Xe', 'Thương Hiệu', 'Phân Khúc', 'Năm Sản Xuất', 'Giá Niêm Yết (VNĐ)', 'Nhiên Liệu', 'Công Suất', 'Trạng Thái Kho']);
+
+            foreach ($cars as $car) {
+                fputcsv($handle, [
+                    $car['id'],
+                    $car['name'],
+                    $car['brand'],
+                    $car['type'] ?? 'Sedan',
+                    $car['year'] ?? 2026,
+                    $car['price'] ?? 0,
+                    $car['fuel'] ?? '',
+                    $car['power'] ?? '',
+                    $car['status'] ?? 'Sẵn hàng',
+                ]);
+            }
+            fclose($handle);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Xuất danh sách lịch hẹn lái thử VIP ra file Excel/CSV
+     */
+    public function exportTestDrives()
+    {
+        $drives = LaiThu::orderBy('id', 'desc')->get();
+        $filename = 'PrimeLux_Lich_Lai_Thu_VIP_'.date('Ymd_His').'.csv';
+
+        try {
+            AuditLog::create([
+                'user_name' => session('user.name', 'Quản trị viên'),
+                'user_role' => session('user.role', 'Tư vấn viên'),
+                'action' => 'Xuất báo cáo Lịch lái thử Excel/CSV',
+                'details' => 'Đã xuất danh sách lịch hẹn lái thử ('.$drives->count().' lịch) ra file CSV/Excel.',
+                'ip_address' => request()->ip(),
+            ]);
+        } catch (\Throwable $e) {
+        }
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ];
+
+        $callback = function () use ($drives) {
+            $handle = fopen('php://output', 'w');
+            fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
+            fputcsv($handle, ['Mã Lịch', 'Họ Và Tên', 'Số Điện Thoại', 'Email', 'Mẫu Xe Trải Nghiệm', 'Showroom', 'Thời Gian Hẹn', 'Trạng Thái', 'Ghi Chú']);
+
+            foreach ($drives as $d) {
+                fputcsv($handle, [
+                    $d->ma_lich,
+                    $d->ho_ten,
+                    $d->sdt,
+                    $d->email,
+                    $d->ten_xe,
+                    $d->showroom,
+                    $d->thoi_gian,
+                    $d->trang_thai,
+                    $d->ghi_chu,
+                ]);
+            }
+            fclose($handle);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Xuất danh sách hóa đơn bán hàng ra file Excel/CSV
+     */
+    public function exportInvoices()
+    {
+        $invoices = HoaDon::with('customer')->orderBy('id', 'desc')->get();
+        $filename = 'PrimeLux_Hoa_Don_Doanh_Thu_'.date('Ymd_His').'.csv';
+
+        try {
+            AuditLog::create([
+                'user_name' => session('user.name', 'Quản trị viên'),
+                'user_role' => session('user.role', 'Kế toán'),
+                'action' => 'Xuất báo cáo Hóa đơn Doanh thu Excel/CSV',
+                'details' => 'Đã xuất toàn bộ danh sách hóa đơn bán xe ('.$invoices->count().' đơn) ra file CSV/Excel.',
+                'ip_address' => request()->ip(),
+            ]);
+        } catch (\Throwable $e) {
+        }
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ];
+
+        $callback = function () use ($invoices) {
+            $handle = fopen('php://output', 'w');
+            fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
+            fputcsv($handle, ['Mã Hóa Đơn', 'Khách Hàng', 'Ngày Lập', 'Tổng Tiền Gốc (VNĐ)', 'Chiết Khấu VIP (VNĐ)', 'Tổng Thanh Toán (VNĐ)', 'Phương Thức TT', 'Trạng Thái']);
+
+            foreach ($invoices as $inv) {
+                fputcsv($handle, [
+                    $inv->ma_hd,
+                    $inv->customer ? $inv->customer->ho_ten : $inv->ma_kh,
+                    $inv->ngay_lap,
+                    $inv->tong_tien_goc,
+                    $inv->giam_gia_hang,
+                    $inv->tong_tien_thanh_toan,
+                    $inv->phuong_thuc_tt,
+                    $inv->trang_thai,
+                ]);
+            }
+            fclose($handle);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Nhật ký kiểm toán & Phân quyền RBAC (Chức năng 9)
+     */
+    public function auditLogs(Request $request)
+    {
+        $logs = AuditLog::orderBy('id', 'desc')->paginate(15);
+        $notifications = ThongBaoDaKenh::orderBy('id', 'desc')->take(10)->get();
+
+        return view('admin.audit', compact('logs', 'notifications'));
     }
 }

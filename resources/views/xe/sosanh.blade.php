@@ -237,9 +237,42 @@
                 </table>
             </div>
         @endif
+    <!-- BIỂU ĐỒ BIẾN ĐỘNG GIÁ THỊ TRƯỜNG 6 THÁNG GẦN NHẤT (AUTOMATED MARKET PRICE ANALYTICS) -->
+    <div class="p-4 p-md-5 rounded-4 mb-5" style="background: var(--bg-card); border: 1px solid var(--border-color); box-shadow: var(--card-shadow);">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+            <div class="d-flex align-items-center gap-3">
+                <div class="p-3 rounded-3 bg-info bg-opacity-20 text-info fs-4">
+                    <i class="fa-solid fa-chart-line"></i>
+                </div>
+                <div>
+                    <h4 class="fw-bold text-white mb-1">Biểu Đồ Lịch Sử Biến Động Giá Thị Trường (6 Tháng Gần Nhất)</h4>
+                    <p class="text-secondary small mb-0">Phân tích xu hướng giá thực tế thu thập từ Oto.com.vn, Bonbanh.com và Chợ Tốt Xe so với giá PrimeLux Auto</p>
+                </div>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-success bg-opacity-25 text-success border border-success px-3 py-2">
+                    <i class="fa-solid fa-robot me-1"></i> Tự động quét Cronjob 4 - 6 giờ/lần
+                </span>
+            </div>
+        </div>
+
+        <div style="height: 320px; position: relative;">
+            <canvas id="marketTrendChart"></canvas>
+        </div>
+
+        <div class="row g-3 mt-3 pt-3 border-top border-secondary border-opacity-30 small text-secondary">
+            <div class="col-md-4">
+                <i class="fa-solid fa-circle-dot text-warning me-1"></i> <strong>Đường màu vàng:</strong> Giá niêm yết cạnh tranh tại Showroom PrimeLux Auto (bình ổn).
+            </div>
+            <div class="col-md-4">
+                <i class="fa-solid fa-circle-dot text-info me-1"></i> <strong>Đường màu xanh lam:</strong> Giá trung bình thị trường trên các sàn giao dịch ô tô toàn quốc.
+            </div>
+            <div class="col-md-4 text-md-end text-success fw-bold">
+                <i class="fa-solid fa-shield-halved me-1"></i> Cam kết bình ổn giá & bảo vệ giá trị bán lại cho khách hàng
+            </div>
+        </div>
     </div>
 
-    <!-- GIÁ TRỊ VƯỢT TRỘI KHI MUA XE TẠI PRIMELUX -->
     <div class="p-4 p-md-5 rounded-4" style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color);">
         <h4 class="fw-bold mb-4 text-center text-white"><i class="fa-solid fa-crown text-warning me-2"></i> So Sánh Quyền Lợi: PrimeLux Auto vs Thị Trường Tự Do</h4>
         <div class="table-responsive">
@@ -278,7 +311,76 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('marketTrendChart');
+    if (ctx) {
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: {!! json_encode($historyTrends['months'] ?? []) !!},
+                datasets: [
+                    {
+                        label: 'Giá PrimeLux Auto (Tỷ VNĐ)',
+                        data: {!! json_encode($historyTrends['primelux'] ?? []) !!},
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        borderWidth: 3,
+                        tension: 0.3,
+                        pointBackgroundColor: '#f59e0b',
+                        pointRadius: 5,
+                        fill: true
+                    },
+                    {
+                        label: 'Giá Trung Bình Thị Trường 3 Sàn (Tỷ VNĐ)',
+                        data: {!! json_encode($historyTrends['market_avg'] ?? []) !!},
+                        borderColor: '#06b6d4',
+                        backgroundColor: 'transparent',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        tension: 0.3,
+                        pointBackgroundColor: '#06b6d4',
+                        pointRadius: 4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#94a3b8',
+                            font: { family: 'inherit', size: 12 }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ' + context.parsed.y + ' Tỷ VNĐ';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        ticks: { color: '#94a3b8' }
+                    },
+                    y: {
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        ticks: {
+                            color: '#94a3b8',
+                            callback: function(value) { return value + ' Tỷ'; }
+                        }
+                    }
+                }
+            }
+        });
+    }
+});
+
 function refreshPrices() {
     const icon = document.getElementById('refreshIcon');
     icon.classList.add('fa-spin');

@@ -80,8 +80,16 @@
                             <li><a class="dropdown-item" href="{{ url('/dich-vu#bao-hiem') }}"><i class="fa-solid fa-shield-halved me-2 text-info"></i> Bảo Hiểm Thân Vỏ PrimeLux</a></li>
                             <li><a class="dropdown-item text-danger fw-bold" href="{{ url('/dich-vu#cuu-ho') }}"><i class="fa-solid fa-truck-medical me-2"></i> Cứu Hộ Khẩn Cấp 24/7</a></li>
                             <li><a class="dropdown-item" href="{{ url('/dich-vu#sua-chua') }}"><i class="fa-solid fa-spray-can-sparkles me-2 text-success"></i> Sửa Chữa & Sơn Hấp Châu Âu</a></li>
+                            <li><a class="dropdown-item text-info fw-bold" href="{{ url('/dich-vu#so-bao-hanh') }}"><i class="fa-solid fa-book-bookmark me-2"></i> Sổ Bảo Hành Điện Tử VIN</a></li>
                             <li><a class="dropdown-item text-warning" href="{{ url('/dich-vu#uu-dai') }}"><i class="fa-solid fa-gift me-2"></i> Ưu Đãi Khách Hàng VIP</a></li>
                         </ul>
+                    </li>
+
+                    <!-- THU CŨ ĐỔI MỚI (TRADE-IN) -->
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom {{ Request::is('trade-in*') || Request::is('thu-cu-doi-moi*') ? 'active' : '' }}" href="{{ url('/trade-in') }}" title="Thu cũ đổi mới siêu xe 176 hạng mục">
+                            <i class="fa-solid fa-arrows-rotate me-1 text-warning"></i> Thu Cũ Đổi Mới
+                        </a>
                     </li>
 
                     <li class="nav-item">

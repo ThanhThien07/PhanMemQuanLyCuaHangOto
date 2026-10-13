@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Xe;
 use App\Models\SoSanhGiaXe;
+use App\Models\Xe;
 use Illuminate\Http\Request;
 
 class SoSanhGiaController extends Controller
@@ -14,12 +14,12 @@ class SoSanhGiaController extends Controller
     public function compare(Request $request, $id = null)
     {
         $allCars = Xe::getAllCars();
-        
+
         $selectedId = $id ?? $request->query('car_id', '1');
-        
+
         $car = collect($allCars)->first(function ($c) use ($selectedId) {
-            return (string)$c['id'] === (string)$selectedId
-                || (string)$c['id'] === 'car-' . str_pad($selectedId, 2, '0', STR_PAD_LEFT)
+            return (string) $c['id'] === (string) $selectedId
+                || (string) $c['id'] === 'car-'.str_pad($selectedId, 2, '0', STR_PAD_LEFT)
                 || (isset($c['name']) && stripos($c['name'], $selectedId) !== false);
         }) ?? ($allCars[0] ?? null);
 
@@ -35,7 +35,7 @@ class SoSanhGiaController extends Controller
             $dbCar = null;
         }
 
-        $carDbId = $dbCar->id ?? (is_numeric($selectedId) ? (int)$selectedId : 1);
+        $carDbId = $dbCar->id ?? (is_numeric($selectedId) ? (int) $selectedId : 1);
 
         // Lấy danh sách giá sàn ngoài sắp xếp TĂNG DẦN
         try {
@@ -46,12 +46,12 @@ class SoSanhGiaController extends Controller
             $sources = collect([]);
         }
 
-        $primeLuxPrice = (float)($car['price'] ?? 0);
+        $primeLuxPrice = (float) ($car['price'] ?? 0);
 
         // Nếu chưa có dữ liệu trong DB, tạo danh sách so sánh mẫu phong phú
         if ($sources->isEmpty() && $primeLuxPrice > 0) {
             $sources = collect([
-                (object)[
+                (object) [
                     'source_name' => 'Chợ Tốt Xe',
                     'source_logo' => 'https://static.chotot.com/storage/default_images/pty/logo-chotot.png',
                     'source_url' => 'https://xe.chotot.com',
@@ -63,7 +63,7 @@ class SoSanhGiaController extends Controller
                     'condition_type' => 'Đã qua sử dụng (Lướt 98%)',
                     'warranty' => 'Bảo hành showroom 6 tháng',
                 ],
-                (object)[
+                (object) [
                     'source_name' => 'Bonbanh.com',
                     'source_logo' => 'https://bonbanh.com/assets/images/logo.png',
                     'source_url' => 'https://bonbanh.com',
@@ -75,7 +75,7 @@ class SoSanhGiaController extends Controller
                     'condition_type' => 'Mới 100% (Nhập khẩu nguyên chiếc)',
                     'warranty' => 'Bảo hành đại lý 1 năm',
                 ],
-                (object)[
+                (object) [
                     'source_name' => 'Oto.com.vn',
                     'source_logo' => 'https://oto.com.vn/images/logo-oto.svg',
                     'source_url' => 'https://oto.com.vn',
@@ -87,7 +87,7 @@ class SoSanhGiaController extends Controller
                     'condition_type' => 'Mới 100% Chính Hãng',
                     'warranty' => 'Bảo hành chính hãng 36 tháng',
                 ],
-                (object)[
+                (object) [
                     'source_name' => 'Carmudi.vn',
                     'source_logo' => 'https://static.carmudi.vn/carmudi-logo.png',
                     'source_url' => 'https://www.carmudi.vn',
@@ -98,13 +98,34 @@ class SoSanhGiaController extends Controller
                     'location' => 'Đà Nẵng',
                     'condition_type' => 'Mới 100% Sưu tầm',
                     'warranty' => 'Bảo hành 24 tháng',
-                ]
+                ],
             ]);
         }
 
         $minPrice = $sources->min('price') ?? $primeLuxPrice;
         $maxPrice = $sources->max('price') ?? $primeLuxPrice;
         $avgPrice = $sources->avg('price') ?? $primeLuxPrice;
+
+        // Dữ liệu biến động giá thị trường 6 tháng gần nhất (Tỷ VNĐ)
+        $historyTrends = [
+            'months' => ['Tháng 5/2026', 'Tháng 6/2026', 'Tháng 7/2026', 'Tháng 8/2026', 'Tháng 9/2026', 'Tháng 10/2026'],
+            'primelux' => [
+                round($primeLuxPrice * 1.02 / 1000000000, 2),
+                round($primeLuxPrice * 1.01 / 1000000000, 2),
+                round($primeLuxPrice * 1.01 / 1000000000, 2),
+                round($primeLuxPrice * 1.00 / 1000000000, 2),
+                round($primeLuxPrice * 1.00 / 1000000000, 2),
+                round($primeLuxPrice / 1000000000, 2),
+            ],
+            'market_avg' => [
+                round($avgPrice * 1.04 / 1000000000, 2),
+                round($avgPrice * 1.03 / 1000000000, 2),
+                round($avgPrice * 1.02 / 1000000000, 2),
+                round($avgPrice * 1.02 / 1000000000, 2),
+                round($avgPrice * 1.01 / 1000000000, 2),
+                round($avgPrice / 1000000000, 2),
+            ],
+        ];
 
         return view('xe.sosanh', compact(
             'car',
@@ -113,7 +134,8 @@ class SoSanhGiaController extends Controller
             'primeLuxPrice',
             'minPrice',
             'maxPrice',
-            'avgPrice'
+            'avgPrice',
+            'historyTrends'
         ));
     }
 

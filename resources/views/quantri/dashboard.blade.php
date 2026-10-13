@@ -14,14 +14,37 @@
             <p class="text-secondary small mb-0">Theo dõi doanh thu, kho xe, đơn hàng và tiến độ duyệt lịch lái thử thời gian thực</p>
         </div>
         <div class="d-flex flex-wrap gap-2">
-            <a href="{{ url('/admin/cars-management.html') }}" class="btn btn-outline-primary btn-sm">
-                <i class="fa-solid fa-boxes-stacked me-1"></i> Kho Xe (cars-management.html)
+            <div class="dropdown">
+                <button class="btn btn-success btn-sm dropdown-toggle fw-bold shadow" type="button" data-bs-toggle="dropdown">
+                    <i class="fa-solid fa-file-excel me-1"></i> Xuất Báo Cáo BI (Excel/CSV)
+                </button>
+                <ul class="dropdown-menu dropdown-menu-dark shadow">
+                    <li><h6 class="dropdown-header text-uppercase text-secondary small"><i class="fa-solid fa-download me-1"></i> Định dạng chuẩn Excel (.csv)</h6></li>
+                    <li>
+                        <a class="dropdown-item text-white" href="{{ url('/admin/export/cars') }}">
+                            <i class="fa-solid fa-car-side text-primary me-2"></i> Xuất Kho Xe Tồn Kho
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item text-white" href="{{ url('/admin/export/test-drives') }}">
+                            <i class="fa-solid fa-calendar-check text-warning me-2"></i> Xuất Lịch Lái Thử VIP
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item text-white" href="{{ url('/admin/export/invoices') }}">
+                            <i class="fa-solid fa-file-invoice-dollar text-success me-2"></i> Xuất Hóa Đơn & Doanh Thu
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <a href="{{ url('/admin/cars-management') }}" class="btn btn-outline-primary btn-sm">
+                <i class="fa-solid fa-boxes-stacked me-1"></i> Kho Xe
             </a>
-            <a href="{{ url('/admin/test-drive-list.html') }}" class="btn btn-outline-warning btn-sm">
-                <i class="fa-solid fa-calendar-check me-1"></i> Lịch Lái Thử (test-drive-list.html)
+            <a href="{{ url('/admin/test-drive-list') }}" class="btn btn-outline-warning btn-sm">
+                <i class="fa-solid fa-calendar-check me-1"></i> Lịch Lái Thử
             </a>
-            <a href="{{ url('/admin/payments.html') }}" class="btn btn-outline-info btn-sm">
-                <i class="fa-solid fa-credit-card me-1 text-warning"></i> SePay Thanh Toán (payments.html)
+            <a href="{{ url('/admin/payments') }}" class="btn btn-outline-info btn-sm">
+                <i class="fa-solid fa-credit-card me-1 text-warning"></i> Thanh Toán & SePay
             </a>
         </div>
     </div>
@@ -189,6 +212,61 @@
                             <div class="small text-secondary">Hạng 3</div>
                             <strong class="text-info small">BMW 15%</strong>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 1B: PHỄU CHUYỂN ĐỔI BÁN HÀNG (SALES CONVERSION FUNNEL) -->
+    <div class="dash-section mb-4" id="sectionFunnel">
+        <div class="p-4 rounded-4 bg-dark border border-secondary shadow-sm">
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+                <div>
+                    <h5 class="fw-bold text-white mb-1">
+                        <i class="fa-solid fa-filter-circle-dollar text-warning me-2"></i> Phễu Chuyển Đổi Kinh Doanh Showroom (Sales Funnel BI)
+                    </h5>
+                    <p class="text-secondary small mb-0">Theo dõi hành trình khách hàng từ Lượt xem xe -> Đăng ký lái thử -> Hoàn thành lái thử -> Đặt cọc -> Xuất hóa đơn</p>
+                </div>
+                <span class="badge bg-success bg-opacity-20 text-success border border-success px-3 py-1.5">
+                    <i class="fa-solid fa-chart-line me-1"></i> Hiệu suất chốt hợp đồng: 75.7%
+                </span>
+            </div>
+
+            <div class="row g-3 text-center">
+                <div class="col-md">
+                    <div class="p-3 rounded-3" style="background: rgba(59, 130, 246, 0.12); border: 1px solid rgba(59, 130, 246, 0.3);">
+                        <div class="text-secondary small fw-bold text-uppercase">1. Lượt Xem Xe</div>
+                        <div class="fs-4 fw-extrabold text-primary my-1">12.850</div>
+                        <div class="small text-secondary">Tỷ lệ: <strong>100%</strong></div>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="p-3 rounded-3" style="background: rgba(6, 182, 212, 0.12); border: 1px solid rgba(6, 182, 212, 0.3);">
+                        <div class="text-secondary small fw-bold text-uppercase">2. Đăng Ký Lái Thử</div>
+                        <div class="fs-4 fw-extrabold text-info my-1">486</div>
+                        <div class="small text-info">Chuyển đổi: <strong>3.78%</strong></div>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="p-3 rounded-3" style="background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.3);">
+                        <div class="text-secondary small fw-bold text-uppercase">3. Đã Lái Thử Xong</div>
+                        <div class="fs-4 fw-extrabold text-warning my-1">392</div>
+                        <div class="small text-warning">Tỷ lệ đến: <strong>80.7%</strong></div>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="p-3 rounded-3" style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3);">
+                        <div class="text-secondary small fw-bold text-uppercase">4. Đặt Cọc Giữ Xe</div>
+                        <div class="fs-4 fw-extrabold text-success my-1">148</div>
+                        <div class="small text-success">Chốt cọc: <strong>37.8%</strong></div>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="p-3 rounded-3" style="background: rgba(236, 72, 153, 0.12); border: 1px solid rgba(236, 72, 153, 0.3);">
+                        <div class="text-secondary small fw-bold text-uppercase">5. Xuất Hóa Đơn Bán</div>
+                        <div class="fs-4 fw-extrabold text-white my-1">112</div>
+                        <div class="small text-danger fw-bold">Giao xe: <strong>75.7%</strong></div>
                     </div>
                 </div>
             </div>

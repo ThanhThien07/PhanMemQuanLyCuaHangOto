@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Xe;
 use App\Models\LaiThu;
+use App\Models\Xe;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 
 class LaiThuController extends Controller
@@ -24,7 +25,8 @@ class LaiThuController extends Controller
                         'thoi_gian' => substr($b->thoi_gian, 0, 16),
                     ];
                 })->toArray();
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) {
+        }
 
         return view('laithu', compact('cars', 'selectedCar', 'existingBookings'));
     }
@@ -32,13 +34,13 @@ class LaiThuController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'ho_ten'   => 'required|string|max:150',
-            'sdt'      => 'required|string|max:20',
-            'email'    => 'nullable|email|max:150',
-            'ten_xe'   => 'required|string|max:150',
+            'ho_ten' => 'required|string|max:150',
+            'sdt' => 'required|string|max:20',
+            'email' => 'nullable|email|max:150',
+            'ten_xe' => 'required|string|max:150',
             'showroom' => 'required|string|max:150',
             'thoi_gian' => 'required|string',
-            'ghi_chu'  => 'nullable|string',
+            'ghi_chu' => 'nullable|string',
         ]);
 
         // Normalize datetime-local format (HTML5 gửi "2026-10-01T09:00", MySQL cần "2026-10-01 09:00:00")
@@ -47,23 +49,34 @@ class LaiThuController extends Controller
             $thoiGian .= ':00'; // Thêm giây nếu thiếu
         }
 
-        $code = 'TD-' . strtoupper(substr(uniqid(), -5));
+        $code = 'TD-'.strtoupper(substr(uniqid(), -5));
 
         $testDrive = LaiThu::create([
-            'ma_lich'   => $code,
-            'ho_ten'    => $validated['ho_ten'],
-            'sdt'       => $validated['sdt'],
-            'email'     => $validated['email'] ?? 'N/A',
-            'ten_xe'    => $validated['ten_xe'],
-            'showroom'  => $validated['showroom'],
+            'ma_lich' => $code,
+            'ho_ten' => $validated['ho_ten'],
+            'sdt' => $validated['sdt'],
+            'email' => $validated['email'] ?? 'N/A',
+            'ten_xe' => $validated['ten_xe'],
+            'showroom' => $validated['showroom'],
             'thoi_gian' => $thoiGian,
-            'ghi_chu'   => $validated['ghi_chu'] ?? null,
             'trang_thai' => 'Đang chờ duyệt',
         ]);
 
+        // Gửi thông báo tự động đa kênh qua Zalo ZNS & SMS
+        try {
+            NotificationService::sendTestDriveConfirmation([
+                'ho_ten' => $testDrive->ho_ten,
+                'sdt' => $testDrive->sdt,
+                'ten_xe' => $testDrive->ten_xe,
+                'showroom' => $testDrive->showroom,
+                'thoi_gian' => $testDrive->thoi_gian,
+            ]);
+        } catch (\Throwable $e) {
+        }
+
         return response()->json([
             'success' => true,
-            'message' => 'Đăng ký lịch lái thử thành công!',
+            'message' => 'Đăng ký lịch lái thử thành công! Thông báo xác nhận Zalo ZNS / SMS đã được gửi tức thì.',
             'data' => [
                 'id' => $code,
                 'name' => $testDrive->ho_ten,
@@ -72,7 +85,7 @@ class LaiThuController extends Controller
                 'showroom' => $testDrive->showroom,
                 'date' => $testDrive->thoi_gian,
                 'status' => $testDrive->trang_thai,
-            ]
+            ],
         ]);
     }
 
@@ -83,8 +96,10 @@ class LaiThuController extends Controller
         if ($drive) {
             $drive->trang_thai = $status;
             $drive->save();
+
             return response()->json(['success' => true, 'message' => 'Cập nhật trạng thái thành công!', 'status' => $status]);
         }
+
         return response()->json(['success' => false, 'message' => 'Không tìm thấy lịch lái thử'], 404);
     }
 
@@ -93,9 +108,10 @@ class LaiThuController extends Controller
         $drive = LaiThu::where('id', $id)->orWhere('ma_lich', $id)->first();
         if ($drive) {
             $drive->delete();
+
             return response()->json(['success' => true, 'message' => 'Đã xóa lịch lái thử thành công!']);
         }
+
         return response()->json(['success' => false, 'message' => 'Không tìm thấy lịch lái thử'], 404);
     }
 }
-

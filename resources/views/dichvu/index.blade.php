@@ -399,6 +399,64 @@
     </div>
 </section>
 
+<!-- SECTION SỔ BẢO HÀNH ĐIỆN TỬ THEO SỐ KHUNG VIN (E-WARRANTY BY VIN) -->
+<section id="so-bao-hanh" class="py-5" style="background: radial-gradient(circle at 10% 50%, rgba(212, 175, 55, 0.08) 0%, rgba(11, 15, 25, 0.98) 70%); border-top: 1px solid rgba(255, 255, 255, 0.08);">
+    <div class="container">
+        <div class="row align-items-center mb-4 g-3">
+            <div class="col-lg-8">
+                <span class="badge bg-warning text-dark px-3 py-1.5 fw-bold rounded-pill text-uppercase mb-2">
+                    <i class="fa-solid fa-certificate me-1"></i> PrimeLux Digital E-Warranty
+                </span>
+                <h3 class="fw-bold text-white mb-2">
+                    Sổ Bảo Hành Điện Tử & Lịch Sử Bảo Dưỡng Theo Số Khung (VIN)
+                </h3>
+                <p class="text-secondary small mb-0">
+                    Tra cứu tức thì toàn bộ lịch sử các lần bảo dưỡng định kỳ (5.000km, 10.000km, 20.000km...), các hạng mục phụ tùng chính hãng đã thay thế và thời hạn bảo hành còn lại của chiếc xe.
+                </p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <div class="small text-secondary mb-1">Thử nhanh với xe mẫu có sẵn:</div>
+                <div class="d-flex flex-wrap gap-2 justify-content-lg-end">
+                    <button type="button" class="btn btn-outline-warning btn-sm" onclick="quickVinSearch('WBA53BJ04RFP98124')">
+                        Maybach S 680
+                    </button>
+                    <button type="button" class="btn btn-outline-info btn-sm" onclick="quickVinSearch('WP0ZZZ99ZTS182931')">
+                        Porsche 911 GT3
+                    </button>
+                    <button type="button" class="btn btn-outline-light btn-sm" onclick="quickVinSearch('51K-888.88')">
+                        Biển 51K-888.88
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- FORM TRA CỨU VIN -->
+        <div class="p-4 rounded-4 mb-4" style="background: #131b2e; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);">
+            <form id="vinLookupForm" class="row g-3 align-items-center">
+                <div class="col-md-9">
+                    <div class="input-group">
+                        <span class="input-group-text bg-dark border-secondary text-warning">
+                            <i class="fa-solid fa-barcode fs-5"></i>
+                        </span>
+                        <input type="text" id="vinInput" class="form-control bg-dark border-secondary text-white text-uppercase py-2.5 fs-6" 
+                               placeholder="Nhập 17 ký tự Số Khung (VIN) hoặc Biển Số Xe (VD: WBA53BJ04RFP98124 hoặc 51K-888.88)..." required>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-warning text-dark fw-bold w-100 py-2.5 shadow rounded-3">
+                        <i class="fa-solid fa-shield-halved me-1"></i> Tra Cứu Bảo Hành VIN
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- KẾT QUẢ SỔ BẢO HÀNH VIN (DYNAMIC RESULT CONTAINER) -->
+        <div id="vinResultContainer" class="d-none">
+            <!-- Rendered by JS -->
+        </div>
+    </div>
+</section>
+
 <!-- MODAL ĐẶT LỊCH DỊCH VỤ -->
 <div class="modal fade" id="bookingModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -628,6 +686,106 @@
         .catch(err => {
             resultContainer.innerHTML = '<div class="alert alert-danger text-center my-2 p-2 small">Lỗi tra cứu.</div>';
         });
+    });
+
+    // TRA CỨU SỔ BẢO HÀNH VIN & LỊCH SỬ BẢO DƯỠNG
+    function quickVinSearch(vin) {
+        document.getElementById('vinInput').value = vin;
+        performVinSearch(vin);
+    }
+
+    function performVinSearch(vin) {
+        const container = document.getElementById('vinResultContainer');
+        container.classList.remove('d-none');
+        container.innerHTML = '<div class="text-center py-5"><i class="fa-solid fa-spinner fa-spin fs-2 gold-accent mb-2"></i><div class="text-secondary small">Đang đối soát số khung VIN với cơ sở dữ liệu bảo hành...</div></div>';
+
+        fetch(`{{ url('/api/dich-vu/so-bao-hanh-vin') }}?vin=${encodeURIComponent(vin)}`)
+        .then(r => r.json())
+        .then(res => {
+            if (res.success && res.data) {
+                const d = res.data;
+                let historyHtml = '';
+                if (d.history && d.history.length > 0) {
+                    d.history.forEach((h, idx) => {
+                        historyHtml += `
+                            <tr>
+                                <td class="fw-bold text-warning">${h.ngay}</td>
+                                <td><span class="badge bg-primary">${h.moc_km}</span></td>
+                                <td class="text-white">${h.noi_dung}</td>
+                                <td class="text-secondary small">${h.phu_tung || 'Kiểm tra tổng quát'}</td>
+                                <td class="text-warning fw-bold">${h.chi_phi}</td>
+                                <td class="text-info small">${h.ky_thuat_vien}</td>
+                                <td class="text-success fw-bold small">${h.diem_thuong}</td>
+                            </tr>
+                        `;
+                    });
+                } else {
+                    historyHtml = '<tr><td colspan="7" class="text-center py-3 text-secondary">Chưa có bản ghi bảo dưỡng nào.</td></tr>';
+                }
+
+                container.innerHTML = `
+                    <div class="p-4 rounded-4" style="background: #111827; border: 1.5px solid #d4af37; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);">
+                        <div class="row g-4 align-items-center mb-4 pb-3 border-bottom border-secondary border-opacity-30">
+                            <div class="col-md-7">
+                                <span class="badge bg-success bg-opacity-20 text-success border border-success px-3 py-1 mb-2">
+                                    <i class="fa-solid fa-circle-check me-1"></i> ${d.trang_thai}
+                                </span>
+                                <h4 class="fw-bold text-white mb-1">${d.ten_xe}</h4>
+                                <div class="text-secondary small">
+                                    Số Khung (VIN): <code class="text-warning fw-bold fs-6">${d.vin}</code> | Biển Số: <strong class="text-white">${d.bien_so || 'Chưa gắn biển'}</strong>
+                                </div>
+                                <div class="text-secondary small mt-1">
+                                    Chủ sở hữu: <strong class="text-white">${d.chu_so_huu}</strong> (${d.sdt})
+                                </div>
+                            </div>
+                            <div class="col-md-5 text-md-end">
+                                <div class="p-3 rounded-3 bg-black bg-opacity-40 border border-secondary border-opacity-40 text-start">
+                                    <div class="small text-secondary">Gói Bảo Hành: <strong class="text-warning">${d.goi_bao_hanh}</strong></div>
+                                    <div class="small text-secondary">Thời Hạn Còn Lại: <strong class="text-success fs-5 fw-bold">${d.con_lai_thang} Tháng</strong> (${d.con_lai_ngay} ngày)</div>
+                                    <div class="small text-secondary">Hết hạn vào: <strong class="text-white">${d.ngay_het_han}</strong></div>
+                                    <div class="small text-secondary">Số ODO hiện tại: <strong class="text-info">${d.so_km_hien_tai}</strong></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h5 class="fw-bold text-white mb-3">
+                            <i class="fa-solid fa-clock-rotate-left text-warning me-2"></i> Lịch Sử Nhật Ký Bảo Dưỡng & Thay Thế Phụ Tùng
+                        </h5>
+                        <div class="table-responsive">
+                            <table class="table table-dark table-striped align-middle mb-0 small">
+                                <thead>
+                                    <tr class="table-secondary text-dark">
+                                        <th>Ngày</th>
+                                        <th>Mốc Km</th>
+                                        <th>Hạng Mục Thực Hiện</th>
+                                        <th>Phụ Tùng Thay Thế</th>
+                                        <th>Chi Phí</th>
+                                        <th>Kỹ Sư Trưởng</th>
+                                        <th>Điểm Thưởng</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${historyHtml}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `<div class="alert alert-warning text-center py-4 my-2"><i class="fa-solid fa-triangle-exclamation fs-3 d-block mb-2"></i>${res.message || 'Không tìm thấy hồ sơ'}</div>`;
+            }
+        })
+        .catch(err => {
+            container.innerHTML = '<div class="alert alert-danger text-center py-4 my-2">Lỗi tra cứu máy chủ. Vui lòng thử lại.</div>';
+        });
+    }
+
+    document.getElementById('vinLookupForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const vin = document.getElementById('vinInput').value.trim();
+        if (vin) {
+            performVinSearch(vin);
+        }
     });
 </script>
 @endpush
