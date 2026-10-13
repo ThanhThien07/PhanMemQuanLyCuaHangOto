@@ -262,7 +262,7 @@
     <!-- TOP HEADER -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-secondary py-2.5">
         <div class="container-fluid px-3 px-md-4">
-            <a class="navbar-brand d-flex align-items-center" href="{{ url('/admin/dashboard.html') }}">
+            <a class="navbar-brand d-flex align-items-center" href="{{ url('/admin') }}">
                 <span class="brand-text fs-4">PRIMELUX <span class="badge bg-warning text-dark fs-6 ms-2">ADMIN PORTAL</span></span>
             </a>
 
@@ -277,7 +277,7 @@
                         <i class="fa-solid fa-headset me-1"></i> Bàn Tư Vấn
                     </a>
                     <a href="{{ url('/') }}" target="_blank" class="btn btn-outline-light btn-sm">
-                        <i class="fa-solid fa-globe me-1"></i> Xem Website (index.html)
+                        <i class="fa-solid fa-globe me-1"></i> Xem Website
                     </a>
                     <a href="{{ url('/logout') }}" class="btn btn-outline-danger btn-sm">
                         <i class="fa-solid fa-right-from-bracket me-1"></i> Đăng Xuất
@@ -291,17 +291,17 @@
     <div class="admin-subbar py-2 px-3 px-md-4">
         <div class="container-fluid px-0 d-flex flex-wrap align-items-center justify-content-between gap-2">
             <div class="d-flex flex-wrap gap-1 gap-md-2 overflow-auto py-1">
-                <a href="{{ url('/admin/dashboard.html') }}" class="admin-nav-link {{ Request::is('admin') || Request::is('admin/dashboard*') || Request::is('quantri*') && !Request::is('admin/cars*') && !Request::is('admin/test*') ? 'active' : '' }}">
-                    <i class="fa-solid fa-chart-line me-2"></i> Tổng Quan (dashboard.html)
+                <a href="{{ url('/admin') }}" class="admin-nav-link {{ Request::is('admin') || Request::is('admin/dashboard*') || Request::is('quantri*') && !Request::is('admin/cars*') && !Request::is('admin/test*') && !Request::is('admin/payment*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-chart-line me-2"></i> Tổng Quan
                 </a>
-                <a href="{{ url('/admin/cars-management.html') }}" class="admin-nav-link {{ Request::is('admin/cars*') ? 'active' : '' }}">
-                    <i class="fa-solid fa-boxes-stacked me-2"></i> Quản Lý Kho Xe (cars-management.html)
+                <a href="{{ url('/admin/cars-management') }}" class="admin-nav-link {{ Request::is('admin/cars*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-boxes-stacked me-2"></i> Quản Lý Kho Xe
                 </a>
-                <a href="{{ url('/admin/test-drive-list.html') }}" class="admin-nav-link {{ Request::is('admin/test*') ? 'active' : '' }}">
-                    <i class="fa-solid fa-calendar-check me-2"></i> Quản Lý Lịch Lái Thử (test-drive-list.html)
+                <a href="{{ url('/admin/test-drive-list') }}" class="admin-nav-link {{ Request::is('admin/test*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-calendar-check me-2"></i> Lịch Lái Thử
                 </a>
-                <a href="{{ url('/admin/payments.html') }}" class="admin-nav-link {{ Request::is('admin/payment*') || Request::is('admin/sepay*') ? 'active' : '' }}">
-                    <i class="fa-solid fa-credit-card me-2 text-warning"></i> Quản Lý Thanh Toán & SePay (payments.html)
+                <a href="{{ url('/admin/payments') }}" class="admin-nav-link {{ Request::is('admin/payment*') || Request::is('admin/sepay*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-credit-card me-2 text-warning"></i> Thanh Toán & SePay
                 </a>
             </div>
             <div class="text-secondary small d-none d-lg-block">
@@ -353,7 +353,7 @@
                     </div>
                 </div>
                 <div class="d-flex gap-2">
-                    <a id="toastDetailLink" href="{{ url('/admin/payments.html') }}" class="btn btn-warning btn-sm w-100 text-dark fw-bold py-1.5" style="font-size: 12px;">
+                    <a id="toastDetailLink" href="{{ url('/admin/payments') }}" class="btn btn-warning btn-sm w-100 text-dark fw-bold py-1.5" style="font-size: 12px;">
                         <i class="fa-solid fa-receipt me-1"></i> Xem Chi Tiết Giao Dịch
                     </a>
                     <button type="button" class="btn btn-outline-secondary btn-sm px-3" onclick="closeAdminPaymentToast()" style="font-size: 12px;">
@@ -394,7 +394,7 @@
             document.getElementById("toastCustomer").textContent = "Khách hàng: " + (tx.customer_name || "Khách VIP") + (tx.customer_phone ? " (" + tx.customer_phone + ")" : "");
             document.getElementById("toastCar").textContent = "Mẫu xe: " + (tx.car_name || "Mẫu xe sang PrimeLux");
             document.getElementById("toastCode").textContent = tx.code || "PLDP...";
-            document.getElementById("toastDetailLink").href = "{{ url('/admin/payments.html') }}?keyword=" + encodeURIComponent(tx.code || '');
+            document.getElementById("toastDetailLink").href = "{{ url('/admin/payments') }}?keyword=" + encodeURIComponent(tx.code || '');
 
             const toastEl = document.getElementById("sepayAdminPaymentToast");
             toastEl.classList.remove("d-none");

@@ -25,10 +25,10 @@
 
         <div class="p-3 rounded-3 border border-success border-opacity-50 bg-success bg-opacity-10 text-end">
             <div class="d-flex align-items-center justify-content-end gap-2 text-success fw-bold small mb-1">
-                <i class="fa-solid fa-circle-check"></i> Cổng Thanh Toán Sẵn Sàng (status: <span class="badge bg-success">true</span>)
+                <i class="fa-solid fa-circle-check"></i> Cổng Thanh Toán Sẵn Sàng
             </div>
             <div class="text-light small">
-                Mã kết nối thụ hưởng: <code class="text-warning fw-bold fs-6">{{ $gateway['id'] ?? 'ba_0VXvtCFwZHBJL8Lb7GYukenOW9B' }}</code>
+                Liên kết ngân hàng: <strong class="text-warning fw-bold">{{ $gateway['bank_name'] ?? 'MBBank' }} &mdash; {{ $gateway['account_number'] ?? '0338929013' }}</strong>
             </div>
             <div class="text-secondary" style="font-size: 11px;">Bảo mật giao dịch mã hóa 256-bit SSL Chuẩn Open Banking</div>
         </div>
@@ -170,8 +170,8 @@
                     <!-- THÔNG TIN PHIÊN THANH TOÁN -->
                     <div class="alert alert-dark border border-secondary p-3 mb-3 small">
                         <div class="d-flex justify-content-between align-items-center mb-1">
-                            <span class="text-secondary">Cổng Thanh Toán ID:</span>
-                            <span class="badge bg-dark border border-secondary text-warning" id="dispGatewayId">{{ $gateway['id'] ?? 'ba_0VXvtCFwZHBJL8Lb7GYukenOW9B' }}</span>
+                            <span class="text-secondary">Cổng Thanh Toán:</span>
+                            <span class="badge bg-dark border border-secondary text-success" id="dispGatewayId">{{ $gateway['bank_name'] ?? 'MBBank' }} &mdash; Chính Thức</span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center mb-1">
                             <span class="text-secondary">Mã Giao Dịch:</span>

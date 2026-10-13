@@ -334,7 +334,7 @@
                     <div class="d-flex align-items-center gap-2 mb-1">
                         <h3 class="fw-bold mb-0 text-white">Bảng Tính Vay Trả Góp & Thanh Toán Trả Trước Online</h3>
                         <span class="badge bg-success bg-opacity-25 text-success border border-success">
-                            <i class="fa-solid fa-circle-check me-1"></i> Cổng Online: Active (ba_0VXvtCFwZHBJL8Lb7GYukenOW9B)
+                            <i class="fa-solid fa-circle-check me-1"></i> Cổng Online: Hoạt Động
                         </span>
                     </div>
                     <p class="text-secondary small mb-0">Hỗ trợ tính toán số tiền trả trước linh hoạt (20% - 80%), dư nợ ngân hàng và quét mã VietQR thanh toán online tức thì</p>
@@ -391,9 +391,9 @@
                 <div class="alert alert-dark border border-secondary text-secondary small mb-3">
                     <div class="d-flex align-items-center justify-content-between mb-1">
                         <span class="text-white fw-bold"><i class="fa-solid fa-shield-halved text-success me-1"></i> Cổng kết nối thanh toán:</span>
-                        <span class="badge bg-success">status: true</span>
+                        <span class="badge bg-success"><i class="fa-solid fa-check me-1"></i> Hoạt Động</span>
                     </div>
-                    <div>Gateway ID: <code class="text-warning">ba_0VXvtCFwZHBJL8Lb7GYukenOW9B</code></div>
+                    <div>Ngân hàng thụ hưởng: <strong class="text-warning">MBBank &mdash; 0338929013</strong> (PRIMELUX AUTO SHOWROOM)</div>
                     <div style="font-size: 11px;" class="mt-1">Xác thực giao dịch tự động qua mã QR VietQR NAPAS 24/7 tức thì.</div>
                 </div>
 
@@ -469,7 +469,7 @@
                             <i class="fa-solid fa-qrcode text-warning"></i> Cổng Thanh Toán Trực Tuyến PrimeLux Pay
                         </h5>
                         <div class="small text-secondary">
-                            Mã cổng kết nối: <code class="text-warning fw-bold">ba_0VXvtCFwZHBJL8Lb7GYukenOW9B</code> — <span class="badge bg-success">status: true</span>
+                            Ngân hàng kết nối: <strong class="text-warning fw-bold">MBBank &mdash; 0338929013</strong> &mdash; <span class="badge bg-success"><i class="fa-solid fa-check me-1"></i> Hoạt Động</span>
                         </div>
                     </div>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -550,7 +550,7 @@
                     <div id="modalSuccessNotice" class="d-none alert alert-success border-success text-center p-3 mt-3">
                         <i class="fa-solid fa-circle-check fa-2x text-success mb-2"></i>
                         <h6 class="fw-bold mb-1">Xác Nhận Đã Nhận Thanh Toán Online Trả Trước Thành Công!</h6>
-                        <p class="small mb-1" id="modalSuccessMsg">Hệ thống đã khớp lệnh thành công qua cổng <b>ba_0VXvtCFwZHBJL8Lb7GYukenOW9B</b>.</p>
+                        <p class="small mb-1" id="modalSuccessMsg">Hệ thống đã khớp lệnh thành công qua cổng <b>PrimeLux Pay &mdash; MBBank</b>.</p>
                         <span class="badge bg-success" id="modalReceiptBadge">Mã biên lai: BL-TT-789012</span>
                     </div>
                 </div>
@@ -832,7 +832,7 @@
         if (modalBtnVerify) {
             modalBtnVerify.addEventListener("click", () => {
                 modalBtnVerify.disabled = true;
-                modalBtnVerify.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Đang kết nối cổng ba_0VXvtCFwZHBJL8Lb7GYukenOW9B...';
+                modalBtnVerify.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Đang kết nối PrimeLux Pay — Đang xác thực...';
 
                 fetch("{{ route('api.payment.check') }}", {
                     method: "POST",

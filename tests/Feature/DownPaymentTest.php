@@ -14,8 +14,9 @@ class DownPaymentTest extends TestCase
     {
         $response = $this->get('/thanh-toan-tra-truoc');
         $response->assertStatus(200);
-        $response->assertSee('ba_0VXvtCFwZHBJL8Lb7GYukenOW9B');
         $response->assertSee('Thanh Toán Online');
+        $response->assertSee('MBBank');
+        $response->assertSee('VietQR');
     }
 
     public function test_api_gateway_info_returns_expected_json(): void
@@ -79,15 +80,15 @@ class DownPaymentTest extends TestCase
     {
         $response = $this->get('/cars/car-01');
         $response->assertStatus(200);
-        $response->assertSee('ba_0VXvtCFwZHBJL8Lb7GYukenOW9B');
         $response->assertSee('Thanh Toán Trả Trước Online');
+        $response->assertSee('MBBank');
     }
 
     public function test_invoice_page_includes_down_payment_tab(): void
     {
         $response = $this->get('/hoadon');
         $response->assertStatus(200);
-        $response->assertSee('ba_0VXvtCFwZHBJL8Lb7GYukenOW9B');
         $response->assertSee('Thanh Toán Online Trả Trước');
+        $response->assertSee('MBBank');
     }
 }

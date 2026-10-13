@@ -15,7 +15,7 @@
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link rounded-pill fw-bold text-warning" id="tab-downpayment-btn" data-bs-toggle="pill" data-bs-target="#tab-downpayment" type="button" role="tab">
-                    <i class="fa-solid fa-credit-card me-1.5"></i> 2. Thanh Toán Online Trả Trước (ba_0VXvtCFwZHBJL8Lb7GYukenOW9B)
+                    <i class="fa-solid fa-credit-card me-1.5"></i> 2. Thanh Toán Online Trả Trước
                 </button>
             </li>
         </ul>
@@ -100,7 +100,7 @@
                                         <i class="fa-solid fa-circle-exclamation me-1"></i> Hóa đơn đang chờ thanh toán khoản trả trước (30%):
                                     </div>
                                     <div class="text-white fs-5 fw-extrabold mt-1" id="res-downpayment-amount-text">4.797.000.000 VNĐ</div>
-                                    <small class="text-secondary">Cổng thanh toán thụ hưởng: <code>ba_0VXvtCFwZHBJL8Lb7GYukenOW9B</code> (status: true)</small>
+                                    <small class="text-secondary">Cổng thanh toán thụ hưởng: <strong class="text-warning">MBBank &mdash; 0338929013</strong> (PRIMELUX AUTO SHOWROOM)</small>
                                 </div>
                                 <button type="button" class="btn btn-warning text-dark fw-bold px-4 py-2 shadow" id="btnPayDownNow">
                                     <i class="fa-solid fa-qrcode me-1"></i> Thanh Toán Online Trả Trước Ngay
@@ -137,8 +137,8 @@
                     <p class="text-secondary">Thanh toán trực tiếp khoản trả trước (20% - 80%) hoặc đặt cọc giữ xe với Cổng thanh toán liên kết PrimeLux Pay & VietQR Open Banking.</p>
                     <div class="d-inline-flex align-items-center gap-2 p-2 px-3 rounded-pill bg-dark border border-secondary small">
                         <span class="badge bg-success"><i class="fa-solid fa-check me-1"></i> Online</span>
-                        <span>Mã Gateway Thụ Hưởng: <code class="text-warning fw-bold">ba_0VXvtCFwZHBJL8Lb7GYukenOW9B</code></span>
-                        <span class="text-secondary">| MBBank 0338929013</span>
+                        <span>Ngân hàng: <strong class="text-warning fw-bold">MBBank &mdash; 0338929013</strong></span>
+                        <span class="text-secondary">| PRIMELUX AUTO SHOWROOM</span>
                     </div>
                 </div>
 
@@ -213,8 +213,8 @@
 
                                 <div class="p-2.5 rounded-3 bg-dark border border-secondary text-start small mt-3">
                                     <div class="d-flex justify-content-between py-1 border-bottom border-secondary">
-                                        <span class="text-secondary">Cổng Thanh Toán ID:</span>
-                                        <code class="text-warning fw-bold">ba_0VXvtCFwZHBJL8Lb7GYukenOW9B</code>
+                                        <span class="text-secondary">Cổng Thanh Toán:</span>
+                                        <strong class="text-success fw-bold">MBBank &mdash; Chính Thức</strong>
                                     </div>
                                     <div class="d-flex justify-content-between py-1 border-bottom border-secondary">
                                         <span class="text-secondary">Ngân Hàng:</span>
@@ -237,7 +237,7 @@
 
                             <div class="mt-3">
                                 <div id="tabSuccessNotice" class="d-none alert alert-success text-center p-2 mb-2 small">
-                                    <i class="fa-solid fa-circle-check text-success me-1"></i> Xác nhận đã nhận tiền trả trước qua cổng <b>ba_0VXvtCFwZHBJL8Lb7GYukenOW9B</b>!
+                                    <i class="fa-solid fa-circle-check text-success me-1"></i> Xác nhận đã nhận tiền trả trước qua PrimeLux Pay &mdash; MBBank!
                                 </div>
                                 <button type="button" class="btn btn-success fw-bold w-100 py-2 shadow" id="btnTabVerify">
                                     <i class="fa-solid fa-arrows-rotate me-1"></i> Tôi Đã Thanh Toán — Kiểm Tra Đối Soát
@@ -457,7 +457,7 @@
     if (btnTabVerify) {
         btnTabVerify.addEventListener("click", () => {
             btnTabVerify.disabled = true;
-            btnTabVerify.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Đang kết nối cổng ba_0VXvtCFwZHBJL8Lb7GYukenOW9B...';
+            btnTabVerify.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Đang kết nối PrimeLux Pay — Đang xác thực...';
 
             fetch("{{ route('api.payment.check') }}", {
                 method: "POST",
