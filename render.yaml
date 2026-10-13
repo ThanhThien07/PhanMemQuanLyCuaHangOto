@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: primelux-auto
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: APP_NAME
+        value: PrimeLux Auto Showroom
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_KEY
+        value: base64:CkriKA23hcRZvBy+L0ULixtL72BhxgrtX+7bj8laQqI=
+      - key: APP_URL
+        value: https://primelux-auto.onrender.com
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: DB_CONNECTION
+        value: sqlite
+      - key: DB_DATABASE
+        value: /var/www/html/database/database.sqlite
+      - key: SEPAY_API_KEY
+        value: Rp.4hxVyw@zA2@p
+      - key: SEPAY_WEBHOOK_TOKEN
+        value: f4c08a043944df8e10262567eb7e0506
+      - key: SEPAY_BANK_ACCOUNT_ID
+        value: ba_0VXvtCFwZHBJL8Lb7GYukenOW9B
+      - key: SEPAY_WEBHOOK_URL
+        value: /hooks/sepay-payment

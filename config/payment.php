@@ -41,7 +41,7 @@ return [
         'enabled' => true,
         'bank_account_id' => env('SEPAY_BANK_ACCOUNT_ID', 'ba_0VXvtCFwZHBJL8Lb7GYukenOW9B'),
         'api_key' => env('SEPAY_API_KEY', 'Rp.4hxVyw@zA2@p'),
-        'webhook_token' => env('SEPAY_WEBHOOK_TOKEN', 'sepay_secret_token_primelux_2026'),
+        'webhook_token' => env('SEPAY_WEBHOOK_TOKEN', 'f4c08a043944df8e10262567eb7e0506'),
         'webhook_url_path' => env('SEPAY_WEBHOOK_URL', '/hooks/sepay-payment'),
         'auto_match_downpayment' => true,
     ],
