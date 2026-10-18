@@ -98,8 +98,7 @@ PhanMemQuanLyCuaHangOto/
 │   │       ├── QuanTriController.php           # Dashboard Quản trị viên & Chỉnh điểm VIP (TV)
 │   │       ├── AdminController.php             # Dashboard Admin (Alias Tiếng Anh)
 │   │       ├── TuVanVienController.php         # Bàn trực tư vấn SSE realtime & trả lời khách (TV)
-│   │       ├── ConsultantController.php        # Tư vấn viên (Alias Tiếng Anh)
-│   │       └── KhoaController.php              # Controller legacy
+│   │       └── ConsultantController.php        # Tư vấn viên (Alias Tiếng Anh)
 │   ├── Models/
 │   │   ├── Xe.php                              # Model Xe (Tiếng Việt - proxy Car)
 │   │   ├── Car.php                             # Model Xe chính thức: formatCar, getAllCars...

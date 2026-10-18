@@ -1,4 +1,4 @@
-﻿# DANH SÁCH FILES & ĐƯỜNG DẪN TOÀN DỰ ÁN
+# DANH SÁCH FILES & ĐƯỜNG DẪN TOÀN DỰ ÁN
 # PrimeLux Auto – Phần mềm Quản lý Cửa hàng Ôtô
 # Cập nhật: 23/09/2026
 # ============================================================
@@ -54,7 +54,6 @@
 | CarController.php             | 0.8  | Xe (tiếng Anh)                               |
 | CarComparisonController.php   | 2.6  | So sánh xe (tiếng Anh)                       |
 | HomeController.php            | 0.3  | Trang chủ (tiếng Anh)                        |
-| KhoaController.php            | 0.3  | Khoa (legacy/unused)                          |
 
 ## MODELS (app/Models/)
 
@@ -83,10 +82,6 @@
 | LichSuDiem.php        | 0.1  | lich_su_diem   | Lịch sử điểm (tiếng Việt)                 |
 | CarPriceSource.php    | 0.7  | so_sanh_gia_xe | Nguồn giá thị trường                        |
 | SoSanhGiaXe.php       | 0.1  | so_sanh_gia_xe | So sánh giá (tiếng Việt)                   |
-| GiangVien.php         | 0.1  | -              | Giảng viên (legacy/unused)                 |
-| Khoa.php              | 0.6  | -              | Khoa (legacy)                              |
-| Nganh.php             | 0.1  | -              | Ngành (legacy)                             |
-| NguoiDung.php         | 0.1  | -              | Người dùng (legacy)                        |
 
 ## MIGRATIONS (database/migrations/)
 
@@ -120,7 +115,6 @@
 | auth/ (thư mục)                   | Auth (tiếng Anh)                                  |
 | loyalty/ (thư mục)                | Loyalty (tiếng Anh)                               |
 | tichdiem/ (thư mục)               | Tích điểm (tiếng Việt)                            |
-| khoas/ (thư mục)                  | Legacy                                            |
 
 ## DATABASE FILES
 

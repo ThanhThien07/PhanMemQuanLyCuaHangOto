@@ -1249,12 +1249,12 @@ def build_full_report():
         add_para(doc, ref, space_after=6, line_spacing=1.2)
 
     # LƯU FILE BÁO CÁO HOÀN CHỈNH
-    output_docx_root = "Bao_Cao_PrimeLux_Auto.docx"
     output_docx_docs = os.path.join("docs", "Bao_Cao_PrimeLux_Auto.docx")
+    output_docx_nhom1 = os.path.join("docs", "Nhóm 1.docx")
 
-    doc.save(output_docx_root)
     doc.save(output_docx_docs)
-    print(f"✅ ĐÃ TẠO THÀNH CÔNG BÁO CÁO PRIMELUX AUTO CHÍNH XÁC 100% THEO WEBSITE TẠI:\n - {output_docx_root}\n - {output_docx_docs}")
+    doc.save(output_docx_nhom1)
+    print(f"✅ ĐÃ TẠO THÀNH CÔNG BÁO CÁO PRIMELUX AUTO CHÍNH XÁC 100% THEO WEBSITE TẠI:\n - {output_docx_docs}\n - {output_docx_nhom1}")
 
 if __name__ == "__main__":
     build_full_report()

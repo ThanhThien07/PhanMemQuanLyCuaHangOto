@@ -3,7 +3,6 @@
 use App\Http\Controllers\DangNhapController;
 use App\Http\Controllers\DichVuController;
 use App\Http\Controllers\HoaDonController;
-use App\Http\Controllers\KhoaController;
 use App\Http\Controllers\LaiThuController;
 use App\Http\Controllers\QuanTriController;
 use App\Http\Controllers\SepayWebhookController;
@@ -124,12 +123,6 @@ Route::post('/dich-vu/dat-lich', [DichVuController::class, 'storeBooking'])->nam
 Route::post('/dich-vu/cuu-ho-khan-cap', [DichVuController::class, 'storeEmergency'])->name('dichvu.cuuho');
 Route::get('/api/dich-vu/tra-cuu', [DichVuController::class, 'traCuu'])->name('api.dichvu.tracuu');
 Route::post('/admin/services/update-status/{id}', [DichVuController::class, 'updateStatus'])->name('admin.services.update-status');
-
-// 14. Legacy Routes
-Route::get('/danhsachkhoa', function () {
-    return view('layouts.app');
-});
-Route::get('/khoa', [KhoaController::class, 'index']);
 
 // 15. THANH TOÁN ONLINE CHO PHẦN TRẢ TRƯỚC (Down Payment Online Checkout - ID ba_0VXvtCFwZHBJL8Lb7GYukenOW9B)
 Route::get('/thanh-toan-tra-truoc', [ThanhToanController::class, 'traTruoc'])->name('thanhtoan.tratruoc');
