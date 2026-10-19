@@ -11,6 +11,7 @@
     <meta name="keywords" content="@yield('meta_keywords', 'showroom ô tô, siêu xe, ô tô hạng sang, mercedes-benz, porsche, bmw, audi, lexus, lái thử xe, bảng giá xe')">
     <meta name="robots" content="@yield('meta_robots', 'index, follow')">
     <meta name="theme-color" content="#d97706">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="canonical" href="@yield('canonical', url()->current())">
 
     <!-- RESOURCE HINTS: PRECONNECT & DNS-PREFETCH TĂNG TỐC TẢI TRANG -->

@@ -9,9 +9,11 @@ class ChatLog extends Model
     protected $table = 'chat_logs';
 
     protected $fillable = [
+        'session_id',
         'ma_tin',
         'thoi_gian',
         'nguoi_gui',
+        'sender_type',
         'sdt_khach',
         'noi_dung',
         'loai_cau_hoi',

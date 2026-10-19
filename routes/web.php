@@ -112,6 +112,7 @@ Route::post('/consultant/reply', [TuVanVienController::class, 'reply'])->name('c
 Route::post('/consultant/status', [TuVanVienController::class, 'updateStatus'])->name('consultant.status');
 Route::post('/api/consultant/submit-question', [TuVanVienController::class, 'submitQuestion'])->name('api.consultant.submit-question');
 Route::get('/api/consultant/check-reply', [TuVanVienController::class, 'checkReply'])->name('api.consultant.check-reply');
+Route::get('/api/consultant/thread-messages', [TuVanVienController::class, 'getThreadMessages'])->name('api.consultant.thread-messages');
 Route::get('/api/consultant/realtime-feed', [TuVanVienController::class, 'getRealtimeFeed'])->name('api.consultant.realtime-feed');
 Route::get('/api/consultant/sse-stream', [TuVanVienController::class, 'sseStream'])->name('api.consultant.sse-stream');
 

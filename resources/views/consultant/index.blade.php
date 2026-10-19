@@ -79,8 +79,8 @@
             background: rgba(30, 41, 59, 0.6);
             border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 12px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
             cursor: pointer;
             transition: all 0.2s ease;
         }
@@ -91,22 +91,24 @@
         }
 
         .inquiry-card.active {
-            background: rgba(59, 130, 246, 0.15);
+            background: rgba(59, 130, 246, 0.18);
             border: 1px solid #3b82f6;
-            box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.25);
         }
 
         .inquiry-list-container {
-            max-height: calc(100vh - 280px);
+            max-height: calc(100vh - 290px);
             overflow-y: auto;
             padding-right: 6px;
         }
 
-        .inquiry-list-container::-webkit-scrollbar {
+        .inquiry-list-container::-webkit-scrollbar,
+        .messenger-stream-box::-webkit-scrollbar {
             width: 6px;
         }
 
-        .inquiry-list-container::-webkit-scrollbar-thumb {
+        .inquiry-list-container::-webkit-scrollbar-thumb,
+        .messenger-stream-box::-webkit-scrollbar-thumb {
             background: rgba(255, 255, 255, 0.15);
             border-radius: 3px;
         }
@@ -115,8 +117,8 @@
             background: rgba(30, 41, 59, 0.7);
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 16px;
-            padding: 24px;
-            min-height: calc(100vh - 280px);
+            padding: 20px 24px;
+            min-height: calc(100vh - 290px);
             display: flex;
             flex-direction: column;
         }
@@ -126,13 +128,13 @@
             color: #facc15;
             border: 1px solid rgba(234, 179, 8, 0.3);
             border-radius: 20px;
-            padding: 5px 12px;
-            font-size: 12px;
+            padding: 4px 11px;
+            font-size: 11.5px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
             display: inline-block;
-            margin: 3px;
+            margin: 2px 4px 2px 0;
             user-select: none;
         }
 
@@ -180,18 +182,6 @@
             100% { opacity: 1; transform: scale(1); }
         }
 
-        .vue-framework-badge {
-            background: linear-gradient(135deg, #42b883, #35495e);
-            color: #ffffff;
-            font-weight: 600;
-            font-size: 11px;
-            padding: 4px 10px;
-            border-radius: 8px;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-
         .new-alert-toast {
             animation: slideDown 0.4s ease;
         }
@@ -204,62 +194,56 @@
 </head>
 
 <body>
-
     <div id="advisorApp" v-cloak>
 
-        <!-- TOP NAVBAR CHO CHUYÊN VIÊN TƯ VẤN -->
-        <nav class="navbar navbar-dark advisor-navbar sticky-top py-2 px-3 px-md-4">
-            <div class="container-fluid px-0">
+        <!-- TOP NOTIFICATION ALERT WHEN NEW INQUIRY ARRIVES -->
+        <div v-if="newInquiryAlert" class="alert alert-warning border-0 rounded-0 shadow-lg text-dark fw-bold py-2.5 px-4 mb-0 new-alert-toast position-sticky top-0 start-0 w-100 z-3 d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+                <i class="fa-solid fa-bell fa-shake fs-5 me-2 text-danger"></i>
+                <span>TIN NHẮN MỚI TỪ KHÁCH HÀNG: <b>@{{ latestMessagePreview }}</b></span>
+            </div>
+            <button type="button" class="btn-close" @click="newInquiryAlert = false"></button>
+        </div>
+
+        <!-- TOP NAVBAR -->
+        <nav class="advisor-navbar py-3 px-4 sticky-top">
+            <div class="container-fluid d-flex align-items-center justify-content-between">
                 <div class="d-flex align-items-center gap-3">
-                    <a class="navbar-brand d-flex align-items-center me-0" href="{{ url('/') }}">
-                        <span class="fw-bold fs-4 text-warning">PRIMELUX</span>
-                        <span class="badge bg-primary text-white ms-2 px-2 py-1 fs-6">ADVISOR DESK</span>
+                    <a href="{{ url('/') }}" class="text-decoration-none d-flex align-items-center gap-2">
+                        <img src="{{ asset('image/Logo.png') }}" alt="PrimeLux" height="34" class="rounded">
+                        <span class="fs-4 fw-extrabold text-white tracking-wider">PrimeLux <span class="text-warning">Advisor</span></span>
                     </a>
+                    <span class="badge bg-warning bg-opacity-20 text-warning border border-warning border-opacity-30 px-2.5 py-1.5 ms-2">
+                        <span class="pulse-online"></span> Bàn Trực Trực Tuyến 24/7
+                    </span>
                 </div>
 
-                <div class="d-flex align-items-center gap-2 gap-md-3">
-                    <span class="text-secondary small d-none d-xl-inline">
-                        <i class="fa-solid fa-clock-rotate-left me-1"></i>Đồng bộ lúc: <strong class="text-white">@{{ lastSyncTime }}</strong>
-                    </span>
-                    <a href="{{ url('/') }}" target="_blank" class="btn btn-outline-light btn-sm">
-                        <i class="fa-solid fa-globe me-1"></i> Trang Chủ Web
-                    </a>
-                    <a href="{{ url('/loyalty') }}" target="_blank" class="btn btn-outline-warning btn-sm">
-                        <i class="fa-solid fa-crown me-1"></i> Cổng Hội Viên
-                    </a>
-                    <a href="{{ url('/admin') }}" target="_blank" class="btn btn-outline-info btn-sm">
-                        <i class="fa-solid fa-gauge-high me-1"></i> Quản Trị Hệ Thống
+                <div class="d-flex align-items-center gap-3">
+                    <div class="text-end d-none d-md-block">
+                        <div class="text-white small fw-bold">@{{ advisorName }}</div>
+                        <div class="text-secondary" style="font-size: 11px;">
+                            Đồng bộ lúc: @{{ lastSyncTime }}
+                            <i class="fa-solid fa-arrows-rotate text-success ms-1" :class="{ 'fa-spin': isRefreshing }"></i>
+                        </div>
+                    </div>
+                    <a href="{{ url('/admin') }}" class="btn btn-outline-light btn-sm">
+                        <i class="fa-solid fa-gauge me-1"></i> Trang Quản Trị
                     </a>
                 </div>
             </div>
         </nav>
 
-        <!-- THÔNG BÁO CÂU HỎI MỚI (TỰ ĐỘNG XUẤT HIỆN KHI CÓ KHÁCH HỎI) -->
-        <div v-if="newInquiryAlert" class="alert alert-warning border-warning new-alert-toast mx-3 mx-md-4 mt-3 mb-0 d-flex align-items-center justify-content-between py-2 px-3 rounded-3" style="background: rgba(234, 179, 8, 0.15); color: #fef08a;">
-            <div>
-                <i class="fa-solid fa-bell fa-bounce text-warning me-2"></i>
-                <strong>Có câu hỏi mới từ khách hàng!</strong> Dữ liệu đã được hệ thống cập nhật tự động lên giao diện.
-            </div>
-            <button type="button" class="btn-close btn-close-white btn-sm" @click="newInquiryAlert = false"></button>
-        </div>
+        <div class="container-fluid py-4 px-4">
 
-        <!-- MAIN WORKSPACE -->
-        <div class="container-fluid px-3 px-md-4 py-4">
-
-            <!-- THỐNG KÊ REALTIME COMPUTED TỰ ĐỘNG CẬP NHẬT (CLICK ĐỂ LỌC TRẠNG THÁI) -->
+            <!-- THỐNG KÊ NHANH (CARDS LỌC TRẠNG THÁI) -->
             <div class="row g-3 mb-4">
                 <div class="col-6 col-lg-3">
                     <div :class="['stat-card-advisor d-flex align-items-center justify-content-between', { 'active-all': statusFilter === 'all' }]"
-                         @click="setFilter('all')"
-                         role="button"
-                         title="Nhấp để hiển thị tất cả yêu cầu">
-                        <span v-if="statusFilter === 'all'" class="badge bg-secondary position-absolute top-0 end-0 m-2" style="font-size: 9px;">
-                            <i class="fa-solid fa-check me-1"></i>Đang xem
-                        </span>
+                         @click="setFilter('all')" role="button">
                         <div>
-                            <div class="text-secondary small fw-bold text-uppercase">Tổng Câu Hỏi Nhận</div>
+                            <div class="text-secondary small fw-bold text-uppercase">Tổng Tin Nhắn</div>
                             <div class="fs-2 fw-bold text-white">@{{ stats.total }}</div>
-                            <div class="text-secondary small">Cập nhật tự động liên tục</div>
+                            <div class="text-secondary small">Cập nhật realtime</div>
                         </div>
                         <div class="p-3 rounded-3 bg-secondary bg-opacity-20 text-info fs-3">
                             <i class="fa-solid fa-comments"></i>
@@ -270,16 +254,11 @@
                 <div class="col-6 col-lg-3">
                     <div :class="['stat-card-advisor d-flex align-items-center justify-content-between', { 'active-pending': statusFilter === 'Chờ phản hồi' }]"
                          style="border-left: 4px solid #ef4444;"
-                         @click="setFilter('Chờ phản hồi')"
-                         role="button"
-                         title="Nhấp để chỉ hiển thị câu hỏi Chờ phản hồi gấp">
-                        <span v-if="statusFilter === 'Chờ phản hồi'" class="badge bg-danger position-absolute top-0 end-0 m-2" style="font-size: 9px;">
-                            <i class="fa-solid fa-filter me-1"></i>Đang lọc
-                        </span>
+                         @click="setFilter('Chờ phản hồi')" role="button">
                         <div>
                             <div class="text-danger small fw-bold text-uppercase">Chờ Phản Hồi Gấp</div>
                             <div class="fs-2 fw-bold text-danger">@{{ stats.pending }}</div>
-                            <div class="text-secondary small">Cần chuyên viên giải đáp</div>
+                            <div class="text-secondary small">Khách đang chờ bạn</div>
                         </div>
                         <div class="p-3 rounded-3 bg-danger bg-opacity-20 text-danger fs-3">
                             <i class="fa-solid fa-bell"></i>
@@ -290,16 +269,11 @@
                 <div class="col-6 col-lg-3">
                     <div :class="['stat-card-advisor d-flex align-items-center justify-content-between', { 'active-progress': statusFilter === 'Đang tư vấn' }]"
                          style="border-left: 4px solid #3b82f6;"
-                         @click="setFilter('Đang tư vấn')"
-                         role="button"
-                         title="Nhấp để chỉ hiển thị câu hỏi Đang tư vấn">
-                        <span v-if="statusFilter === 'Đang tư vấn'" class="badge bg-primary position-absolute top-0 end-0 m-2" style="font-size: 9px;">
-                            <i class="fa-solid fa-filter me-1"></i>Đang lọc
-                        </span>
+                         @click="setFilter('Đang tư vấn')" role="button">
                         <div>
                             <div class="text-info small fw-bold text-uppercase">Đang Tư Vấn</div>
                             <div class="fs-2 fw-bold text-info">@{{ stats.inProgress }}</div>
-                            <div class="text-secondary small">Đang trao đổi cùng khách</div>
+                            <div class="text-secondary small">Đang trò chuyện</div>
                         </div>
                         <div class="p-3 rounded-3 bg-primary bg-opacity-20 text-primary fs-3">
                             <i class="fa-solid fa-headset"></i>
@@ -310,16 +284,11 @@
                 <div class="col-6 col-lg-3">
                     <div :class="['stat-card-advisor d-flex align-items-center justify-content-between', { 'active-resolved': statusFilter === 'Đã trả lời' }]"
                          style="border-left: 4px solid #10b981;"
-                         @click="setFilter('Đã trả lời')"
-                         role="button"
-                         title="Nhấp để chỉ hiển thị câu hỏi Đã giải đáp xong">
-                        <span v-if="statusFilter === 'Đã trả lời'" class="badge bg-success position-absolute top-0 end-0 m-2" style="font-size: 9px;">
-                            <i class="fa-solid fa-filter me-1"></i>Đang lọc
-                        </span>
+                         @click="setFilter('Đã trả lời')" role="button">
                         <div>
                             <div class="text-success small fw-bold text-uppercase">Đã Giải Đáp Xong</div>
                             <div class="fs-2 fw-bold text-success">@{{ stats.resolved }}</div>
-                            <div class="text-secondary small">Khách hàng hài lòng</div>
+                            <div class="text-secondary small">Khách hài lòng</div>
                         </div>
                         <div class="p-3 rounded-3 bg-success bg-opacity-20 text-success fs-3">
                             <i class="fa-solid fa-circle-check"></i>
@@ -328,7 +297,7 @@
                 </div>
             </div>
 
-            <!-- BỘ LỌC TRẠNG THÁI VÀ Ô TÌM KIẾM (TWO-WAY REACTIVE BINDING) -->
+            <!-- BỘ LỌC VÀ Ô TÌM KIẾM -->
             <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
                 <div class="btn-group" role="group">
                     <button type="button" @click="setFilter('all')" :class="['btn btn-sm', statusFilter === 'all' ? 'btn-primary' : 'btn-dark border-secondary text-secondary']">
@@ -346,9 +315,9 @@
                 </div>
 
                 <div class="d-flex align-items-center gap-2">
-                    <div class="input-group input-group-sm" style="width: 300px;">
+                    <div class="input-group input-group-sm" style="width: 280px;">
                         <span class="input-group-text bg-dark border-secondary text-secondary"><i class="fa-solid fa-search"></i></span>
-                        <input type="text" v-model="searchQuery" class="form-control bg-dark border-secondary text-white" placeholder="Tìm theo tên, SĐT, nội dung...">
+                        <input type="text" v-model="searchQuery" class="form-control bg-dark border-secondary text-white" placeholder="Tìm tên, SĐT, nội dung...">
                         <button v-if="searchQuery" class="btn btn-outline-secondary" type="button" @click="searchQuery = ''"><i class="fa-solid fa-xmark"></i></button>
                     </div>
                     <button class="btn btn-outline-secondary btn-sm" @click="fetchRealtimeFeed" title="Cập nhật ngay">
@@ -357,17 +326,17 @@
                 </div>
             </div>
 
-            <!-- WORKSPACE CHÍNH: 2 CỘT TỰ ĐỘNG REACTIVE -->
+            <!-- WORKSPACE 2 CỘT: DANH SÁCH KHÁCH HÀNG & LUỒNG CHAT MESSENGER -->
             <div class="row g-4">
                 
-                <!-- CỘT TRÁI: DANH SÁCH YÊU CẦU & CÂU HỎI -->
+                <!-- CỘT TRÁI: DANH SÁCH CUỘC TRÒ CHUYỆN / YÊU CẦU -->
                 <div class="col-lg-5 col-xl-4">
                     <div class="p-3 rounded-4 bg-dark border border-secondary">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <span class="fw-bold text-white small text-uppercase">
-                                <i class="fa-solid fa-inbox text-warning me-1"></i> Hộp Thư Yêu Cầu (@{{ filteredInquiries.length }})
+                                <i class="fa-solid fa-inbox text-warning me-1"></i> Cuộc Trò Chuyện (@{{ filteredInquiries.length }})
                             </span>
-                            <span class="text-secondary small"><i class="fa-solid fa-bolt text-warning me-1"></i>Tự động cập nhật</span>
+                            <span class="text-secondary small"><i class="fa-solid fa-bolt text-warning me-1"></i>1.5s realtime</span>
                         </div>
 
                         <div class="inquiry-list-container">
@@ -376,7 +345,7 @@
                                  :class="['inquiry-card', { active: activeInquiryId === item.ma_tin }]" 
                                  @click="selectInquiry(item.ma_tin)">
                                 
-                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div class="d-flex justify-content-between align-items-start mb-1.5">
                                     <div>
                                         <span class="fw-bold text-white fs-6">@{{ item.nguoi_gui }}</span>
                                         <span v-if="item.customer_info" :class="'badge bg-' + item.customer_info.badge + ' text-dark ms-1'" style="font-size: 10px;">
@@ -388,7 +357,7 @@
                                     </span>
                                 </div>
 
-                                <p class="text-light small mb-2 text-truncate" style="max-height: 40px; line-height: 1.4;">
+                                <p class="text-light small mb-2 text-truncate" style="line-height: 1.4;">
                                     @{{ item.noi_dung }}
                                 </p>
 
@@ -405,18 +374,18 @@
 
                             <div v-if="filteredInquiries.length === 0" class="text-center py-5 text-secondary">
                                 <i class="fa-regular fa-comment-dots fa-3x mb-3 text-muted"></i>
-                                <p class="mb-0">Không tìm thấy câu hỏi phù hợp.</p>
+                                <p class="mb-0">Không tìm thấy cuộc trò chuyện phù hợp.</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- CỘT PHẢI: KHÔNG GIAN TƯ VẤN & TRẢ LỜI TRỰC TIẾP -->
+                <!-- CỘT PHẢI: LUỒNG CHAT MESSENGER THỜI GIAN THỰC CÙNG KHÁCH HÀNG -->
                 <div class="col-lg-7 col-xl-8">
                     <div class="reply-panel">
                         
                         <div v-if="activeInquiry">
-                            <!-- HEADER KHÁCH HÀNG & HẠNG VIP -->
+                            <!-- HEADER THÔNG TIN KHÁCH HÀNG -->
                             <div class="d-flex flex-wrap justify-content-between align-items-center pb-3 mb-3 border-bottom border-secondary">
                                 <div>
                                     <div class="d-flex align-items-center gap-2 mb-1">
@@ -442,34 +411,49 @@
                                 </div>
                             </div>
 
-                            <!-- CHI TIẾT CÂU HỎI CỦA KHÁCH HÀNG -->
-                            <div class="mb-4">
-                                <label class="form-label text-warning small fw-bold text-uppercase">
-                                    <i class="fa-solid fa-quote-left me-1"></i> Nội Dung Câu Hỏi Riêng Của Khách Hàng:
-                                </label>
-                                <div class="p-3 rounded-3 text-white" style="font-size: 15px; line-height: 1.6; background-color: #0d131f; border: 1px solid rgba(255, 255, 255, 0.1);">
-                                    @{{ activeInquiry.noi_dung }}
-                                </div>
-                            </div>
-
-                            <!-- PHẢN HỒI HIỆN TẠI (NẾU CÓ) -->
-                            <div v-if="activeInquiry.tra_loi_tu_van" class="mb-4">
-                                <label class="form-label text-success small fw-bold text-uppercase">
-                                    <i class="fa-solid fa-circle-check me-1"></i> Câu Trả Lời Của Chuyên Viên Đã Gửi:
-                                </label>
-                                <div class="p-3 rounded-3 border border-success border-opacity-50 text-light" style="background: rgba(16, 185, 129, 0.08); font-size: 14px; line-height: 1.6;">
-                                    @{{ activeInquiry.tra_loi_tu_van }}
-                                </div>
-                                <div class="text-secondary small mt-1">
-                                    Trả lời bởi: <strong class="text-info">@{{ activeInquiry.ten_tu_van || 'Chuyên viên tư vấn' }}</strong> 
-                                    <span v-if="activeInquiry.thoi_gian_tra_loi"> lúc @{{ activeInquiry.thoi_gian_tra_loi }}</span>
-                                </div>
-                            </div>
-
-                            <!-- CÂU TRẢ LỜI MẪU NHANH CHO CHUYÊN VIÊN -->
+                            <!-- LUỒNG TRÒ CHUYỆN TOÀN DIỆN DẠNG MESSENGER (CHRONOLOGICAL STREAM) -->
                             <div class="mb-3">
-                                <label class="form-label text-secondary small fw-bold">
-                                    <i class="fa-solid fa-bolt text-warning me-1"></i> Mẫu Phản Hồi Nhanh (Click để chèn nội dung):
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label class="form-label text-warning small fw-bold text-uppercase mb-0">
+                                        <i class="fa-solid fa-comments me-1"></i> Luồng Trò Chuyện Trực Tiếp (Messenger Stream):
+                                    </label>
+                                    <span class="text-secondary small" style="font-size: 11px;">
+                                        <i class="fa-solid fa-bolt text-warning me-1"></i>Tự động cập nhật 1.5s
+                                    </span>
+                                </div>
+
+                                <div class="messenger-stream-box p-3 rounded-3" 
+                                     id="advisorMessengerStream"
+                                     style="height: 290px; overflow-y: auto; background-color: #0b1120; border: 1px solid rgba(255, 255, 255, 0.1); display: flex; flex-direction: column; gap: 10px;">
+                                    
+                                    <div v-for="msg in activeThreadMessages" :key="msg.id || msg.ma_tin" 
+                                         :class="['d-flex flex-column', msg.sender_type === 'consultant' ? 'align-items-end' : 'align-items-start']">
+                                        
+                                        <div class="d-flex align-items-center gap-1 mb-1 small" style="font-size: 11px;">
+                                            <strong :class="msg.sender_type === 'consultant' ? 'text-warning' : 'text-info'">
+                                                <i :class="msg.sender_type === 'consultant' ? 'fa-solid fa-headset me-1' : 'fa-solid fa-user me-1'"></i>
+                                                @{{ msg.nguoi_gui || (msg.sender_type === 'consultant' ? 'Tư Vấn Viên' : 'Khách hàng') }}
+                                            </strong>
+                                            <span class="text-secondary">• @{{ msg.thoi_gian }}</span>
+                                        </div>
+
+                                        <div :class="['px-3 py-2 rounded-4', msg.sender_type === 'consultant' ? 'bg-warning text-dark fw-medium' : 'bg-secondary bg-opacity-25 text-white border border-secondary']"
+                                             style="font-size: 13.5px; line-height: 1.5; max-width: 85%; word-break: break-word;">
+                                            @{{ msg.noi_dung }}
+                                        </div>
+                                    </div>
+
+                                    <div v-if="activeThreadMessages.length === 0" class="text-center py-4 text-secondary small my-auto">
+                                        <i class="fa-regular fa-comment-dots fa-2x mb-2 d-block text-muted"></i>
+                                        Chưa có tin nhắn nào trong luồng trò chuyện này.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- MẪU PHẢN HỒI NHANH CHO CHUYÊN VIÊN -->
+                            <div class="mb-2">
+                                <label class="form-label text-secondary small fw-bold mb-1">
+                                    <i class="fa-solid fa-bolt text-warning me-1"></i> Câu Trả Lời Mẫu Nhanh (Click để chèn):
                                 </label>
                                 <div class="d-flex flex-wrap">
                                     <span v-for="canned in cannedReplies" 
@@ -481,37 +465,33 @@
                                 </div>
                             </div>
 
-                            <!-- FORM NHẬP CÂU TRẢ LỜI TƯ VẤN (VUE TWO-WAY REACTIVITY) -->
+                            <!-- KHUNG SOẠN TIN NHẮN TRẢ LỜI (ENTER ĐỂ GỬI NGAY) -->
                             <form @submit.prevent="sendReply" class="mt-auto">
-                                <div class="mb-3">
-                                    <label class="form-label text-white small fw-bold">
-                                        <i class="fa-solid fa-pen-nib text-primary me-1"></i> Soạn Câu Trả Lời Riêng Của Bạn Cho Khách Hàng (*):
-                                    </label>
+                                <div class="mb-2">
                                     <textarea v-model="replyText" 
+                                              @keydown.enter.exact.prevent="sendReply"
                                               class="form-control bg-dark border-secondary text-white p-3" 
-                                              rows="4" 
+                                              rows="3" 
                                               required 
-                                              placeholder="Nhập câu trả lời chi tiết, tận tâm cho câu hỏi của khách hàng..." 
-                                              style="border-radius: 12px; font-size: 14px;"></textarea>
+                                              placeholder="Nhập nội dung tư vấn cho khách hàng (Nhấn Enter để gửi ngay, Shift+Enter xuống dòng)..." 
+                                              style="border-radius: 12px; font-size: 13.5px;"></textarea>
                                 </div>
 
                                 <div class="row g-2 align-items-center">
                                     <div class="col-md-4">
-                                        <label class="text-secondary small">Tên Chuyên Viên Ký Tên:</label>
-                                        <input type="text" v-model="advisorName" class="form-control form-control-sm bg-dark border-secondary text-white">
+                                        <input type="text" v-model="advisorName" placeholder="Tên Chuyên viên" class="form-control form-control-sm bg-dark border-secondary text-white">
                                     </div>
                                     <div class="col-md-4">
-                                        <label class="text-secondary small">Cập Nhật Trạng Thái:</label>
                                         <select v-model="selectedStatus" class="form-select form-select-sm bg-dark border-secondary text-white">
                                             <option value="Đã trả lời">Đã Giải Đáp (Hoàn tất)</option>
-                                            <option value="Đang tư vấn">Đang Tư Vấn (Chờ trao đổi thêm)</option>
+                                            <option value="Đang tư vấn">Đang Tư Vấn (Tiếp tục trao đổi)</option>
                                             <option value="Chờ phản hồi">Chờ Phản Hồi</option>
                                         </select>
                                     </div>
-                                    <div class="col-md-4 text-md-end mt-3 mt-md-auto">
+                                    <div class="col-md-4 text-md-end mt-2 mt-md-0">
                                         <button type="submit" class="btn btn-warning fw-bold text-dark w-100" :disabled="isSubmitting">
                                             <span v-if="isSubmitting"><i class="fa-solid fa-spinner fa-spin me-1"></i> Đang gửi...</span>
-                                            <span v-else><i class="fa-solid fa-paper-plane me-1"></i> Gửi Câu Trả Lời</span>
+                                            <span v-else><i class="fa-solid fa-paper-plane me-1"></i> Gửi Tin Nhắn (Enter)</span>
                                         </button>
                                     </div>
                                 </div>
@@ -520,8 +500,8 @@
 
                         <div v-else class="text-center py-5 my-auto text-secondary">
                             <i class="fa-solid fa-inbox fa-4x mb-3 text-muted"></i>
-                            <h4 class="text-white">Không Có Câu Hỏi Nào Được Chọn</h4>
-                            <p>Vui lòng chọn một câu hỏi từ danh sách bên trái để phản hồi tư vấn cho khách hàng.</p>
+                            <h4 class="text-white">Không Có Cuộc Trò Chuyện Nào Được Chọn</h4>
+                            <p>Vui lòng chọn một cuộc trò chuyện từ danh sách bên trái để phản hồi tư vấn cho khách hàng.</p>
                         </div>
 
                     </div>
@@ -548,6 +528,7 @@
                 return {
                     inquiries: initialInquiries || [],
                     activeInquiryId: initialInquiries.length > 0 ? initialInquiries[0].ma_tin : null,
+                    threadMessages: [],
                     statusFilter: 'all',
                     searchQuery: '',
                     replyText: '',
@@ -556,13 +537,14 @@
                     isSubmitting: false,
                     isRefreshing: false,
                     newInquiryAlert: false,
+                    latestMessagePreview: '',
                     lastSyncTime: new Date().toLocaleTimeString('vi-VN'),
                     cannedReplies: initialCannedReplies || [],
-                    pollTimer: null
+                    pollTimer: null,
+                    audioContext: null
                 };
             },
             computed: {
-                // TỰ ĐỘNG TÍNH TOÁN THỐNG KÊ KHI DỮ LIỆU THAY ĐỔI MÀ KHÔNG CẦN GỌI HÀM
                 stats() {
                     const total = this.inquiries.length;
                     const pending = this.inquiries.filter(i => i.trang_thai === 'Chờ phản hồi').length;
@@ -571,15 +553,12 @@
                     return { total, pending, inProgress, resolved };
                 },
 
-                // TỰ ĐỘNG LỌC DANH SÁCH THEO TRẠNG THÁI VÀ TỪ KHÓA TÌM KIẾM
                 filteredInquiries() {
                     const query = this.searchQuery.toLowerCase().trim();
                     return this.inquiries.filter(item => {
-                        // Lọc theo trạng thái
                         const matchStatus = (this.statusFilter === 'all') || (item.trang_thai === this.statusFilter);
                         if (!matchStatus) return false;
 
-                        // Lọc theo từ khóa tìm kiếm
                         if (!query) return true;
 
                         const matin = (item.ma_tin || '').toLowerCase();
@@ -591,16 +570,76 @@
                     });
                 },
 
-                // TỰ ĐỘNG TRUY XUẤT CÂU HỎI ĐANG ĐƯỢC CHỌN
                 activeInquiry() {
                     if (this.filteredInquiries.length === 0) {
                         return null;
                     }
                     const found = this.filteredInquiries.find(i => i.ma_tin === this.activeInquiryId);
                     return found || this.filteredInquiries[0];
+                },
+
+                activeThreadMessages() {
+                    if (this.threadMessages.length > 0) {
+                        return this.threadMessages;
+                    }
+                    if (this.activeInquiry) {
+                        const defaultMsgs = [];
+                        defaultMsgs.push({
+                            id: this.activeInquiry.id,
+                            sender_type: 'customer',
+                            nguoi_gui: this.activeInquiry.nguoi_gui,
+                            noi_dung: this.activeInquiry.noi_dung,
+                            thoi_gian: this.activeInquiry.thoi_gian
+                        });
+                        if (this.activeInquiry.tra_loi_tu_van) {
+                            defaultMsgs.push({
+                                id: 'rep-' + this.activeInquiry.id,
+                                sender_type: 'consultant',
+                                nguoi_gui: this.activeInquiry.ten_tu_van || 'Chuyên Viên Tư Vấn',
+                                noi_dung: this.activeInquiry.tra_loi_tu_van,
+                                thoi_gian: this.activeInquiry.thoi_gian_tra_loi || 'Vừa xong'
+                            });
+                        }
+                        return defaultMsgs;
+                    }
+                    return [];
                 }
             },
             methods: {
+                playNotificationSound() {
+                    try {
+                        const AudioContext = window.AudioContext || window.webkitAudioContext;
+                        if (!AudioContext) return;
+                        if (!this.audioContext) this.audioContext = new AudioContext();
+                        if (this.audioContext.state === 'suspended') this.audioContext.resume();
+
+                        const now = this.audioContext.currentTime;
+                        // Tone 1
+                        const o1 = this.audioContext.createOscillator();
+                        const g1 = this.audioContext.createGain();
+                        o1.type = "sine";
+                        o1.frequency.setValueAtTime(523.25, now);
+                        g1.gain.setValueAtTime(0.2, now);
+                        g1.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                        o1.connect(g1);
+                        g1.connect(this.audioContext.destination);
+                        o1.start(now);
+                        o1.stop(now + 0.3);
+
+                        // Tone 2
+                        const o2 = this.audioContext.createOscillator();
+                        const g2 = this.audioContext.createGain();
+                        o2.type = "sine";
+                        o2.frequency.setValueAtTime(659.25, now + 0.15);
+                        g2.gain.setValueAtTime(0.2, now + 0.15);
+                        g2.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                        o2.connect(g2);
+                        g2.connect(this.audioContext.destination);
+                        o2.start(now + 0.15);
+                        o2.stop(now + 0.5);
+                    } catch(e) {}
+                },
+
                 setFilter(status) {
                     this.statusFilter = status;
                     this.$nextTick(() => {
@@ -620,6 +659,29 @@
                     if (item) {
                         this.selectedStatus = item.trang_thai;
                     }
+                    this.fetchThreadMessages();
+                },
+
+                async fetchThreadMessages() {
+                    if (!this.activeInquiry) return;
+                    const sid = this.activeInquiry.session_id || this.activeInquiry.ma_tin;
+                    try {
+                        const res = await fetch(`/api/consultant/thread-messages?session_id=${encodeURIComponent(sid)}&ma_tin=${encodeURIComponent(this.activeInquiry.ma_tin)}`);
+                        const data = await res.json();
+                        if (data.success && Array.isArray(data.messages)) {
+                            this.threadMessages = data.messages;
+                            this.scrollStreamBottom();
+                        }
+                    } catch (e) {
+                        console.log("Thread fetch note:", e);
+                    }
+                },
+
+                scrollStreamBottom() {
+                    this.$nextTick(() => {
+                        const el = document.getElementById("advisorMessengerStream");
+                        if (el) el.scrollTop = el.scrollHeight;
+                    });
                 },
 
                 insertCanned(text) {
@@ -632,12 +694,25 @@
                     return 'status-badge-resolved';
                 },
 
-                // GỬI PHẢN HỒI CHO KHÁCH HÀNG & CẬP NHẬT TRẠNG THÁI REACTIVE
+                // GỬI PHẢN HỒI CHO KHÁCH HÀNG & CẬP NHẬT TRẠNG THÁI REALTIME
                 async sendReply() {
                     if (!this.activeInquiry || !this.replyText.trim()) return;
 
                     this.isSubmitting = true;
+                    const textToSend = this.replyText.trim();
                     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
+                    // Optimistic update vào luồng chat
+                    const tempId = 'temp-' + Date.now();
+                    this.threadMessages.push({
+                        id: tempId,
+                        sender_type: 'consultant',
+                        nguoi_gui: this.advisorName.trim(),
+                        noi_dung: textToSend,
+                        thoi_gian: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })
+                    });
+                    this.replyText = '';
+                    this.scrollStreamBottom();
 
                     try {
                         const response = await fetch("{{ route('consultant.reply') }}", {
@@ -649,7 +724,8 @@
                             },
                             body: JSON.stringify({
                                 ma_tin: this.activeInquiry.ma_tin,
-                                tra_loi: this.replyText.trim(),
+                                session_id: this.activeInquiry.session_id || this.activeInquiry.ma_tin,
+                                tra_loi: textToSend,
                                 ten_tu_van: this.advisorName.trim(),
                                 trang_thai: this.selectedStatus
                             })
@@ -657,17 +733,14 @@
 
                         const res = await response.json();
                         if (res.success) {
-                            // CẬP NHẬT TRỰC TIẾP VÀO REACTIVE STATE (VUE TỰ ĐỘNG RE-RENDER GIAO DIỆN)
                             const current = this.inquiries.find(i => i.ma_tin === this.activeInquiry.ma_tin);
                             if (current) {
-                                current.tra_loi_tu_van = this.replyText.trim();
+                                current.tra_loi_tu_van = textToSend;
                                 current.ten_tu_van = this.advisorName.trim();
                                 current.trang_thai = this.selectedStatus;
                                 current.thoi_gian_tra_loi = res.data.thoi_gian;
                             }
-
-                            this.replyText = '';
-                            alert("Đã gửi câu trả lời tư vấn thành công tới khách hàng!");
+                            this.fetchThreadMessages();
                         } else {
                             alert("Lỗi: " + (res.message || "Không thể gửi phản hồi."));
                         }
@@ -679,7 +752,7 @@
                     }
                 },
 
-                // ĐỒNG BỘ REALTIME TỰ ĐỘNG KHÔNG CẦN GỌI HÀM THỦ CÔNG
+                // ĐỒNG BỘ REALTIME TỰ ĐỘNG KHÔNG CẦN F5 (1.5s POLLING)
                 async fetchRealtimeFeed() {
                     this.isRefreshing = true;
                     try {
@@ -687,20 +760,25 @@
                         const data = await res.json();
 
                         if (data.success && Array.isArray(data.inquiries)) {
-                            // Kiểm tra xem có câu hỏi mới xuất hiện không
+                            // Kiểm tra có tin nhắn mới xuất hiện không
                             if (data.inquiries.length > this.inquiries.length) {
+                                const newest = data.inquiries[0];
+                                this.latestMessagePreview = (newest.nguoi_gui || 'Khách hàng') + ': ' + (newest.noi_dung || '');
                                 this.newInquiryAlert = true;
-                                setTimeout(() => { this.newInquiryAlert = false; }, 5000);
+                                this.playNotificationSound();
+                                document.title = "(1) 💬 TIN NHẮN MỚI TỪ KHÁCH! - PrimeLux Advisor";
+                                setTimeout(() => { this.newInquiryAlert = false; }, 6000);
                             }
 
-                            // Cập nhật mảng inquiries (Vue tự động phản ứng và vẽ lại tất cả các component)
                             this.inquiries = data.inquiries;
                             this.lastSyncTime = data.timestamp;
 
-                            // Đảm bảo vẫn chọn đúng inquiry đang xem
                             if (!this.inquiries.some(i => i.ma_tin === this.activeInquiryId) && this.inquiries.length > 0) {
                                 this.activeInquiryId = this.inquiries[0].ma_tin;
                             }
+
+                            // Cập nhật lại thread messages của inquiry đang chọn
+                            this.fetchThreadMessages();
                         }
                     } catch (err) {
                         console.log("Realtime sync note:", err);
@@ -709,17 +787,20 @@
                     }
                 },
 
-                // KÍCH HOẠT REALTIME EVENT STREAM LIÊN TỤC
                 initContinuousRealtime() {
-                    // Thực hiện polling định kỳ 2.5 giây tự động cập nhật
+                    // Polling mỗi 1.5 giây để tin nhắn hiển thị tức thì
                     this.pollTimer = setInterval(() => {
                         this.fetchRealtimeFeed();
-                    }, 2500);
+                    }, 1500);
                 }
             },
             mounted() {
-                // Khởi động luồng realtime liên tục khi component được mount
                 this.initContinuousRealtime();
+                this.fetchThreadMessages();
+
+                window.addEventListener("focus", () => {
+                    document.title = "Cổng Chuyên Viên Tư Vấn Trực Tuyến - PrimeLux Advisor Portal";
+                });
             },
             beforeUnmount() {
                 if (this.pollTimer) clearInterval(this.pollTimer);
