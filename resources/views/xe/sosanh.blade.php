@@ -1,6 +1,7 @@
 @extends('layouts.giaodien')
 
 @section('title', 'So Sánh Giá Xe ' . ($car['name'] ?? 'Ô Tô') . ' - Phân Tích Đa Sàn Thị Trường - PrimeLux Auto')
+@section('meta_description', 'Công cụ so sánh giá xe ' . ($car['name'] ?? 'ô tô') . ' đa sàn trực tuyến tại Oto.com.vn, Bonbanh, Carmudi, Chợ Tốt Xe và giá niêm yết PrimeLux Auto.')
 
 @section('content')
 <div class="container py-5">

@@ -1,6 +1,7 @@
 @extends('layouts.giaodien')
 
 @section('title', 'Thanh Toán Online Tiền Trả Trước Xe - PrimeLux Auto')
+@section('meta_description', 'Cổng thanh toán trực tuyến tiền trả trước và đặt cọc xe ô tô sang qua quét mã VietQR tự động xác nhận tức thì tại PrimeLux Auto.')
 
 @section('content')
 <div class="container py-5">

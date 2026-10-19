@@ -1,6 +1,7 @@
 @extends('layouts.giaodien')
 
 @section('title', 'Thời Khóa Biểu Đăng Ký Lái Thử Xe VIP - PrimeLux Auto')
+@section('meta_description', 'Đăng ký lịch lái thử các dòng xe sang Mercedes-Benz, Porsche, BMW, Audi, Lexus tại tư gia hoặc showroom PrimeLux Auto với chuyên viên VIP.')
 
 @push('styles')
 <style>

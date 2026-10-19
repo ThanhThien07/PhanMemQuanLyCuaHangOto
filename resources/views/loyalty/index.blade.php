@@ -1,6 +1,7 @@
 @extends('layouts.client')
 
 @section('title', 'PrimeLux Club - Đặc Quyền & Điểm Thưởng Khách Hàng VIP')
+@section('meta_description', 'Chương trình PrimeLux Club - Tích lũy điểm thưởng PrimePoints, đặc quyền nâng hạng hội viên VIP và ưu đãi chiết khấu mua siêu xe độc quyền.')
 
 @section('content')
 <!-- HERO SECTION -->

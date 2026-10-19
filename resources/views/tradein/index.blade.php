@@ -1,6 +1,7 @@
 @extends('layouts.giaodien')
 
 @section('title', 'Thẩm Định Xe Cũ & Thu Cũ Đổi Mới (Trade-In) - PrimeLux Auto')
+@section('meta_description', 'Chương trình Trade-In thu cũ đổi mới siêu xe và xe sang tại PrimeLux Auto. Định giá xe cũ theo thuật toán 176 hạng mục chuẩn quốc tế.')
 
 @section('content')
 <div class="container py-5">

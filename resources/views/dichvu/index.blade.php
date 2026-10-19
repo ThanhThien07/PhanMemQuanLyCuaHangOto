@@ -1,6 +1,7 @@
 @extends('layouts.giaodien')
 
 @section('title', 'Trung Tâm Dịch Vụ & Cứu Hộ Ô Tô Cao Cấp - PrimeLux Auto')
+@section('meta_description', 'Trung tâm dịch vụ bảo dưỡng định kỳ, bảo hiểm thân vỏ, sơn hấp tiêu chuẩn Đức và cứu hộ khẩn cấp 24/7 tại Showroom PrimeLux Auto.')
 
 @push('styles')
 <style>

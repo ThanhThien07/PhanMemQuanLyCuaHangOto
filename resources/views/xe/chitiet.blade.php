@@ -1,6 +1,39 @@
 @extends('layouts.giaodien')
 
 @section('title', $car['name'] . ' - Chi Tiết Xe, Thông Số Kỹ Thuật & Giá Lăn Bánh - PrimeLux Auto')
+@section('meta_description', Str::limit(strip_tags($car['desc'] ?? ($car['name'] . ' phân phối chính hãng tại PrimeLux Auto. Xem thông số kỹ thuật, bảng giá lăn bánh và đặt lái thử VIP.')), 155))
+@section('og_image', $car['image'])
+@section('og_type', 'product')
+@section('og_title', $car['name'] . ' - Thông Số Kỹ Thuật & Giá Lăn Bánh | PrimeLux Auto')
+
+@push('head_preload')
+<!-- PRELOAD ẢNH HERO LCP CHO TRANG CHI TIẾT XE -->
+<link rel="preload" as="image" href="{{ $car['image'] }}" fetchpriority="high">
+@endpush
+
+@push('structured_data')
+<!-- STRUCTURED DATA THEO SCHEMA.ORG (PRODUCT & CAR) THEO CHƯƠNG 8 -->
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@@type": "Product",
+    "name": "{{ $car['name'] }}",
+    "image": "{{ $car['image'] }}",
+    "description": "{{ addslashes(strip_tags($car['desc'] ?? '')) }}",
+    "brand": {
+        "@@type": "Brand",
+        "name": "{{ $car['brand'] }}"
+    },
+    "offers": {
+        "@@type": "Offer",
+        "price": "{{ $car['price'] ?? 0 }}",
+        "priceCurrency": "VND",
+        "availability": "https://schema.org/InStock",
+        "url": "{{ url('/cars/' . $car['id']) }}"
+    }
+}
+</script>
+@endpush
 
 @section('content')
 <div class="container py-5">
@@ -16,9 +49,13 @@
     <div class="row g-5">
         <!-- CỘT TRÁI: HÌNH ẢNH NGOẠI THẤT & NỘI THẤT -->
         <div class="col-lg-7">
-            <!-- ẢNH CHÍNH LỚN -->
+            <!-- ẢNH CHÍNH LỚN (LCP CHO TRANG CHI TIẾT: KHAI BÁO WIDTH/HEIGHT VÀ FETCHPRIORITY) -->
             <div class="rounded-4 overflow-hidden mb-3 border border-secondary shadow-2xl position-relative" style="height: 440px; background: #000;">
-                <img id="car-detail-img" src="{{ $car['image'] }}" class="w-100 h-100 object-fit-cover" alt="{{ $car['name'] }}" style="transition: opacity 0.3s ease;">
+                <img id="car-detail-img" src="{{ $car['image'] }}" class="w-100 h-100 object-fit-cover" 
+                     alt="Siêu xe {{ $car['name'] }} - {{ $car['brand'] }} chính hãng tại PrimeLux Auto" 
+                     width="700" height="440" 
+                     fetchpriority="high" decoding="async" 
+                     style="transition: opacity 0.3s ease;">
                 <span class="badge {{ $car['tagClass'] ?? 'tag-hot' }} position-absolute top-0 end-0 m-3 px-3 py-2 fs-6">
                     {{ $car['tag'] ?? 'Nổi Bật' }}
                 </span>
@@ -49,7 +86,9 @@
                 <div class="col-4">
                     <img src="{{ $img }}" class="w-100 rounded-3 border thumb-img {{ $idx === 0 ? 'border-primary active-thumb' : 'border-secondary' }}" 
                          style="height: 100px; object-fit: cover; cursor: pointer; transition: all 0.2s ease;"
-                         alt="Ngoại thất {{ $car['name'] }} - {{ $idx + 1 }}">
+                         width="220" height="100"
+                         loading="lazy" decoding="async"
+                         alt="Ngoại thất {{ $car['name'] }} - Ảnh {{ $idx + 1 }}">
                 </div>
                 @endforeach
             </div>
@@ -63,7 +102,9 @@
                 <div class="col-4">
                     <img src="{{ $img }}" class="w-100 rounded-3 border border-secondary thumb-img" 
                          style="height: 100px; object-fit: cover; cursor: pointer; transition: all 0.2s ease;"
-                         alt="Nội thất {{ $car['name'] }} - {{ $idx + 1 }}">
+                         width="220" height="100"
+                         loading="lazy" decoding="async"
+                         alt="Nội thất {{ $car['name'] }} - Ảnh {{ $idx + 1 }}">
                 </div>
                 @endforeach
             </div>
@@ -134,7 +175,7 @@
                 <i class="fa-solid fa-gauge-high"></i>
             </div>
             <div>
-                <h3 class="fw-bold mb-1 text-white">Thông Số Kỹ Thuật Chi Tiết</h3>
+                <h2 class="fw-bold mb-1 text-white fs-4">Thông Số Kỹ Thuật Chi Tiết</h2>
                 <p class="text-secondary small mb-0">Động cơ, hệ thống truyền động, hiệu suất vận hành và trang bị an toàn tiêu chuẩn quốc tế</p>
             </div>
         </div>
@@ -143,9 +184,9 @@
             <!-- 1. ĐỘNG CƠ & HIỆU SUẤT VẬN HÀNH -->
             <div class="col-lg-6">
                 <div class="p-3.5 rounded-3 h-100" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08);">
-                    <h5 class="fw-bold text-warning mb-3">
+                    <h3 class="fw-bold text-warning mb-3 fs-5">
                         <i class="fa-solid fa-engine me-2"></i> 1. Động Cơ & Hiệu Năng Vận Hành
-                    </h5>
+                    </h3>
                     <table class="table table-dark table-striped align-middle mb-0 small">
                         <tbody>
                             <tr>
@@ -188,9 +229,9 @@
             <!-- 2. HỆ THỐNG AN TOÀN CAO CẤP -->
             <div class="col-lg-6">
                 <div class="p-3.5 rounded-3 h-100" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08);">
-                    <h5 class="fw-bold text-info mb-3">
+                    <h3 class="fw-bold text-info mb-3 fs-5">
                         <i class="fa-solid fa-shield-halved me-2"></i> 2. Hệ Thống An Toàn & Hỗ Trợ Lái
-                    </h5>
+                    </h3>
                     <ul class="list-group list-group-flush bg-transparent">
                         @php
                             $safeties = $car['specs']['safety'] ?? [
@@ -222,7 +263,7 @@
                     <i class="fa-solid fa-calculator"></i>
                 </div>
                 <div>
-                    <h3 class="fw-bold mb-1 text-white">Bảng Tính Chi Phí Lăn Bánh</h3>
+                    <h2 class="fw-bold mb-1 text-white fs-4">Bảng Tính Chi Phí Lăn Bánh</h2>
                     <p class="text-secondary small mb-0">Tự động ước tính dựa trên Giá xe, Lệ phí trước bạ, Phí biển số theo từng Tỉnh/Thành</p>
                 </div>
             </div>
@@ -332,7 +373,7 @@
                 </div>
                 <div>
                     <div class="d-flex align-items-center gap-2 mb-1">
-                        <h3 class="fw-bold mb-0 text-white">Bảng Tính Vay Trả Góp & Thanh Toán Trả Trước Online</h3>
+                        <h2 class="fw-bold mb-0 text-white fs-4">Bảng Tính Vay Trả Góp & Thanh Toán Trả Trước Online</h2>
                         <span class="badge bg-success bg-opacity-25 text-success border border-success">
                             <i class="fa-solid fa-circle-check me-1"></i> Cổng Online: Hoạt Động
                         </span>

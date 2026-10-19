@@ -1,6 +1,7 @@
 @extends('layouts.giaodien')
 
 @section('title', 'Danh Sách Xe Hạng Sang - PrimeLux Auto')
+@section('meta_description', 'Khám phá danh sách các mẫu xe hạng sang, siêu xe thể thao và xe điện EV nhập khẩu chính hãng: Mercedes-Maybach, Porsche, BMW, Audi, Lexus tại PrimeLux Auto.')
 
 @section('content')
 <!-- HEADER TITLE -->
@@ -19,9 +20,9 @@
         <div class="col-lg-3 mb-4">
             <div class="p-4 rounded-4 sticky-top" style="background: var(--bg-card); border: 1px solid var(--border-color); top: 90px; z-index: 10;">
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h5 class="fw-bold mb-0 text-white">
+                    <h2 class="h5 fw-bold mb-0 text-white">
                         <i class="fa-solid fa-sliders text-primary me-2"></i> Bộ Lọc Tìm Kiếm
-                    </h5>
+                    </h2>
                     <button type="button" class="btn btn-outline-secondary btn-sm" id="btnResetFilter" title="Đặt lại bộ lọc">
                         <i class="fa-solid fa-rotate-left me-1"></i> Đặt Lại
                     </button>
@@ -134,7 +135,13 @@
                     <div class="car-card h-100 d-flex flex-column">
                         <div class="car-thumb position-relative overflow-hidden">
                             <a href="{{ url('/cars/' . $car['id']) }}" class="d-block w-100 h-100" title="Xem chi tiết {{ $car['name'] }}">
-                                <img src="{{ $car['image'] }}" alt="{{ $car['name'] }}" class="w-100 object-fit-cover" style="height: 220px;">
+                                <img src="{{ $car['image'] }}" 
+                                     alt="Mẫu xe {{ $car['name'] }} - {{ $car['brand'] }} chính hãng tại PrimeLux Auto" 
+                                     class="w-100 object-fit-cover" 
+                                     width="400" 
+                                     height="220" 
+                                     loading="lazy" 
+                                     decoding="async">
                             </a>
                             <span class="car-tag {{ $car['tagClass'] ?? 'tag-hot' }} position-absolute top-0 end-0 m-3 pe-none">
                                 {{ $car['tag'] }}
@@ -288,8 +295,17 @@
             }
         }
 
+        // Hàm Debounce tối ưu hiệu năng Runtime theo Chương 8
+        function debounce(fn, delay = 250) {
+            let timer;
+            return function(...args) {
+                clearTimeout(timer);
+                timer = setTimeout(() => fn.apply(this, args), delay);
+            };
+        }
+
         // BẮT SỰ KIỆN THAY ĐỔI BỘ LỌC
-        if (searchInput) searchInput.addEventListener("input", filterAndSortCars);
+        if (searchInput) searchInput.addEventListener("input", debounce(filterAndSortCars, 250));
         if (filterBrand) filterBrand.addEventListener("change", filterAndSortCars);
         if (filterFuel) filterFuel.addEventListener("change", filterAndSortCars);
         if (filterTransmission) filterTransmission.addEventListener("change", filterAndSortCars);

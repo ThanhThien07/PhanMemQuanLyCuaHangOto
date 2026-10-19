@@ -1,2 +1,17 @@
 User-agent: *
-Disallow:
+Allow: /
+Allow: /cars
+Allow: /xe
+Allow: /compare
+Allow: /dich-vu
+Allow: /trade-in
+Allow: /test-drive
+Allow: /loyalty
+Allow: /invoices
+Allow: /thanh-toan-tra-truoc
+Disallow: /admin/
+Disallow: /quantri/
+Disallow: /api/
+Disallow: /hooks/
+
+Sitemap: https://primeluxauto.vn/sitemap.xml

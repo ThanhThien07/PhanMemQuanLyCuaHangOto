@@ -1,6 +1,7 @@
 @extends('layouts.client')
 
 @section('title', 'Tra Cứu Hóa Đơn & Thanh Toán Online Trả Trước - PrimeLux Auto')
+@section('meta_description', 'Tra cứu hóa đơn mua xe, xem lịch sử thanh toán và thực hiện thanh toán online trả trước bảo mật qua PrimeLux Auto.')
 
 @section('content')
 <!-- HÓA ĐƠN & THANH TOÁN (HOADON, THANHTOAN, KHACHHANG, DIEMTHUONG) -->

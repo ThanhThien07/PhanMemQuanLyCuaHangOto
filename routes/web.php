@@ -176,3 +176,14 @@ Route::get('/admin/export/invoices', [QuanTriController::class, 'exportInvoices'
 
 // 21. NHẬT KÝ KIỂM TOÁN & PHÂN QUYỀN RBAC (Chức năng 9)
 Route::get('/admin/audit-logs', [QuanTriController::class, 'auditLogs'])->name('admin.audit.logs');
+
+// 22. SEO TECHNICAL - SITEMAP.XML DÀNH CHO CÔNG CỤ TÌM KIẾM
+Route::get('/sitemap.xml', function () {
+    $sitemapPath = public_path('sitemap.xml');
+    if (file_exists($sitemapPath)) {
+        return response(file_get_contents($sitemapPath), 200, [
+            'Content-Type' => 'application/xml; charset=utf-8',
+        ]);
+    }
+    abort(404);
+})->name('seo.sitemap');

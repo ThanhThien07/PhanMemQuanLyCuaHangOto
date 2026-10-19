@@ -1,20 +1,29 @@
 @extends('layouts.giaodien')
 
 @section('title', 'PrimeLux Auto - Cửa Hàng Ô Tô Hạng Sang & Siêu Xe')
+@section('meta_description', 'Khám phá bộ sưu tập siêu xe và ô tô hạng sang nhập khẩu chính hãng: Mercedes-Maybach, Porsche, BMW, Audi, Lexus tại PrimeLux Auto. Đặt lịch lái thử VIP tận nơi.')
+
+@push('head_preload')
+<!-- PRELOAD ẢNH HERO CHO CHỈ SỐ LCP THEO CHƯƠNG 8 -->
+<link rel="preload" as="image" href="https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=1200&auto=format&fit=crop" fetchpriority="high">
+@endpush
 
 @section('content')
+<!-- TIÊU ĐỀ H1 DUY NHẤT CHUẨN SEO ON-PAGE THEO CHƯƠNG 8 -->
+<h1 class="visually-hidden">PrimeLux Auto - Cửa Hàng Phân Phối Siêu Xe & Ô Tô Hạng Sang Chính Hãng</h1>
+
 <!-- BANNER QUẢNG CÁO XE NỔI BẬT (HERO PROMOTIONAL CAROUSEL) -->
 <section class="hero-promotional-carousel position-relative overflow-hidden">
     <div id="heroPromoCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="6000">
         <!-- Indicators -->
         <div class="carousel-indicators mb-4">
-            <button type="button" data-bs-target="#heroPromoCarousel" data-bs-slide-to="0" class="active" aria-current="true"></button>
-            <button type="button" data-bs-target="#heroPromoCarousel" data-bs-slide-to="1"></button>
-            <button type="button" data-bs-target="#heroPromoCarousel" data-bs-slide-to="2"></button>
+            <button type="button" data-bs-target="#heroPromoCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1: Mercedes-Maybach S 680"></button>
+            <button type="button" data-bs-target="#heroPromoCarousel" data-bs-slide-to="1" aria-label="Slide 2: Porsche Taycan Turbo S"></button>
+            <button type="button" data-bs-target="#heroPromoCarousel" data-bs-slide-to="2" aria-label="Slide 3: BMW 740i"></button>
         </div>
 
         <div class="carousel-inner">
-            <!-- Slide 1: Mercedes-Maybach S 680 -->
+            <!-- Slide 1: Mercedes-Maybach S 680 (ẢNH LCP: KHÔNG LAZY-LOAD, GẮN FETCHPRIORITY=HIGH VÀ WIDTH/HEIGHT ĐỂ TRÁNH CLS) -->
             <div class="carousel-item active" style="min-height: 580px; background: linear-gradient(90deg, #090d16 40%, rgba(9, 13, 22, 0.6) 70%, rgba(9, 13, 22, 0.2) 100%);">
                 <div class="container py-5">
                     <div class="row align-items-center min-vh-50">
@@ -22,7 +31,7 @@
                             <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold mb-3">
                                 <i class="fa-solid fa-fire me-1"></i> HOT DEAL - ĐẶC QUYỀN HỘI VIÊN VIP
                             </span>
-                            <h1 class="display-4 fw-extrabold text-white mb-3">Mercedes-Maybach S 680 4MATIC</h1>
+                            <h2 class="display-4 fw-extrabold text-white mb-3">Mercedes-Maybach S 680 4MATIC</h2>
                             <p class="fs-5 text-secondary mb-4">
                                 Đỉnh cao xa hoa chuẩn nguyên thủ. Động cơ V12 Bi-Turbo 612 mã lực, khoang ghế First-Class bọc da Nappa cùng hệ dẫn động 4 bánh toàn thời gian.
                             </p>
@@ -43,7 +52,10 @@
                             <a href="{{ url('/cars/car-01') }}" title="Khám phá chi tiết Mercedes-Maybach S 680" class="d-inline-block">
                                 <img src="https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=1200&auto=format&fit=crop"
                                     class="img-fluid rounded-4 shadow-2xl border border-secondary border-opacity-25 hero-car-img"
-                                    alt="Mercedes-Maybach S 680">
+                                    alt="Siêu xe Mercedes-Maybach S 680 4MATIC sang trọng chính hãng tại PrimeLux Auto"
+                                    width="600" height="380"
+                                    fetchpriority="high"
+                                    decoding="async">
                             </a>
                         </div>
                     </div>
@@ -58,7 +70,7 @@
                             <span class="badge bg-info text-dark px-3 py-2 rounded-pill fw-bold mb-3">
                                 <i class="fa-solid fa-bolt me-1"></i> XE MỚI VỀ - CÔNG NGHỆ THUẦN ĐIỆN 800V
                             </span>
-                            <h1 class="display-4 fw-extrabold text-white mb-3">Porsche Taycan Turbo S</h1>
+                            <h2 class="display-4 fw-extrabold text-white mb-3">Porsche Taycan Turbo S</h2>
                             <p class="fs-5 text-secondary mb-4">
                                 Siêu xe thuần điện bứt tốc 0-100km/h chỉ trong 2.8 giây. Công suất cực đại 761 mã lực với hệ thống sạc siêu tốc độ cao nhất phân khúc.
                             </p>
@@ -79,7 +91,10 @@
                             <a href="{{ url('/cars/car-02') }}" title="Khám phá chi tiết Porsche Taycan Turbo S" class="d-inline-block">
                                 <img src="https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?q=80&w=1200&auto=format&fit=crop"
                                     class="img-fluid rounded-4 shadow-2xl border border-secondary border-opacity-25 hero-car-img"
-                                    alt="Porsche Taycan Turbo S">
+                                    alt="Siêu xe thể thao thuần điện Porsche Taycan Turbo S chính hãng"
+                                    width="600" height="380"
+                                    loading="lazy"
+                                    decoding="async">
                             </a>
                         </div>
                     </div>
@@ -94,7 +109,7 @@
                             <span class="badge bg-primary text-white px-3 py-2 rounded-pill fw-bold mb-3">
                                 <i class="fa-solid fa-tag me-1"></i> ƯU ĐÃI THÁNG - BẢO DƯỠNG 3 NĂM
                             </span>
-                            <h1 class="display-4 fw-extrabold text-white mb-3">BMW 740i Pure Excellence</h1>
+                            <h2 class="display-4 fw-extrabold text-white mb-3">BMW 740i Pure Excellence</h2>
                             <p class="fs-5 text-secondary mb-4">
                                 Thiết kế tương lai với lưới tản nhiệt Iconic Glow, rạp chiếu phim Theatre Screen 31 inch 8K phía sau cùng nội thất pha lai Crafted Clarity đỉnh cao.
                             </p>
@@ -115,7 +130,10 @@
                             <a href="{{ url('/cars/car-03') }}" title="Khám phá chi tiết BMW 740i Pure Excellence" class="d-inline-block">
                                 <img src="https://images.unsplash.com/photo-1555215695-3004980ad54e?q=80&w=1200&auto=format&fit=crop"
                                     class="img-fluid rounded-4 shadow-2xl border border-secondary border-opacity-25 hero-car-img"
-                                    alt="BMW 740i Pure Excellence">
+                                    alt="Sedan hạng sang BMW 740i Pure Excellence thế hệ mới"
+                                    width="600" height="380"
+                                    loading="lazy"
+                                    decoding="async">
                             </a>
                         </div>
                     </div>
@@ -139,9 +157,9 @@
 <div class="container my-4">
     <div class="filter-card shadow-lg p-4 rounded-4" style="background: var(--bg-card); border: 1px solid var(--border-color);">
         <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
-            <h5 class="fw-bold mb-0 text-white">
+            <h2 class="h5 fw-bold mb-0 text-white">
                 <i class="fa-solid fa-magnifying-glass text-primary me-2"></i> Tìm Kiếm Nhanh Mẫu Xe Phù Hợp
-            </h5>
+            </h2>
             <span class="badge bg-secondary text-white" id="filterResultCount">Đang hiển thị {{ count($cars) }} mẫu xe</span>
         </div>
         <div class="row g-3">
@@ -230,7 +248,13 @@
                 <div class="car-card h-100 d-flex flex-column">
                     <div class="car-thumb position-relative overflow-hidden">
                         <a href="{{ url('/cars/' . $car['id']) }}" class="d-block w-100 h-100" title="Xem chi tiết {{ $car['name'] }}">
-                            <img src="{{ $car['image'] }}" alt="{{ $car['name'] }}" class="w-100 object-fit-cover" style="height: 230px;">
+                            <img src="{{ $car['image'] }}" 
+                                 alt="Siêu xe {{ $car['name'] }} - {{ $car['brand'] }} chính hãng tại PrimeLux Auto" 
+                                 class="w-100 object-fit-cover" 
+                                 width="400" 
+                                 height="230" 
+                                 loading="lazy" 
+                                 decoding="async">
                         </a>
                         <span class="car-tag {{ $car['tagClass'] ?? 'tag-hot' }} position-absolute top-0 end-0 m-3 pe-none">
                             {{ $car['tag'] }}
@@ -285,21 +309,21 @@
             <div class="col-md-4">
                 <div class="p-4 rounded-4 h-100" style="background: var(--bg-card); border: 1px solid var(--border-color);">
                     <i class="fa-solid fa-certificate text-warning fa-3x mb-3"></i>
-                    <h4 class="fw-bold fs-5 text-white">Cam Kết Chính Hãng 100%</h4>
+                    <h3 class="fw-bold fs-5 text-white">Cam Kết Chính Hãng 100%</h3>
                     <p class="text-secondary small mb-0">Tất cả dòng siêu xe và xe sang đều có nguồn gốc minh bạch, kiểm định 165 điểm khắt khe chuẩn châu Âu.</p>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="p-4 rounded-4 h-100" style="background: var(--bg-card); border: 1px solid var(--border-color);">
                     <i class="fa-solid fa-handshake-angle text-primary fa-3x mb-3"></i>
-                    <h4 class="fw-bold fs-5 text-white">Lái Thử Tận Nơi VIP</h4>
+                    <h3 class="fw-bold fs-5 text-white">Lái Thử Tận Nơi VIP</h3>
                     <p class="text-secondary small mb-0">Giao xe tận tư gia hoặc cơ quan để khách hàng trải nghiệm thực tế cùng chuyên viên cao cấp.</p>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="p-4 rounded-4 h-100" style="background: var(--bg-card); border: 1px solid var(--border-color);">
                     <i class="fa-solid fa-shield-halved text-success fa-3x mb-3"></i>
-                    <h4 class="fw-bold fs-5 text-white">Bảo Hành & Cứu Hộ 24/7</h4>
+                    <h3 class="fw-bold fs-5 text-white">Bảo Hành & Cứu Hộ 24/7</h3>
                     <p class="text-secondary small mb-0">Hỗ trợ kỹ thuật 24/7, xe cứu hộ chuyên dụng riêng biệt và chính sách bảo dưỡng 5 sao miễn phí.</p>
                 </div>
             </div>
@@ -323,7 +347,7 @@
                             <i class="fa-solid fa-building-flag"></i>
                         </div>
                         <div>
-                            <h5 class="fw-bold mb-1 text-white">Showroom TP. Hồ Chí Minh</h5>
+                            <h3 class="fw-bold mb-1 text-white fs-5">Showroom TP. Hồ Chí Minh</h3>
                             <span class="badge bg-primary">Flagship Center</span>
                         </div>
                     </div>
@@ -339,7 +363,7 @@
                             <i class="fa-solid fa-building-user"></i>
                         </div>
                         <div>
-                            <h5 class="fw-bold mb-1 text-white">Showroom Hà Nội</h5>
+                            <h3 class="fw-bold mb-1 text-white fs-5">Showroom Hà Nội</h3>
                             <span class="badge bg-warning text-dark">Luxury Hub</span>
                         </div>
                     </div>
@@ -355,7 +379,7 @@
                             <i class="fa-solid fa-warehouse"></i>
                         </div>
                         <div>
-                            <h5 class="fw-bold mb-1 text-white">Center Đà Nẵng</h5>
+                            <h3 class="fw-bold mb-1 text-white fs-5">Center Đà Nẵng</h3>
                             <span class="badge bg-info text-dark">Service & Sales</span>
                         </div>
                     </div>
@@ -460,10 +484,19 @@
             }
         }
 
+        // Hàm Debounce tối ưu hiệu năng Runtime & INP theo Chương 8
+        function debounce(fn, delay = 250) {
+            let timer;
+            return function(...args) {
+                clearTimeout(timer);
+                timer = setTimeout(() => fn.apply(this, args), delay);
+            };
+        }
+
         if (filterBrand) filterBrand.addEventListener("change", applyQuickFilter);
         if (filterType) filterType.addEventListener("change", applyQuickFilter);
         if (filterPrice) filterPrice.addEventListener("change", applyQuickFilter);
-        if (searchInput) searchInput.addEventListener("input", applyQuickFilter);
+        if (searchInput) searchInput.addEventListener("input", debounce(applyQuickFilter, 250));
 
         categoryTabs.forEach(tab => {
             tab.addEventListener("click", function() {

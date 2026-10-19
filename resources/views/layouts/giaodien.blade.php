@@ -6,6 +6,72 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'PrimeLux Auto - Cửa Hàng Ô Tô Hạng Sang & Siêu Xe')</title>
 
+    <!-- SEO ON-PAGE & METADATA THEO CHƯƠNG 8 -->
+    <meta name="description" content="@yield('meta_description', 'PrimeLux Auto - Hệ thống phân phối siêu xe và ô tô hạng sang nhập khẩu chính hãng: Mercedes-Maybach, Porsche, BMW, Audi, Lexus. Lái thử tận nơi, bảo dưỡng 5 sao.')">
+    <meta name="keywords" content="@yield('meta_keywords', 'showroom ô tô, siêu xe, ô tô hạng sang, mercedes-benz, porsche, bmw, audi, lexus, lái thử xe, bảng giá xe')">
+    <meta name="robots" content="@yield('meta_robots', 'index, follow')">
+    <meta name="theme-color" content="#d97706">
+    <link rel="canonical" href="@yield('canonical', url()->current())">
+
+    <!-- RESOURCE HINTS: PRECONNECT & DNS-PREFETCH TĂNG TỐC TẢI TRANG -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://images.unsplash.com" crossorigin>
+    <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="//images.unsplash.com">
+    @stack('head_preload')
+
+    <!-- OPEN GRAPH (FACEBOOK, ZALO, LINKEDIN) -->
+    <meta property="og:type" content="@yield('og_type', 'website')">
+    <meta property="og:site_name" content="PrimeLux Auto">
+    <meta property="og:title" content="@yield('og_title', 'PrimeLux Auto - Cửa Hàng Ô Tô Hạng Sang & Siêu Xe')">
+    <meta property="og:description" content="@yield('og_description', 'PrimeLux Auto - Hệ thống phân phối các dòng siêu xe và ô tô hạng sang nhập khẩu chính hãng hàng đầu Việt Nam.')">
+    <meta property="og:image" content="@yield('og_image', asset('image/Logo.png'))">
+    <meta property="og:url" content="@yield('canonical', url()->current())">
+    <meta property="og:locale" content="vi_VN">
+
+    <!-- TWITTER CARD -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="@yield('og_title', 'PrimeLux Auto - Cửa Hàng Ô Tô Hạng Sang & Siêu Xe')">
+    <meta name="twitter:description" content="@yield('og_description', 'Khám phá bộ sưu tập siêu xe và ô tô hạng sang tại PrimeLux Auto.')">
+    <meta name="twitter:image" content="@yield('og_image', asset('image/Logo.png'))">
+
+    <!-- STRUCTURED DATA: JSON-LD THEO SCHEMA.ORG (AUTODEALER) -->
+    <script type="application/ld+json">
+    {
+        "@@context": "https://schema.org",
+        "@@type": "AutoDealer",
+        "name": "PrimeLux Auto",
+        "image": "{{ asset('image/Logo.png') }}",
+        "url": "{{ url('/') }}",
+        "telephone": "0338929013",
+        "priceRange": "$$$$",
+        "currenciesAccepted": "VND",
+        "paymentAccepted": "Tiền mặt, Chuyển khoản, Trả góp trực tuyến",
+        "address": {
+            "@@type": "PostalAddress",
+            "streetAddress": "123 Nguyễn Văn Linh, Phường Tân Phong, Quận 7",
+            "addressLocality": "TP. Hồ Chí Minh",
+            "addressCountry": "VN"
+        },
+        "geo": {
+            "@@type": "GeoCoordinates",
+            "latitude": 10.7291,
+            "longitude": 106.7118
+        },
+        "openingHoursSpecification": [
+            {
+                "@@type": "OpeningHoursSpecification",
+                "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+                "opens": "08:00",
+                "closes": "20:00"
+            }
+        ]
+    }
+    </script>
+    @stack('structured_data')
+
     <!-- Bootstrap 5 CSS & FontAwesome -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
@@ -216,10 +282,10 @@
         </div>
     </footer>
 
-    <!-- JS BOOTSTRAP, MAIN JS & CHATBOT (TIẾNG VIỆT) -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ asset('js/trangchu.js') }}"></script>
-    <script src="{{ asset('js/trolyao.js') }}"></script>
+    <!-- JS BOOTSTRAP, MAIN JS & CHATBOT (DEFER ĐỂ KHÔNG CHẶN PARSER HTML) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
+    <script src="{{ asset('js/trangchu.js') }}" defer></script>
+    <script src="{{ asset('js/trolyao.js') }}" defer></script>
     @stack('scripts')
 </body>
 
