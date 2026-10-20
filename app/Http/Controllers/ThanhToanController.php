@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\HoaDonXacNhanMail;
+use App\Models\HoaDon;
+use App\Models\KhachHang;
 use App\Models\SepayTransaction;
 use App\Models\Xe;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 
 class ThanhToanController extends Controller
@@ -251,6 +255,75 @@ class ThanhToanController extends Controller
                     'status' => SepayTransaction::STATUS_VERIFIED,
                     'is_notified_admin' => false,
                 ]);
+            }
+
+            // Tạo bản ghi Hóa Đơn thực tế trong CSDL để phục vụ tra cứu
+            $invCode = 'HD'.substr($transCode, -4);
+            try {
+                $custPhone = $trans->customer_phone ?? '0901234567';
+                $custName = $trans->customer_name ?? 'Khách hàng VIP';
+                $customer = KhachHang::firstOrCreate(
+                    ['sdt' => $custPhone],
+                    [
+                        'ma_kh' => 'KH'.rand(1000, 9999),
+                        'ho_ten' => $custName,
+                        'email' => $trans->customer_email ?? ($custPhone.'@gmail.com'),
+                        'diem_tich_luy' => 500,
+                        'tong_chi_tieu' => $amount,
+                    ]
+                );
+
+                $carPrice = (float) ($trans->raw_data['car_price'] ?? ($amount * 10 / 3));
+
+                HoaDon::updateOrCreate(
+                    ['ma_hd' => $invCode],
+                    [
+                        'ma_kh' => $customer->ma_kh,
+                        'ngay_lap' => now(),
+                        'tong_tien_goc' => $carPrice,
+                        'giam_gia_hang' => 0,
+                        'tong_tien_thanh_toan' => $carPrice,
+                        'diem_thuong_nhan' => round($carPrice / 10000000),
+                        'phuong_thuc_tt' => 'Chuyển khoản SePay / VietQR Open Banking',
+                        'thoi_gian_bh' => '36 Tháng Chính Hãng',
+                        'trang_thai' => 'Đã thanh toán trả trước (30%)',
+                    ]
+                );
+            } catch (\Throwable $invEx) {
+                Log::warning('Tạo HoaDon thực tế từ SePay lỗi: '.$invEx->getMessage());
+            }
+
+            // Gửi email xác nhận hóa đơn tới Gmail của khách hàng
+            try {
+                $targetEmail = $trans->customer_email ?? session('user.email');
+                if (empty($targetEmail) && $trans->customer_phone) {
+                    $foundCust = KhachHang::where('sdt', $trans->customer_phone)->first();
+                    $targetEmail = $foundCust?->email;
+                }
+                if (! empty($targetEmail)) {
+                    Mail::to($targetEmail)->send(new HoaDonXacNhanMail([
+                        'ma_hd' => 'HD'.substr($transCode, -4),
+                        'ngay_lap' => now()->format('d/m/Y H:i'),
+                        'customer_name' => $trans->customer_name ?? 'Khách hàng VIP',
+                        'customer_phone' => $trans->customer_phone ?? '',
+                        'customer_email' => $targetEmail,
+                        'phuong_thuc_tt' => 'Chuyển khoản SePay / VietQR Open Banking',
+                        'trang_thai' => 'Đã thanh toán trả trước qua SePay',
+                        'tong_tien_goc' => $trans->raw_data['car_price'] ?? ($amount * 10 / 3),
+                        'giam_gia_hang' => 0,
+                        'tong_tien_thanh_toan' => $trans->raw_data['car_price'] ?? ($amount * 10 / 3),
+                        'car_name' => $trans->car_name,
+                        'thoi_gian_bh' => '36 tháng chính hãng',
+                    ], [
+                        'paid_amount' => $amount,
+                        'customer_name' => $trans->customer_name ?? 'Khách hàng VIP',
+                        'customer_phone' => $trans->customer_phone ?? '',
+                        'customer_email' => $targetEmail,
+                        'car_name' => $trans->car_name,
+                    ]));
+                }
+            } catch (\Throwable $mailEx) {
+                Log::info('Gửi email hóa đơn note: '.$mailEx->getMessage());
             }
 
             return response()->json([

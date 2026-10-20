@@ -11,7 +11,12 @@ class SepayWebhookTest extends TestCase
 
     public function test_admin_payments_page_loads_successfully(): void
     {
-        $response = $this->get('/admin/payments');
+        // Khách vãng lai bị chặn bởi AdminAuth
+        $this->get('/admin/payments')->assertStatus(302);
+
+        // Quản trị viên truy cập thành công
+        $response = $this->withSession(['user' => ['role' => 'admin', 'name' => 'Admin']])
+            ->get('/admin/payments');
         $response->assertStatus(200);
         $response->assertSee('Quản Lý Thanh Toán & SePay Webhook');
         $response->assertSee('hooks/sepay-payment');
@@ -128,7 +133,8 @@ class SepayWebhookTest extends TestCase
         ]);
 
         // 3. Admin polling bắt được giao dịch này để hiện Form Popup góc phải
-        $notifRes = $this->getJson('/admin/payments/latest-notification');
+        $adminSession = ['user' => ['role' => 'admin', 'name' => 'Admin']];
+        $notifRes = $this->withSession($adminSession)->getJson('/admin/payments/latest-notification');
         $notifRes->assertStatus(200);
         $notifRes->assertJson([
             'has_new' => true,
@@ -139,14 +145,14 @@ class SepayWebhookTest extends TestCase
         ]);
 
         // 4. Admin đánh dấu đã xem thông báo
-        $markRes = $this->postJson('/admin/payments/mark-notified', [
+        $markRes = $this->withSession($adminSession)->postJson('/admin/payments/mark-notified', [
             'code' => $transCode,
         ]);
         $markRes->assertStatus(200);
         $markRes->assertJson(['success' => true]);
 
         // Sau khi đánh dấu thì không còn popup lặp lại
-        $notifRes2 = $this->getJson('/admin/payments/latest-notification');
+        $notifRes2 = $this->withSession($adminSession)->getJson('/admin/payments/latest-notification');
         $notifRes2->assertJson(['has_new' => false]);
     }
 }

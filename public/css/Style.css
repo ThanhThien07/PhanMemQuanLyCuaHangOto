@@ -376,6 +376,28 @@ a {
 .tag-hot { background: #ef4444; color: #fff; }
 .tag-sale { background: #f59e0b; color: #fff; }
 
+.status-indicator-dot {
+    width: 9px;
+    height: 9px;
+    min-width: 9px;
+    border-radius: 50%;
+    display: inline-block;
+    vertical-align: middle;
+    flex-shrink: 0;
+}
+.status-indicator-dot.tag-new {
+    background-color: #10b981;
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.7);
+}
+.status-indicator-dot.tag-hot {
+    background-color: #ef4444;
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.7);
+}
+.status-indicator-dot.tag-sale {
+    background-color: #f59e0b;
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.7);
+}
+
 .car-body {
     padding: 22px;
     flex: 1;
@@ -443,7 +465,17 @@ a:hover > .hero-car-img {
 .car-actions {
     margin-top: auto;
     display: flex;
-    gap: 10px;
+    gap: 8px;
+}
+
+.car-actions .btn {
+    font-size: 13px;
+    padding: 8px 6px;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
 }
 
 /* SECTION HEADINGS */
@@ -687,5 +719,96 @@ a:hover > .hero-car-img {
 .thumb-img.active-thumb {
     box-shadow: 0 0 12px rgba(37, 99, 235, 0.8);
     transform: scale(1.02);
+}
+
+/* ============================================================
+   HIGH-CONTRAST ACCESSIBILITY FOR LUXURY DARK THEME
+   Fixes illegible dark-on-dark text and low-contrast badges
+   ============================================================ */
+.text-danger {
+    color: #f87171 !important; /* Vivid coral red for dark background */
+}
+.text-success {
+    color: #34d399 !important; /* Vivid emerald green */
+}
+.text-warning {
+    color: #fbbf24 !important; /* Warm bright gold */
+}
+.text-info {
+    color: #38bdf8 !important; /* Bright sky cyan */
+}
+.text-primary {
+    color: #60a5fa !important; /* Clear light blue */
+}
+.text-secondary {
+    color: #94a3b8 !important; /* Crisp slate-400 */
+}
+.text-muted {
+    color: #94a3b8 !important;
+}
+
+/* Solid Badges */
+.badge.bg-danger {
+    background-color: #ef4444 !important;
+    color: #ffffff !important;
+}
+.badge.bg-success {
+    background-color: #10b981 !important;
+    color: #ffffff !important;
+}
+.badge.bg-warning {
+    background-color: #f59e0b !important;
+    color: #0f172a !important;
+    font-weight: 700;
+}
+.badge.bg-info {
+    background-color: #06b6d4 !important;
+    color: #0f172a !important;
+    font-weight: 700;
+}
+.badge.bg-primary {
+    background-color: #2563eb !important;
+    color: #ffffff !important;
+}
+.badge.bg-secondary {
+    background-color: #334155 !important;
+    color: #f8fafc !important;
+}
+
+/* Translucent badges with high-contrast text */
+.badge.bg-danger.bg-opacity-20,
+.badge.bg-danger.bg-opacity-25 {
+    background-color: rgba(239, 68, 68, 0.25) !important;
+    color: #fca5a5 !important;
+    border: 1px solid #ef4444 !important;
+    font-weight: 700 !important;
+}
+.badge.bg-success.bg-opacity-20,
+.badge.bg-success.bg-opacity-25 {
+    background-color: rgba(16, 185, 129, 0.25) !important;
+    color: #6ee7b7 !important;
+    border: 1px solid #10b981 !important;
+    font-weight: 700 !important;
+}
+.badge.bg-warning.bg-opacity-20,
+.badge.bg-warning.bg-opacity-25 {
+    background-color: rgba(245, 158, 11, 0.25) !important;
+    color: #fde047 !important;
+    border: 1px solid #f59e0b !important;
+    font-weight: 700 !important;
+}
+.badge.bg-info.bg-opacity-20,
+.badge.bg-info.bg-opacity-25 {
+    background-color: rgba(6, 182, 212, 0.25) !important;
+    color: #67e8f9 !important;
+    border: 1px solid #06b6d4 !important;
+    font-weight: 700 !important;
+}
+.badge.bg-secondary.bg-opacity-20,
+.badge.bg-secondary.bg-opacity-25 {
+    background-color: rgba(51, 65, 85, 0.6) !important;
+    color: #f1f5f9 !important;
+    border: 1px solid rgba(148, 163, 184, 0.3) !important;
+    font-weight: 600 !important;
 }
 

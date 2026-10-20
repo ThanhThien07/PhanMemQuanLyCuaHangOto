@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\HoaDonXacNhanMail;
 use App\Models\HoaDon;
+use App\Models\KhachHang;
 use App\Models\SepayTransaction;
 use App\Models\Xe;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class SepayWebhookController extends Controller
 {
@@ -106,6 +109,39 @@ class SepayWebhookController extends Controller
                 'status' => $status,
                 'raw_data' => $request->all(),
             ]);
+
+            // Tự động gửi hóa đơn điện tử về Gmail của khách hàng
+            try {
+                $targetEmail = null;
+                if (! empty($customerPhone)) {
+                    $foundCust = KhachHang::where('sdt', $customerPhone)->first();
+                    $targetEmail = $foundCust?->email;
+                }
+                if (! empty($targetEmail)) {
+                    Mail::to($targetEmail)->send(new HoaDonXacNhanMail([
+                        'ma_hd' => 'HD'.substr($transaction->code, -4),
+                        'ngay_lap' => now()->format('d/m/Y H:i'),
+                        'customer_name' => $customerName ?: 'Khách hàng VIP',
+                        'customer_phone' => $customerPhone ?: '',
+                        'customer_email' => $targetEmail,
+                        'phuong_thuc_tt' => 'Chuyển khoản SePay / VietQR MBBank',
+                        'trang_thai' => 'Đã xác minh thanh toán trả trước',
+                        'tong_tien_goc' => (float) $amount * 10 / 3,
+                        'giam_gia_hang' => 0,
+                        'tong_tien_thanh_toan' => (float) $amount * 10 / 3,
+                        'car_name' => $carName ?: 'Mẫu xe sang PrimeLux',
+                        'thoi_gian_bh' => '36 tháng chính hãng',
+                    ], [
+                        'paid_amount' => $amount,
+                        'customer_name' => $customerName ?: 'Khách hàng VIP',
+                        'customer_phone' => $customerPhone ?: '',
+                        'customer_email' => $targetEmail,
+                        'car_name' => $carName ?: 'Mẫu xe sang PrimeLux',
+                    ]));
+                }
+            } catch (\Throwable $mEx) {
+                Log::info('Webhook email send note: '.$mEx->getMessage());
+            }
 
             return response()->json([
                 'success' => true,

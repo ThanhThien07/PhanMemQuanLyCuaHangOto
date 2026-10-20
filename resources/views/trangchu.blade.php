@@ -37,14 +37,16 @@
                             </p>
                             <div class="d-flex align-items-center gap-3 mb-4">
                                 <div class="fs-3 fw-bold text-warning">15.990.000.000 VNĐ</div>
-                                <span class="badge bg-danger bg-opacity-20 text-danger border border-danger px-2.5 py-1.5">Tặng 100% Phí Biển Số</span>
+                                <span class="badge bg-danger text-white px-3 py-1.5 fw-bold shadow-sm rounded-pill">
+                                    <i class="fa-solid fa-gift me-1"></i> Tặng 100% Phí Biển Số
+                                </span>
                             </div>
                             <div class="d-flex flex-wrap gap-3">
                                 <a href="{{ url('/cars/car-01') }}" class="btn btn-accent btn-lg px-4 shadow">
                                     <i class="fa-solid fa-eye me-2"></i> Khám Phá Chi Tiết
                                 </a>
                                 <a href="{{ url('/test-drive?car=' . urlencode('Mercedes-Maybach S 680 4MATIC')) }}" class="btn btn-outline-light btn-lg px-4">
-                                    <i class="fa-solid fa-steering-wheel me-2"></i> Đặt Lái Thử VIP
+                                    <i class="fa-solid fa-car me-2"></i> Đặt Lái Thử VIP
                                 </a>
                             </div>
                         </div>
@@ -76,14 +78,16 @@
                             </p>
                             <div class="d-flex align-items-center gap-3 mb-4">
                                 <div class="fs-3 fw-bold text-warning">9.550.000.000 VNĐ</div>
-                                <span class="badge bg-success bg-opacity-20 text-success border border-success px-2.5 py-1.5">Tặng Trụ Sạc Home Charger</span>
+                                <span class="badge bg-success text-white px-3 py-1.5 fw-bold shadow-sm rounded-pill">
+                                    <i class="fa-solid fa-charging-station me-1"></i> Tặng Trụ Sạc Home Charger
+                                </span>
                             </div>
                             <div class="d-flex flex-wrap gap-3">
                                 <a href="{{ url('/cars/car-02') }}" class="btn btn-accent btn-lg px-4 shadow">
                                     <i class="fa-solid fa-eye me-2"></i> Khám Phá Chi Tiết
                                 </a>
                                 <a href="{{ url('/test-drive?car=' . urlencode('Porsche Taycan Turbo S')) }}" class="btn btn-outline-light btn-lg px-4">
-                                    <i class="fa-solid fa-steering-wheel me-2"></i> Đặt Lái Thử VIP
+                                    <i class="fa-solid fa-car me-2"></i> Đặt Lái Thử VIP
                                 </a>
                             </div>
                         </div>
@@ -115,14 +119,16 @@
                             </p>
                             <div class="d-flex align-items-center gap-3 mb-4">
                                 <div class="fs-3 fw-bold text-warning">6.299.000.000 VNĐ</div>
-                                <span class="badge bg-warning bg-opacity-20 text-warning border border-warning px-2.5 py-1.5">Hỗ Trợ Trả Góp 0%</span>
+                                <span class="badge bg-warning text-dark px-3 py-1.5 fw-bold shadow-sm rounded-pill">
+                                    <i class="fa-solid fa-percent me-1"></i> Hỗ Trợ Trả Góp 0%
+                                </span>
                             </div>
                             <div class="d-flex flex-wrap gap-3">
                                 <a href="{{ url('/cars/car-03') }}" class="btn btn-accent btn-lg px-4 shadow">
                                     <i class="fa-solid fa-eye me-2"></i> Khám Phá Chi Tiết
                                 </a>
                                 <a href="{{ url('/test-drive?car=' . urlencode('BMW 740i Pure Excellence')) }}" class="btn btn-outline-light btn-lg px-4">
-                                    <i class="fa-solid fa-steering-wheel me-2"></i> Đặt Lái Thử VIP
+                                    <i class="fa-solid fa-car me-2"></i> Đặt Lái Thử VIP
                                 </a>
                             </div>
                         </div>
@@ -215,9 +221,9 @@
                 <h2 class="section-title mb-0">Các Dòng Xe Đang Phân Phối</h2>
             </div>
             <!-- TABS LỌC DANH MỤC: TẤT CẢ / XE MỚI VỀ / XE BÁN CHẠY / ƯU ĐÃI -->
-            <div class="d-flex flex-wrap gap-2">
+            <div class="d-flex flex-wrap gap-2 align-items-center">
                 <button class="btn btn-sm btn-category-tab active" data-category="all">
-                    <i class="fa-solid fa-border-all me-1"></i> Tất Cả Xe
+                    <i class="fa-solid fa-bars me-1"></i> Tất Cả Xe
                 </button>
                 <button class="btn btn-sm btn-category-tab" data-category="new">
                     <i class="fa-solid fa-sparkles me-1 text-info"></i> Xe Mới Về
@@ -229,7 +235,7 @@
                     <i class="fa-solid fa-tags me-1 text-warning"></i> Ưu Đãi Đặc Biệt
                 </button>
                 <a href="{{ url('/cars') }}" class="btn btn-sm btn-outline-primary ms-lg-2">
-                    Xem Tất Cả (cars.html) <i class="fa-solid fa-arrow-right ms-1"></i>
+                    Xem Tất Cả <i class="fa-solid fa-arrow-right ms-1"></i>
                 </a>
             </div>
         </div>
@@ -238,6 +244,8 @@
         <div class="row" id="car-list-container">
             @foreach($cars as $car)
             <div class="col-lg-4 col-md-6 mb-4 car-item-col" 
+                 id="car-card-{{ $car['id'] }}"
+                 data-id="{{ $car['id'] }}"
                  data-brand="{{ $car['brand'] }}" 
                  data-type="{{ $car['type'] }}" 
                  data-price="{{ $car['price'] }}" 
@@ -256,22 +264,22 @@
                                  loading="lazy" 
                                  decoding="async">
                         </a>
-                        <span class="car-tag {{ $car['tagClass'] ?? 'tag-hot' }} position-absolute top-0 end-0 m-3 pe-none">
-                            {{ $car['tag'] }}
-                        </span>
-                        @if(!empty($car['year']))
-                        <span class="badge bg-dark bg-opacity-75 text-white position-absolute top-0 start-0 m-3 border border-secondary pe-none">
-                            Đời {{ $car['year'] }}
-                        </span>
-                        @endif
                     </div>
                     <div class="car-body d-flex flex-column flex-grow-1 p-3">
                         <div class="d-flex justify-content-between align-items-center mb-1">
                             <span class="car-brand text-primary fw-bold small text-uppercase">{{ $car['brand'] }}</span>
-                            <span class="badge bg-secondary bg-opacity-25 text-secondary small">{{ $car['type'] }}</span>
+                            <div class="d-flex align-items-center gap-1">
+                                @if(!empty($car['year']))
+                                <span class="badge bg-dark border border-secondary text-light" style="font-size: 11px;">Đời {{ $car['year'] }}</span>
+                                @endif
+                                <span class="badge bg-secondary text-white small px-2 py-1">{{ $car['type'] }}</span>
+                            </div>
                         </div>
-                        <h3 class="car-title fs-5 fw-bold text-white mb-2">
+                        <h3 class="car-title fs-5 fw-bold text-white mb-2 d-flex align-items-center">
                             <a href="{{ url('/cars/' . $car['id']) }}" class="text-white text-decoration-none" title="Xem chi tiết {{ $car['name'] }}">{{ $car['name'] }}</a>
+                            @if(!empty($car['tag']))
+                            <span class="status-indicator-dot {{ $car['tagClass'] ?? 'tag-hot' }} ms-2" title="{{ $car['tag'] }}"></span>
+                            @endif
                         </h3>
                         <div class="car-specs text-secondary small mb-3 d-flex flex-wrap gap-2">
                             <span><i class="fa-solid fa-gas-pump text-primary me-1"></i> {{ $car['fuel'] }}</span>
@@ -280,14 +288,14 @@
                         </div>
                         <div class="car-price text-warning fw-bold fs-5 mt-auto mb-3">{{ $car['priceText'] }}</div>
                         <div class="car-actions d-flex gap-2">
-                            <a href="{{ url('/cars/' . $car['id']) }}" class="btn btn-accent flex-grow-1 text-center py-2" title="Chi tiết xe">
+                            <a href="{{ url('/cars/' . $car['id']) }}" class="btn btn-accent flex-fill text-center py-2 px-1 small fw-bold" title="Xem chi tiết {{ $car['name'] }}">
                                 <i class="fa-solid fa-eye me-1"></i> Chi Tiết
                             </a>
-                            <a href="{{ url('/cars/' . $car['id'] . '/compare') }}" class="btn btn-outline-info text-center py-2 px-2.5" title="So Sánh Giá Đa Sàn (PO)">
-                                <i class="fa-solid fa-scale-balanced"></i>
+                            <a href="{{ url('/cars/' . $car['id'] . '/compare') }}" class="btn btn-outline-info flex-fill text-center py-2 px-1 small fw-bold" title="So Sánh Giá Đa Sàn">
+                                <i class="fa-solid fa-scale-balanced me-1"></i> So Sánh
                             </a>
-                            <a href="{{ url('/test-drive?car=' . urlencode($car['name'])) }}" class="btn btn-gold text-center py-2 px-2.5" title="Đặt Lái Thử Xe">
-                                <i class="fa-solid fa-steering-wheel"></i>
+                            <a href="{{ url('/test-drive?car=' . urlencode($car['name'])) }}" class="btn btn-gold flex-fill text-center py-2 px-1 small fw-bold" title="Đặt Lái Thử Xe">
+                                <i class="fa-solid fa-car me-1"></i> Lái Thử
                             </a>
                         </div>
                     </div>
@@ -436,7 +444,6 @@
         const btnResetFilter = document.getElementById("btnResetFilter");
         const countBadge = document.getElementById("filterResultCount");
         const categoryTabs = document.querySelectorAll(".btn-category-tab");
-        const carCols = document.querySelectorAll(".car-item-col");
 
         let activeCategory = "all";
 
@@ -445,10 +452,11 @@
             const typeVal = filterType ? filterType.value : "all";
             const priceVal = filterPrice ? filterPrice.value : "all";
             const query = searchInput ? searchInput.value.toLowerCase().trim() : "";
+            const currentCarCols = document.querySelectorAll(".car-item-col");
 
             let visibleCount = 0;
 
-            carCols.forEach(col => {
+            currentCarCols.forEach(col => {
                 const brand = col.dataset.brand;
                 const type = col.dataset.type;
                 const price = parseFloat(col.dataset.price) || 0;
@@ -459,7 +467,7 @@
 
                 let matchBrand = (brandVal === "all" || brand === brandVal);
                 let matchType = (typeVal === "all" || type === typeVal);
-                let matchQuery = (!query || name.includes(query) || brand.toLowerCase().includes(query));
+                let matchQuery = (!query || name.includes(query) || (brand && brand.toLowerCase().includes(query)));
 
                 let matchPrice = true;
                 if (priceVal === "under5") matchPrice = (price < 5000000000);
@@ -482,6 +490,200 @@
             if (countBadge) {
                 countBadge.textContent = `Đang hiển thị ${visibleCount} mẫu xe`;
             }
+        }
+
+        // Tạo thẻ card xe cho trang chủ khi có xe mới từ Admin
+        function renderTrangChuCarCard(car) {
+            const col = document.createElement('div');
+            col.className = 'col-lg-4 col-md-6 mb-4 car-item-col car-card-highlight-new';
+            col.id = `car-card-${car.id}`;
+            col.dataset.id = car.id;
+            col.dataset.brand = car.brand || '';
+            col.dataset.type = car.type || 'Sedan';
+            col.dataset.price = car.price || 0;
+            col.dataset.name = (car.name || '').toLowerCase();
+            col.dataset.tag = car.tag || '';
+            col.dataset.new = car.is_new ? '1' : '0';
+            col.dataset.bestseller = car.is_best_seller ? '1' : '0';
+
+            const priceText = car.priceText || (parseFloat(car.price || 0).toLocaleString('vi-VN') + ' VNĐ');
+            const tagClass = car.tagClass || 'tag-hot';
+
+            col.innerHTML = `
+                <div class="car-card h-100 d-flex flex-column">
+                    <div class="car-thumb position-relative overflow-hidden">
+                        <a href="/cars/${car.id}" class="d-block w-100 h-100" title="Xem chi tiết ${car.name}">
+                            <img src="${car.image}" 
+                                 alt="Siêu xe ${car.name} - ${car.brand} chính hãng tại PrimeLux Auto" 
+                                 class="w-100 object-fit-cover" 
+                                 width="400" 
+                                 height="230" 
+                                 loading="lazy" 
+                                 decoding="async">
+                        </a>
+                    </div>
+                    <div class="car-body d-flex flex-column flex-grow-1 p-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="car-brand text-primary fw-bold small text-uppercase">${car.brand}</span>
+                            <div class="d-flex align-items-center gap-1">
+                                ${car.year ? `<span class="badge bg-dark border border-secondary text-light" style="font-size: 11px;">Đời ${car.year}</span>` : ''}
+                                <span class="badge bg-secondary text-white small px-2 py-1">${car.type}</span>
+                            </div>
+                        </div>
+                        <h3 class="car-title fs-5 fw-bold text-white mb-2 d-flex align-items-center">
+                            <a href="/cars/${car.id}" class="text-white text-decoration-none" title="Xem chi tiết ${car.name}">${car.name}</a>
+                            ${car.tag ? `<span class="status-indicator-dot ${tagClass} ms-2" title="${car.tag}"></span>` : ''}
+                        </h3>
+                        <div class="car-specs text-secondary small mb-3 d-flex flex-wrap gap-2">
+                            <span><i class="fa-solid fa-gas-pump text-primary me-1"></i> ${car.fuel || 'Xăng'}</span>
+                            <span><i class="fa-solid fa-bolt text-warning me-1"></i> ${car.power || '400 Mã lực'}</span>
+                            <span><i class="fa-solid fa-chair text-info me-1"></i> ${car.seats || '5 Chỗ'}</span>
+                        </div>
+                        <div class="car-price text-warning fw-bold fs-5 mt-auto mb-3">${priceText}</div>
+                        <div class="car-actions d-flex gap-2">
+                            <a href="/cars/${car.id}" class="btn btn-accent flex-fill text-center py-2 px-1 small fw-bold" title="Xem chi tiết ${car.name}">
+                                <i class="fa-solid fa-eye me-1"></i> Chi Tiết
+                            </a>
+                            <a href="/cars/${car.id}/compare" class="btn btn-outline-info flex-fill text-center py-2 px-1 small fw-bold" title="So Sánh Giá Đa Sàn">
+                                <i class="fa-solid fa-scale-balanced me-1"></i> So Sánh
+                            </a>
+                            <a href="/test-drive?car=${encodeURIComponent(car.name)}" class="btn btn-gold flex-fill text-center py-2 px-1 small fw-bold" title="Đặt Lái Thử Xe">
+                                <i class="fa-solid fa-car me-1"></i> Lái Thử
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `;
+            return col;
+        }
+
+        // Cập nhật thẻ xe đã có trong DOM khi Admin sửa thông tin
+        function updateTrangChuCarCard(car) {
+            const existing = document.getElementById(`car-card-${car.id}`);
+            if (!existing) return;
+
+            existing.dataset.brand = car.brand || '';
+            existing.dataset.type = car.type || 'Sedan';
+            existing.dataset.price = car.price || 0;
+            existing.dataset.name = (car.name || '').toLowerCase();
+            existing.dataset.tag = car.tag || '';
+            existing.dataset.new = car.is_new ? '1' : '0';
+            existing.dataset.bestseller = car.is_best_seller ? '1' : '0';
+
+            const priceText = car.priceText || (parseFloat(car.price || 0).toLocaleString('vi-VN') + ' VNĐ');
+            const tagClass = car.tagClass || 'tag-hot';
+
+            const img = existing.querySelector('.car-thumb img');
+            if (img && car.image) img.src = car.image;
+
+            const brandEl = existing.querySelector('.car-brand');
+            if (brandEl) brandEl.textContent = car.brand;
+
+            const titleLink = existing.querySelector('.car-title a');
+            if (titleLink) titleLink.textContent = car.name;
+
+            let dot = existing.querySelector('.status-indicator-dot');
+            if (car.tag) {
+                if (!dot) {
+                    dot = document.createElement('span');
+                    existing.querySelector('.car-title').appendChild(dot);
+                }
+                dot.className = `status-indicator-dot ${tagClass} ms-2`;
+                dot.title = car.tag || '';
+            } else if (dot) {
+                dot.remove();
+            }
+
+            const priceEl = existing.querySelector('.car-price');
+            if (priceEl) priceEl.textContent = priceText;
+
+            existing.classList.remove('car-card-highlight-update');
+            void existing.offsetWidth;
+            existing.classList.add('car-card-highlight-update');
+        }
+
+        // LẮNG NGHE SỰ KIỆN REAL-TIME TỪ ADMIN (KHÔNG CẦN F5)
+        if (window.PrimeLuxSync) {
+            window.PrimeLuxSync.listen((event) => {
+                const action = event.action;
+                const data = event.data || {};
+
+                if (action === 'CAR_ADDED' && data.car) {
+                    const container = document.getElementById("car-list-container");
+                    if (container && !document.getElementById(`car-card-${data.car.id}`)) {
+                        const newCard = renderTrangChuCarCard(data.car);
+                        container.insertBefore(newCard, container.firstChild);
+                        applyQuickFilter();
+
+                        window.PrimeLuxSync.showToast({
+                            title: 'Xe Mới Nhập Showroom',
+                            message: `Mẫu xe <strong>${data.car.name}</strong> (${data.car.priceText || ''}) vừa cập bến Showroom PrimeLux!`,
+                            icon: 'fa-sparkles',
+                            type: 'success',
+                            actionUrl: `/cars/${data.car.id}`,
+                            actionText: 'Xem chi tiết'
+                        });
+                    }
+                } else if (action === 'CAR_UPDATED' && data.car) {
+                    updateTrangChuCarCard(data.car);
+                    applyQuickFilter();
+                    window.PrimeLuxSync.showToast({
+                        title: 'Showroom Cập Nhật',
+                        message: `Thông tin mẫu xe <strong>${data.car.name}</strong> vừa được cập nhật.`,
+                        icon: 'fa-pen-to-square',
+                        type: 'info',
+                        actionUrl: `/cars/${data.car.id}`
+                    });
+                } else if (action === 'CAR_DELETED' && data.carId) {
+                    const el = document.getElementById(`car-card-${data.carId}`);
+                    if (el) {
+                        el.style.transition = 'all 0.4s ease';
+                        el.style.opacity = '0';
+                        el.style.transform = 'scale(0.9)';
+                        setTimeout(() => {
+                            el.remove();
+                            applyQuickFilter();
+                        }, 400);
+                    }
+                }
+            });
+
+            // BẬT SMART BACKGROUND POLLING CHO KHÁCH TRÊN CÁC THIẾT BỊ KHÁC
+            window.PrimeLuxSync.startFeedPolling((carsList) => {
+                const container = document.getElementById("car-list-container");
+                if (!container || !Array.isArray(carsList)) return;
+
+                let hasNew = false;
+                carsList.forEach(car => {
+                    const existing = document.getElementById(`car-card-${car.id}`);
+                    if (!existing) {
+                        const newCard = renderTrangChuCarCard(car);
+                        container.insertBefore(newCard, container.firstChild);
+                        hasNew = true;
+                    } else {
+                        updateTrangChuCarCard(car);
+                    }
+                });
+
+                const currentCarIds = carsList.map(c => String(c.id));
+                document.querySelectorAll(".car-item-col").forEach(col => {
+                    const cid = col.dataset.id;
+                    if (cid && !currentCarIds.includes(String(cid))) {
+                        col.remove();
+                    }
+                });
+
+                applyQuickFilter();
+
+                if (hasNew) {
+                    window.PrimeLuxSync.showToast({
+                        title: 'Showroom Cập Nhật',
+                        message: 'Kho xe vừa có mẫu xe mới được bổ sung!',
+                        icon: 'fa-crown',
+                        type: 'success'
+                    });
+                }
+            });
         }
 
         // Hàm Debounce tối ưu hiệu năng Runtime & INP theo Chương 8

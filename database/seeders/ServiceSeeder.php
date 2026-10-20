@@ -184,7 +184,7 @@ class ServiceSeeder extends Seeder
                 'trang_thai' => 'Đang hoạt động',
                 'created_at' => now(),
                 'updated_at' => now(),
-            ]
+            ],
         ]);
 
         // ĐẶT LỊCH MẪU
@@ -223,7 +223,7 @@ class ServiceSeeder extends Seeder
                 'trang_thai' => 'Đang xử lý',
                 'created_at' => now()->subMinutes(50),
                 'updated_at' => now()->subMinutes(20),
-            ]
+            ],
         ]);
     }
 }

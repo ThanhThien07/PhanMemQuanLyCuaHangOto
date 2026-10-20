@@ -84,11 +84,16 @@ class DownPaymentTest extends TestCase
         $response->assertSee('MBBank');
     }
 
-    public function test_invoice_page_includes_down_payment_tab(): void
+    public function test_invoice_page_is_dedicated_lookup_and_links_to_downpayment(): void
     {
         $response = $this->get('/hoadon');
         $response->assertStatus(200);
-        $response->assertSee('Thanh Toán Online Trả Trước');
-        $response->assertSee('MBBank');
+        $response->assertSee('Tra Cứu Hóa Đơn');
+        $response->assertSee('/thanh-toan-tra-truoc');
+
+        // Trang thanh toán trả trước chuyên biệt có thông tin ngân hàng MBBank
+        $paymentResponse = $this->get('/thanh-toan-tra-truoc');
+        $paymentResponse->assertStatus(200);
+        $paymentResponse->assertSee('MBBank');
     }
 }

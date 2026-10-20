@@ -262,8 +262,9 @@
     <!-- TOP HEADER -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-secondary py-2.5">
         <div class="container-fluid px-3 px-md-4">
-            <a class="navbar-brand d-flex align-items-center" href="{{ url('/admin') }}">
-                <span class="brand-text fs-4">PRIMELUX <span class="badge bg-warning text-dark fs-6 ms-2">ADMIN PORTAL</span></span>
+            <a class="navbar-brand d-flex align-items-center text-decoration-none" href="{{ url('/admin') }}">
+                <span class="brand-text fs-4 fw-bold">PRIMELUX</span>
+                <span class="badge rounded-pill ms-2 px-2.5 py-1 fw-bold text-dark shadow-sm" style="background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); font-size: 11px; letter-spacing: 0.5px; -webkit-text-fill-color: #0f172a !important; color: #0f172a !important; display: inline-flex; align-items: center;">ADMIN PORTAL</span>
             </a>
 
             <button class="navbar-toggler text-white border-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#adminNavbarContent">
@@ -299,6 +300,9 @@
                 </a>
                 <a href="{{ url('/admin/test-drive-list') }}" class="admin-nav-link {{ Request::is('admin/test*') ? 'active' : '' }}">
                     <i class="fa-solid fa-calendar-check me-2"></i> Lịch Lái Thử
+                </a>
+                <a href="{{ url('/admin/invoices') }}" class="admin-nav-link {{ Request::is('admin/invoices*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-file-invoice-dollar me-2 text-success"></i> Hóa Đơn & Doanh Thu
                 </a>
                 <a href="{{ url('/admin/payments') }}" class="admin-nav-link {{ Request::is('admin/payment*') || Request::is('admin/sepay*') ? 'active' : '' }}">
                     <i class="fa-solid fa-credit-card me-2 text-warning"></i> Thanh Toán & SePay
@@ -438,6 +442,16 @@
 
         setInterval(pollSepayPaymentNotifications, 4000);
         setTimeout(pollSepayPaymentNotifications, 1000);
+    </script>
+    <script src="{{ asset('js/cars-realtime.js') }}"></script>
+
+    <!-- CHỐNG BROWSER BACK-BUTTON CACHE (BFCACHE) SAU LOGOUT ADMIN -->
+    <script>
+        window.addEventListener('pageshow', function (event) {
+            if (event.persisted || (window.performance && window.performance.navigation && window.performance.navigation.type === 2)) {
+                window.location.reload();
+            }
+        });
     </script>
     @stack('scripts')
 </body>

@@ -56,9 +56,6 @@
                      width="700" height="440" 
                      fetchpriority="high" decoding="async" 
                      style="transition: opacity 0.3s ease;">
-                <span class="badge {{ $car['tagClass'] ?? 'tag-hot' }} position-absolute top-0 end-0 m-3 px-3 py-2 fs-6">
-                    {{ $car['tag'] ?? 'Nổi Bật' }}
-                </span>
                 <span class="badge bg-dark bg-opacity-75 text-white border border-secondary position-absolute bottom-0 start-0 m-3 px-3 py-2">
                     <i class="fa-solid fa-camera me-1 text-warning"></i> <span id="gallery-current-label">Ngoại Thất</span>
                 </span>
@@ -120,7 +117,12 @@
                 @endif
             </div>
 
-            <h1 class="fw-extrabold text-white mb-2" id="car-detail-name">{{ $car['name'] }}</h1>
+            <h1 class="fw-extrabold text-white mb-2 d-flex align-items-center" id="car-detail-name">
+                {{ $car['name'] }}
+                @if(!empty($car['tag']))
+                <span class="status-indicator-dot {{ $car['tagClass'] ?? 'tag-hot' }} ms-2" title="{{ $car['tag'] }}"></span>
+                @endif
+            </h1>
             <div class="fs-2 fw-bold text-warning mb-3" id="car-detail-price">{{ $car['priceText'] }}</div>
 
             <!-- TÓM TẮT NHANH -->
@@ -145,8 +147,11 @@
 
             <!-- CÁC NÚT HÀNH ĐỘNG -->
             <div class="d-grid gap-2 mb-3">
+                <a href="{{ url('/thanh-toan-tra-truoc') }}" class="btn btn-warning btn-lg py-2.5 fw-bold text-dark shadow">
+                    <i class="fa-solid fa-credit-card me-2"></i> Đặt Cọc & Trả Trước Online (VietQR)
+                </a>
                 <a id="btn-test-drive-link" href="{{ url('/test-drive?car=' . urlencode($car['name'])) }}" class="btn btn-gold btn-lg py-2.5 fw-bold shadow">
-                    <i class="fa-solid fa-steering-wheel me-2"></i> Đăng Ký Lái Thử Mẫu Xe Này (test-drive.html)
+                    <i class="fa-solid fa-car me-2"></i> Đăng Ký Lái Thử Mẫu Xe Này
                 </a>
                 <a id="btn-compare-link" href="{{ url('/cars/' . $car['id'] . '/compare') }}" class="btn btn-outline-info btn-lg py-2.5 fw-bold">
                     <i class="fa-solid fa-scale-balanced me-2 text-warning"></i> So Sánh Giá Đa Sàn (PO Market)
@@ -554,7 +559,7 @@
                                     <small class="text-secondary d-block">Số tài khoản thụ hưởng:</small>
                                     <div class="d-flex align-items-center justify-content-between">
                                         <strong class="text-warning fs-5" id="modalAccNo">0338929013</strong>
-                                        <button class="btn btn-outline-warning btn-xs py-0 px-2" onclick="navigator.clipboard.writeText('0338929013'); alert('Đã sao chép STK!');">
+                                        <button class="btn btn-outline-warning btn-xs py-0 px-2" onclick="navigator.clipboard.writeText('0338929013'); if(window.PrimeLuxSync) window.PrimeLuxSync.showToast({ title: 'Đã Sao Chép', message: 'Đã sao chép STK MBBank: 0338929013', icon: 'fa-copy', type: 'info' });">
                                             <i class="fa-regular fa-copy me-1"></i> Sao Chép
                                         </button>
                                     </div>
@@ -856,7 +861,14 @@
         if (btnModalCopyAmount) {
             btnModalCopyAmount.addEventListener("click", () => {
                 navigator.clipboard.writeText(Math.round(activeDownPaymentAmount).toString());
-                alert("Đã sao chép số tiền: " + formatVnd(activeDownPaymentAmount));
+                if (window.PrimeLuxSync) {
+                    window.PrimeLuxSync.showToast({
+                        title: 'Đã Sao Chép Số Tiền',
+                        message: formatVnd(activeDownPaymentAmount),
+                        icon: 'fa-money-bill-wave',
+                        type: 'info'
+                    });
+                }
             });
         }
 
@@ -864,7 +876,14 @@
         if (btnModalCopyContent) {
             btnModalCopyContent.addEventListener("click", () => {
                 navigator.clipboard.writeText(document.getElementById("modalPayContent").textContent);
-                alert("Đã sao chép nội dung chuyển khoản!");
+                if (window.PrimeLuxSync) {
+                    window.PrimeLuxSync.showToast({
+                        title: 'Đã Sao Chép Nội Dung',
+                        message: document.getElementById("modalPayContent").textContent,
+                        icon: 'fa-copy',
+                        type: 'info'
+                    });
+                }
             });
         }
 
@@ -898,13 +917,43 @@
                             document.getElementById("modalSuccessMsg").innerHTML = `Đã xác nhận thanh toán thành công <b>${formatVnd(activeDownPaymentAmount)}</b> cho mẫu xe <b>${carName}</b> qua cổng kết nối <b>${data.id}</b>!`;
                             document.getElementById("modalReceiptBadge").textContent = "Mã Biên Lai Điện Tử: " + (data.receipt_number || "BL-TT-112233");
                         }
+
+                        if (window.PrimeLuxSync) {
+                            window.PrimeLuxSync.showToast({
+                                title: 'Thanh Toán Thành Công',
+                                message: `Đã xác nhận thanh toán trả trước cho ${carName}!`,
+                                icon: 'fa-circle-check',
+                                type: 'success'
+                            });
+                        }
                     }, 1000);
                 })
                 .catch(err => {
                     modalBtnVerify.disabled = false;
                     modalBtnVerify.innerHTML = '<i class="fa-solid fa-arrows-rotate me-1"></i> Tôi Đã Chuyển Khoản — Xác Nhận Ngay';
-                    alert("Đã gửi yêu cầu đối soát thanh toán. Vui lòng thử lại sau giây lát.");
+                    if (window.PrimeLuxSync) {
+                        window.PrimeLuxSync.showToast({
+                            title: 'Đang Đối Soát',
+                            message: 'Đã gửi yêu cầu đối soát thanh toán. Vui lòng thử lại sau giây lát.',
+                            icon: 'fa-clock',
+                            type: 'warning'
+                        });
+                    }
                 });
+            });
+        }
+
+        // Lắng nghe giá xe được cập nhật realtime từ Admin
+        if (window.PrimeLuxSync) {
+            window.PrimeLuxSync.on('CAR_UPDATED', (updatedCar) => {
+                if (updatedCar && (updatedCar.id == '{{ $car["id"] ?? "" }}' || (updatedCar.name && updatedCar.name.toLowerCase() === '{{ strtolower($car["name"] ?? "") }}'))) {
+                    window.PrimeLuxSync.showToast({
+                        title: 'Giá Xe Đã Cập Nhật',
+                        message: `Mẫu xe này vừa được điều chỉnh giá mới: ${updatedCar.priceText || updatedCar.gia_text || ''}`,
+                        icon: 'fa-tags',
+                        type: 'warning'
+                    });
+                }
             });
         }
 

@@ -39,7 +39,7 @@
                         @endforeach
                     </select>
                     <div class="d-flex justify-content-between align-items-center small text-secondary">
-                        <span><i class="fa-solid fa-clock-rotate-left me-1"></i> Dữ liệu tự động sắp xếp <b>tăng dần</b></span>
+                        <span id="syncStatusBadge"><i class="fa-solid fa-clock-rotate-left me-1"></i> Dữ liệu tự động sắp xếp <b>tăng dần</b></span>
                         <button type="button" class="btn btn-outline-secondary btn-sm py-0 px-2" onclick="refreshPrices()">
                             <i class="fa-solid fa-arrows-rotate me-1" id="refreshIcon"></i> Làm mới giá
                         </button>
@@ -281,7 +281,7 @@
 <script>
 function refreshPrices() {
     const icon = document.getElementById('refreshIcon');
-    icon.classList.add('fa-spin');
+    if (icon) icon.classList.add('fa-spin');
     
     fetch('{{ url("/api/cars/" . ($car["id"] ?? 1) . "/refresh-prices") }}', {
         method: 'POST',
@@ -293,15 +293,52 @@ function refreshPrices() {
     .then(r => r.json())
     .then(data => {
         setTimeout(() => {
-            icon.classList.remove('fa-spin');
-            alert(data.message + '\nThời gian đồng bộ: ' + data.synced_at);
-            window.location.reload();
-        }, 600);
+            if (icon) icon.classList.remove('fa-spin');
+            
+            const badge = document.getElementById('syncStatusBadge');
+            if (badge) {
+                badge.innerHTML = `<i class="fa-solid fa-circle-check text-success me-1"></i> Đã đồng bộ: <b class="text-white">${data.synced_at || 'Vừa xong'}</b>`;
+            }
+
+            document.querySelectorAll('table tbody tr').forEach(row => {
+                row.classList.remove('table-row-highlight-update');
+                void row.offsetWidth;
+                row.classList.add('table-row-highlight-update');
+            });
+
+            if (window.PrimeLuxSync) {
+                window.PrimeLuxSync.showToast({
+                    title: 'Đồng Bộ Giá Thị Trường',
+                    message: data.message || 'Đã đồng bộ giá mới nhất từ các sàn giao dịch trực tuyến!',
+                    icon: 'fa-scale-balanced',
+                    type: 'success'
+                });
+            }
+        }, 400);
     })
     .catch(err => {
-        icon.classList.remove('fa-spin');
-        alert('Đã đồng bộ giá thành công!');
-        window.location.reload();
+        if (icon) icon.classList.remove('fa-spin');
+        if (window.PrimeLuxSync) {
+            window.PrimeLuxSync.showToast({
+                title: 'Đồng Bộ Thành Công',
+                message: 'Dữ liệu giá xe đã được cập nhật theo sàn giao dịch gần nhất.',
+                icon: 'fa-check',
+                type: 'info'
+            });
+        }
+    });
+}
+
+if (window.PrimeLuxSync) {
+    window.PrimeLuxSync.on('CAR_UPDATED', (updatedCar) => {
+        if (updatedCar && (updatedCar.id == '{{ $car["id"] ?? 1 }}')) {
+            window.PrimeLuxSync.showToast({
+                title: 'Giá Xe Đã Cập Nhật',
+                message: `Mẫu xe ${updatedCar.name || updatedCar.ten_xe} vừa được ban quản trị Showroom cập nhật thông tin mới.`,
+                icon: 'fa-car-side',
+                type: 'warning'
+            });
+        }
     });
 }
 </script>

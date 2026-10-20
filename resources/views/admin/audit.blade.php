@@ -14,7 +14,7 @@
                 </span>
             </div>
             <p class="text-secondary small mb-0">
-                Ghi nhận toàn bộ thao tác nghiệp vụ nhạy cảm của các vai trò (Super Admin, Quản lý bán hàng, Tư vấn viên, Kế toán) kèm địa chỉ IP và dấu thời gian thực.
+                Ghi nhận các thao tác nghiệp vụ của nhân viên (Quản lý bán hàng, Tư vấn viên, Kế toán) để giám sát và bảo mật dữ liệu. <span class="text-warning fw-bold"><i class="fa-solid fa-shield-halved me-1"></i>Super Admin có quyền quản trị tối thượng và được miễn trừ theo dõi nhật ký.</span>
             </p>
         </div>
 
@@ -34,10 +34,10 @@
             <div class="p-3 rounded-4 bg-dark border border-danger border-opacity-40">
                 <div class="d-flex justify-content-between align-items-center mb-2">
                     <span class="badge bg-danger">Super Admin</span>
-                    <i class="fa-solid fa-user-shield text-danger fs-5"></i>
+                    <span class="badge bg-dark border border-warning text-warning" style="font-size: 10px;">Miễn Trừ Log</span>
                 </div>
-                <div class="fw-bold text-white mb-1">Toàn Quyền Quản Trị</div>
-                <div class="text-secondary" style="font-size: 11px;">Quản lý kho xe, duyệt cấu hình giá, phân quyền tài khoản, xem toàn bộ log.</div>
+                <div class="fw-bold text-white mb-1">Toàn Quyền Tối Thượng</div>
+                <div class="text-secondary" style="font-size: 11px;">Toàn quyền hệ thống, không bị giám sát thao tác, cấu hình bảo mật & phân quyền cấp cao.</div>
             </div>
         </div>
         <div class="col-md-3">
@@ -203,10 +203,24 @@
 function verifyTwoFactor() {
     const code = document.getElementById('twoFactorCode').value.trim();
     if (code.length < 6) {
-        alert('Vui lòng nhập đủ 6 chữ số mã xác thực OTP từ ứng dụng Google Authenticator!');
+        if (window.PrimeLuxSync) {
+            window.PrimeLuxSync.showToast({
+                title: 'Mã OTP Không Hợp Lệ',
+                message: 'Vui lòng nhập đủ 6 chữ số mã xác thực OTP từ ứng dụng Google Authenticator!',
+                icon: 'fa-shield-halved',
+                type: 'warning'
+            });
+        }
         return;
     }
-    alert('🎉 Kích hoạt Xác thực 2 bước (2FA) thành công cho tài khoản Quản trị!');
+    if (window.PrimeLuxSync) {
+        window.PrimeLuxSync.showToast({
+            title: 'Kích Hoạt 2FA Thành Công',
+            message: 'Tài khoản Quản Trị đã được bảo vệ an toàn bằng Xác thực 2 bước (Google Authenticator)!',
+            icon: 'fa-lock',
+            type: 'success'
+        });
+    }
     bootstrap.Modal.getInstance(document.getElementById('twoFactorModal')).hide();
 }
 </script>

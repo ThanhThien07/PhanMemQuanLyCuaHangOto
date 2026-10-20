@@ -35,8 +35,8 @@ class Car extends Model
         $id = $car->ma_xe ?? $car['ma_xe'] ?? $car['id'] ?? 'car-01';
         $brand = $car->ma_th ?? $car['ma_th'] ?? $car['brand'] ?? 'Mercedes-Benz';
         $name = $car->ten_xe ?? $car['ten_xe'] ?? $car['name'] ?? '';
-        $price = (float)($car->gia_niem_yet ?? $car['gia_niem_yet'] ?? $car['price'] ?? 0);
-        $priceText = $car->gia_chu ?? $car['gia_chu'] ?? ($price > 0 ? number_format($price, 0, ',', '.') . ' VNĐ' : ($car['priceText'] ?? '0 VNĐ'));
+        $price = (float) ($car->gia_niem_yet ?? $car['gia_niem_yet'] ?? $car['price'] ?? 0);
+        $priceText = $car->gia_chu ?? $car['gia_chu'] ?? ($price > 0 ? number_format($price, 0, ',', '.').' VNĐ' : ($car['priceText'] ?? '0 VNĐ'));
         $type = $car->ma_loai ?? $car['ma_loai'] ?? $car['type'] ?? 'Sedan';
         $fuel = $car->nhien_lieu ?? $car['nhien_lieu'] ?? $car['fuel'] ?? 'Xăng';
         $power = $car->cong_suat ?? $car['cong_suat'] ?? $car['power'] ?? '400 Mã lực';
@@ -45,27 +45,27 @@ class Car extends Model
         $tagClass = $car->tag_class ?? $car['tag_class'] ?? $car['tagClass'] ?? 'tag-new';
         $image = $car->hinh_anh ?? $car['hinh_anh'] ?? $car['image'] ?? '';
         $desc = $car->mo_ta ?? $car['mo_ta'] ?? $car['desc'] ?? '';
-        $year = (int)($car->nam_sx ?? $car['nam_sx'] ?? $car['year'] ?? 2026);
-        $stock = (int)($car->so_luong_kho ?? $car['so_luong_kho'] ?? $car['stock'] ?? 3);
+        $year = (int) ($car->nam_sx ?? $car['nam_sx'] ?? $car['year'] ?? 2026);
+        $stock = (int) ($car->so_luong_kho ?? $car['so_luong_kho'] ?? $car['stock'] ?? 3);
         $status = $car->trang_thai ?? $car['trang_thai'] ?? $car['status'] ?? 'Sẵn sàng giao';
 
         // Lấy thông tin hộp số và specs mặc định theo mã xe nếu DB chưa có cột riêng
         $defaults = self::getCarDefaultsById($id);
 
         $transmission = $car->hop_so ?? $car['hop_so'] ?? $car['transmission'] ?? $defaults['transmission'] ?? 'Tự động 8 cấp';
-        $isNew = isset($car['is_new']) ? (bool)$car['is_new'] : ($tag === 'Mới Về' || in_array($id, ['car-02', 'car-05']));
-        $isBestSeller = isset($car['is_best_seller']) ? (bool)$car['is_best_seller'] : ($tag === 'HOT' || in_array($id, ['car-01', 'car-04', 'car-06']));
+        $isNew = isset($car['is_new']) ? (bool) $car['is_new'] : ($tag === 'Mới Về' || in_array($id, ['car-02', 'car-05']));
+        $isBestSeller = isset($car['is_best_seller']) ? (bool) $car['is_best_seller'] : ($tag === 'HOT' || in_array($id, ['car-01', 'car-04', 'car-06']));
 
         $galleryExterior = $car['gallery_exterior'] ?? $defaults['gallery_exterior'] ?? [
             $image,
             'https://images.unsplash.com/photo-1555215695-3004980ad54e?q=80&w=800&auto=format&fit=crop',
-            'https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=800&auto=format&fit=crop'
+            'https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=800&auto=format&fit=crop',
         ];
 
         $galleryInterior = $car['gallery_interior'] ?? $defaults['gallery_interior'] ?? [
             'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?q=80&w=800&auto=format&fit=crop',
             'https://images.unsplash.com/photo-1563720223185-11003d516935?q=80&w=800&auto=format&fit=crop',
-            'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=800&auto=format&fit=crop'
+            'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?q=80&w=800&auto=format&fit=crop',
         ];
 
         $specs = $car['specs'] ?? $defaults['specs'] ?? [
@@ -81,8 +81,8 @@ class Car extends Model
                 'Gói an toàn chủ động cao cấp (Hỗ trợ phanh AEB, giữ làn LKA, giám sát điểm mù BSM)',
                 'Hệ thống 11 túi khí bảo vệ toàn diện',
                 'Hệ thống camera 360 độ 3D Surround View và cảm biến đỗ xe trước/sau',
-                'Hệ thống cân bằng điện tử ESP và hỗ trợ khởi hành ngang dốc'
-            ]
+                'Hệ thống cân bằng điện tử ESP và hỗ trợ khởi hành ngang dốc',
+            ],
         ];
 
         return [
@@ -119,11 +119,12 @@ class Car extends Model
         try {
             $dbCars = self::orderBy('id', 'asc')->get();
             if ($dbCars->count() > 0) {
-                return $dbCars->map(fn($c) => self::formatCar($c))->toArray();
+                return $dbCars->map(fn ($c) => self::formatCar($c))->toArray();
             }
         } catch (\Throwable $e) {
             // Fallback to default
         }
+
         return self::getDefaultCars();
     }
 
@@ -138,6 +139,7 @@ class Car extends Model
                 return $c;
             }
         }
+
         return $all[0] ?? [];
     }
 
@@ -192,9 +194,9 @@ class Car extends Model
                         'Hệ thống phanh tự động khẩn cấp PRE-SAFE Impulse Side bảo vệ va chạm ngang',
                         'Hệ thống camera 360 độ 3D Surround View sắc nét hỗ trợ đỗ xe tự động',
                         'Hệ thống treo khí nén chủ động AIRMATIC kết hợp công nghệ E-ACTIVE BODY CONTROL',
-                        'Đèn pha thông minh DIGITAL LIGHT chiếu hình ảnh hướng dẫn xuống mặt đường'
-                    ]
-                ]
+                        'Đèn pha thông minh DIGITAL LIGHT chiếu hình ảnh hướng dẫn xuống mặt đường',
+                    ],
+                ],
             ],
             [
                 'id' => 'car-02',
@@ -241,9 +243,9 @@ class Car extends Model
                         'Hỗ trợ quan sát ban đêm Night Vision Assist với camera hồng ngoại',
                         'Hệ thống hỗ trợ chuyển làn và cảnh báo phương tiện cắt ngang',
                         '8 túi khí bảo vệ thể thao toàn diện quanh cabin',
-                        'Hệ thống cân bằng chủ động Porsche Dynamic Chassis Control Sport (PDCC Sport)'
-                    ]
-                ]
+                        'Hệ thống cân bằng chủ động Porsche Dynamic Chassis Control Sport (PDCC Sport)',
+                    ],
+                ],
             ],
             [
                 'id' => 'car-03',
@@ -290,9 +292,9 @@ class Car extends Model
                         'Cảnh báo va chạm trước và phanh khẩn cấp tự động Active Guard',
                         'Camera 360 Surround View 3D kèm chức năng ghi hình hành trình Drive Recorder',
                         '10 túi khí bảo vệ khoang hành khách',
-                        'Hệ thống kiểm soát hành trình chủ động Active Cruise Control với Stop&Go'
-                    ]
-                ]
+                        'Hệ thống kiểm soát hành trình chủ động Active Cruise Control với Stop&Go',
+                    ],
+                ],
             ],
             [
                 'id' => 'car-04',
@@ -339,9 +341,9 @@ class Car extends Model
                         'Cảnh báo điểm mù và cảnh báo phương tiện cắt ngang khi lùi',
                         'Camera 360 độ 3D mô phỏng góc nhìn thực tế ảo',
                         'Hệ thống 8 túi khí quanh xe',
-                        'Hệ thống treo khí nén thích ứng 3 buồng Adaptive Air Suspension'
-                    ]
-                ]
+                        'Hệ thống treo khí nén thích ứng 3 buồng Adaptive Air Suspension',
+                    ],
+                ],
             ],
             [
                 'id' => 'car-05',
@@ -388,9 +390,9 @@ class Car extends Model
                         'Hỗ trợ lội nước sâu tới 900mm với cảm biến Wade Sensing',
                         'Camera 3D vòm toàn cảnh 360 độ ClearSight Ground View',
                         '10 túi khí an toàn cao cấp bao gồm túi khí rèm toàn xe',
-                        'Ga tự động thích ứng với tính năng Hỗ trợ đánh lái giữ làn'
-                    ]
-                ]
+                        'Ga tự động thích ứng với tính năng Hỗ trợ đánh lái giữ làn',
+                    ],
+                ],
             ],
             [
                 'id' => 'car-06',
@@ -437,10 +439,10 @@ class Car extends Model
                         'Kiểm soát hành trình chủ động bằng radar Dynamic Radar Cruise Control mọi dải tốc độ',
                         'Hỗ trợ theo dõi làn đường Lane Tracing Assist và đèn pha tự động BladeScan AHS',
                         '10 túi khí an toàn bao bọc quanh 4 vị trí ghế VIP',
-                        'Hệ thống điều chỉnh chiều cao chủ động AHC kết hợp hệ thống treo thích ứng AVS'
-                    ]
-                ]
-            ]
+                        'Hệ thống điều chỉnh chiều cao chủ động AHC kết hợp hệ thống treo thích ứng AVS',
+                    ],
+                ],
+            ],
         ];
     }
 }

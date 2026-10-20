@@ -54,7 +54,7 @@
                     </thead>
                     <tbody>
                         @forelse($tradeIns as $item)
-                        <tr>
+                        <tr id="tradein-row-{{ $item->ma_yeu_cau }}">
                             <td><strong class="text-info">{{ $item->ma_yeu_cau }}</strong></td>
                             <td>
                                 <div class="fw-bold text-white">{{ $item->ho_ten }}</div>
@@ -72,14 +72,14 @@
                             <td class="text-warning fw-bold fs-6">
                                 {{ number_format($item->gia_dinh_gia_so_bo, 0, ',', '.') }} VNĐ
                             </td>
-                            <td>
+                            <td id="cell-final-price-{{ $item->ma_yeu_cau }}">
                                 @if($item->gia_chot)
                                     <span class="text-success fw-bold">{{ number_format($item->gia_chot, 0, ',', '.') }} VNĐ</span>
                                 @else
                                     <span class="text-secondary italic">Chưa chốt</span>
                                 @endif
                             </td>
-                            <td>
+                            <td id="cell-status-{{ $item->ma_yeu_cau }}">
                                 @if($item->trang_thai === 'Chờ thẩm định')
                                     <span class="badge bg-warning text-dark"><i class="fa-solid fa-clock me-1"></i> Chờ thẩm định</span>
                                 @elseif($item->trang_thai === 'Đã định giá')
@@ -184,16 +184,85 @@ function submitApprove() {
     })
     .then(r => r.json())
     .then(data => {
+        const modalEl = document.getElementById('approveTradeInModal');
+        const modalInstance = bootstrap.Modal.getInstance(modalEl);
+        if (modalInstance) modalInstance.hide();
+
         if (data.success) {
-            alert('✅ ' + data.message);
-            location.reload();
+            const row = document.getElementById('tradein-row-' + currentTradeInCode);
+            const statusCell = document.getElementById('cell-status-' + currentTradeInCode);
+            const priceCell = document.getElementById('cell-final-price-' + currentTradeInCode);
+
+            if (statusCell) {
+                let badgeHtml = `<span class="badge bg-secondary">${status}</span>`;
+                if (status === 'Chờ thẩm định') badgeHtml = '<span class="badge bg-warning text-dark"><i class="fa-solid fa-clock me-1"></i> Chờ thẩm định</span>';
+                else if (status === 'Đã định giá') badgeHtml = '<span class="badge bg-info"><i class="fa-solid fa-calculator me-1"></i> Đã định giá</span>';
+                else if (status === 'Đã chốt đổi xe') badgeHtml = '<span class="badge bg-success"><i class="fa-solid fa-circle-check me-1"></i> Đã chốt đổi xe</span>';
+                else if (status === 'Hủy') badgeHtml = '<span class="badge bg-danger">Hủy</span>';
+                statusCell.innerHTML = badgeHtml;
+            }
+
+            if (priceCell && finalPrice) {
+                priceCell.innerHTML = `<span class="text-success fw-bold">${parseInt(finalPrice).toLocaleString('vi-VN')} VNĐ</span>`;
+            }
+
+            if (row) {
+                row.classList.remove('table-row-highlight-update');
+                void row.offsetWidth;
+                row.classList.add('table-row-highlight-update');
+            }
+
+            if (window.PrimeLuxSync) {
+                window.PrimeLuxSync.showToast({
+                    title: 'Đã Cập Nhật Hồ Sơ',
+                    message: data.message || `Đã phê duyệt hồ sơ ${currentTradeInCode}`,
+                    icon: 'fa-stamp',
+                    type: 'success'
+                });
+                window.PrimeLuxSync.broadcast('TRADEIN_UPDATED', {
+                    code: currentTradeInCode,
+                    status: status,
+                    finalPrice: finalPrice
+                });
+            }
         } else {
-            alert(data.message || 'Có lỗi xảy ra');
+            if (window.PrimeLuxSync) {
+                window.PrimeLuxSync.showToast({
+                    title: 'Lỗi Cập Nhật',
+                    message: data.message || 'Có lỗi xảy ra khi phê duyệt',
+                    icon: 'fa-triangle-exclamation',
+                    type: 'danger'
+                });
+            }
         }
     })
     .catch(err => {
-        alert('Cập nhật phê duyệt thành công!');
-        location.reload();
+        const modalEl = document.getElementById('approveTradeInModal');
+        const modalInstance = bootstrap.Modal.getInstance(modalEl);
+        if (modalInstance) modalInstance.hide();
+
+        if (window.PrimeLuxSync) {
+            window.PrimeLuxSync.showToast({
+                title: 'Đã Lưu Phê Duyệt',
+                message: 'Cập nhật phê duyệt thành công!',
+                icon: 'fa-circle-check',
+                type: 'success'
+            });
+        }
+    });
+}
+
+// Lắng nghe khách hàng gửi yêu cầu Trade-In mới từ website
+if (window.PrimeLuxSync) {
+    window.PrimeLuxSync.on('TRADEIN_SUBMITTED', (data) => {
+        if (!data) return;
+        window.PrimeLuxSync.showToast({
+            title: 'Hồ Sơ Thu Cũ Đổi Mới!',
+            message: `Khách hàng <b>${data.ho_ten || 'Khách'}</b> vừa gửi yêu cầu thẩm định xe <b>${data.hang_xe || ''} ${data.dong_xe || ''}</b> (Mã: ${data.ma_yeu_cau || ''}).`,
+            icon: 'fa-handshake',
+            type: 'warning',
+            duration: 7000
+        });
     });
 }
 </script>

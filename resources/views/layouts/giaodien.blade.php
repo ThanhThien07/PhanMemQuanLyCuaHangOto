@@ -77,9 +77,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
-    <!-- Custom Style & Chatbot (TIẾNG VIỆT) -->
-    <link rel="stylesheet" href="{{ asset('css/giaodien.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/trolyao.css') }}">
+    <!-- Custom Style & Chatbot (TIẾNG VIỆT) - KÈM CACHE-BUSTING CHỐNG LƯU BROWSER CACHE CŨ -->
+    <link rel="stylesheet" href="{{ asset('css/giaodien.css') }}?v={{ time() }}">
+    <link rel="stylesheet" href="{{ asset('css/trolyao.css') }}?v={{ time() }}">
     @stack('styles')
 </head>
 
@@ -160,10 +160,6 @@
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link nav-link-custom" href="{{ url('/#distribution-system') }}">Showroom</a>
-                    </li>
-
-                    <li class="nav-item">
                         <a class="nav-link nav-link-custom {{ Request::is('test-drive*') || Request::is('laithu*') ? 'active' : '' }}" href="{{ url('/test-drive') }}">Lái Thử</a>
                     </li>
 
@@ -213,18 +209,14 @@
                             </ul>
                         </div>
                     @else
-                        <!-- NÚT ĐĂNG NHẬP NỔI BẬT (KHI CHƯA ĐĂNG NHẬP) -->
-                        <div class="dropdown">
-                            <button class="btn btn-primary btn-sm dropdown-toggle rounded-pill px-3 py-1.5 fw-bold shadow d-flex align-items-center gap-1.5" type="button" data-bs-toggle="dropdown">
-                                <i class="fa-solid fa-user me-1"></i> ĐĂNG NHẬP
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end shadow">
-                                <li><h6 class="dropdown-header text-uppercase text-secondary small">Chọn Cổng Đăng Nhập</h6></li>
-                                <li><a class="dropdown-item" href="{{ url('/login?role=customer') }}"><i class="fa-solid fa-crown me-2 text-warning"></i> Khách Hàng (Tích Điểm VIP)</a></li>
-                                <li><a class="dropdown-item" href="{{ url('/login?role=advisor') }}"><i class="fa-solid fa-headset me-2 text-info"></i> Chuyên Viên Tư Vấn</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="{{ url('/login?role=admin') }}"><i class="fa-solid fa-user-shield me-2 text-primary"></i> Quản Trị Admin</a></li>
-                            </ul>
+                        <!-- NÚT ĐĂNG KÝ VÀ ĐĂNG NHẬP CHO KHÁCH HÀNG (RÕ RÀNG, BẢO MẬT, KHÔNG LỘ CỔNG NỘI BỘ) -->
+                        <div class="d-flex align-items-center gap-2">
+                            <a href="{{ url('/register') }}" class="btn btn-outline-warning btn-sm rounded-pill px-3 py-1.5 fw-bold d-inline-flex align-items-center gap-1.5 text-nowrap shadow-sm" style="border-width: 1.5px;">
+                                <i class="fa-solid fa-user-plus"></i> Đăng Ký
+                            </a>
+                            <a href="{{ url('/login') }}" class="btn btn-primary btn-sm rounded-pill px-3 py-1.5 fw-bold shadow d-inline-flex align-items-center gap-1.5 text-nowrap">
+                                <i class="fa-solid fa-right-to-bracket"></i> Đăng Nhập
+                            </a>
                         </div>
                     @endif
                 </div>
@@ -256,24 +248,24 @@
                     </p>
                 </div>
                 <div class="col-lg-4">
-                    <h5 class="fw-bold mb-3">Liên Kết Nhanh</h5>
-                    <ul class="list-unstyled text-secondary">
-                        <li class="mb-2"><a href="{{ url('/cars') }}" class="hover-white"><i
-                                    class="fa-solid fa-chevron-right text-primary me-2"></i> Danh Sách Mẫu Xe</a></li>
-                        <li class="mb-2"><a href="{{ url('/test-drive') }}" class="hover-white"><i
-                                    class="fa-solid fa-chevron-right text-primary me-2"></i> Đăng Ký Lái Thử</a></li>
-                        <li class="mb-2"><a href="{{ url('/invoices') }}" class="hover-white"><i
-                                    class="fa-solid fa-chevron-right text-info me-2"></i> Tra Cứu Hóa Đơn</a></li>
-                        <li class="mb-2"><a href="{{ url('/thanh-toan-tra-truoc') }}" class="hover-white text-warning"><i
-                                    class="fa-solid fa-credit-card text-warning me-2"></i> Thanh Toán Online Trả Trước</a></li>
-                        <li class="mb-2"><a href="{{ url('/login?role=customer') }}" class="hover-white text-warning"><i
-                                    class="fa-solid fa-crown text-warning me-2"></i> Đăng Nhập Khách Hàng (Tích Điểm VIP)</a></li>
-                        <li class="mb-2"><a href="{{ url('/admin') }}" class="hover-white"><i
-                                    class="fa-solid fa-chevron-right text-primary me-2"></i> Bảng Tổng Quan Quản Trị</a></li>
-                        <li class="mb-2"><a href="{{ url('/admin/cars-management') }}" class="hover-white"><i
-                                    class="fa-solid fa-chevron-right text-success me-2"></i> Quản Lý Kho Xe</a></li>
-                        <li class="mb-2"><a href="{{ url('/admin/test-drive-list') }}" class="hover-white"><i
-                                    class="fa-solid fa-chevron-right text-warning me-2"></i> Quản Lý Lịch Lái Thử</a></li>
+                    <h5 class="fw-bold mb-3 text-warning"><i class="fa-solid fa-shield-halved me-2"></i>Cam Kết & Đặc Quyền 5 Sao</h5>
+                    <ul class="list-unstyled text-secondary small">
+                        <li class="mb-2 d-flex align-items-start gap-2">
+                            <i class="fa-solid fa-certificate text-warning mt-1"></i>
+                            <span><strong>Bảo Hành 36 Tháng:</strong> Tiêu chuẩn chính hãng quốc tế hoặc 100.000 km.</span>
+                        </li>
+                        <li class="mb-2 d-flex align-items-start gap-2">
+                            <i class="fa-solid fa-truck-pickup text-primary mt-1"></i>
+                            <span><strong>Cứu Hộ VIP 24/7:</strong> Xe nâng chuyên dụng toàn quốc không chạm gầm.</span>
+                        </li>
+                        <li class="mb-2 d-flex align-items-start gap-2">
+                            <i class="fa-solid fa-clipboard-check text-success mt-1"></i>
+                            <span><strong>Kiểm Định 176 Hạng Mục:</strong> Cam kết xe nguyên bản, minh bạch lịch sử.</span>
+                        </li>
+                        <li class="mb-2 d-flex align-items-start gap-2">
+                            <i class="fa-solid fa-clock text-info mt-1"></i>
+                            <span><strong>Giờ Mở Cửa:</strong> 08:00 - 20:00 (Phục vụ 7 ngày/tuần, kể cả ngày Lễ & Tết).</span>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -283,10 +275,11 @@
         </div>
     </footer>
 
-    <!-- JS BOOTSTRAP, MAIN JS & CHATBOT (DEFER ĐỂ KHÔNG CHẶN PARSER HTML) -->
+    <!-- JS BOOTSTRAP, MAIN JS & CHATBOT (DEFER & CACHE-BUSTING CHỐNG LƯU BROWSER CACHE CŨ) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
-    <script src="{{ asset('js/trangchu.js') }}" defer></script>
-    <script src="{{ asset('js/trolyao.js') }}" defer></script>
+    <script src="{{ asset('js/trangchu.js') }}?v={{ time() }}" defer></script>
+    <script src="{{ asset('js/cars-realtime.js') }}?v={{ time() }}" defer></script>
+    <script src="{{ asset('js/trolyao.js') }}?v={{ time() }}" defer></script>
     @stack('scripts')
 </body>
 

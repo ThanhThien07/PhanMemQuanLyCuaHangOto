@@ -38,37 +38,15 @@ class TestDrive extends Model
     {
         try {
             $dbDrives = self::orderBy('id', 'desc')->get();
-            if ($dbDrives->count() > 0) {
-                return $dbDrives->map(fn($d) => self::formatBooking($d))->toArray();
-            }
-        } catch (\Throwable $e) {}
 
-        return self::getDefaultBookings();
+            return $dbDrives->map(fn ($d) => self::formatBooking($d))->toArray();
+        } catch (\Throwable $e) {
+            return [];
+        }
     }
 
     public static function getDefaultBookings(): array
     {
-        return [
-            [
-                'id' => 'TD-101',
-                'name' => 'Nguyễn Văn Hùng',
-                'phone' => '0908123456',
-                'email' => 'hung.nguyen@gmail.com',
-                'carName' => 'Mercedes-Maybach S 680 4MATIC',
-                'location' => 'Showroom TP. Hồ Chí Minh',
-                'date' => '2026-09-20 10:00:00',
-                'status' => 'Đang chờ duyệt'
-            ],
-            [
-                'id' => 'TD-102',
-                'name' => 'Trần Thị Mai',
-                'phone' => '0912987654',
-                'email' => 'mai.tran@gmail.com',
-                'carName' => 'Porsche Taycan Turbo S',
-                'location' => 'Showroom Hà Nội',
-                'date' => '2026-09-21 14:30:00',
-                'status' => 'Đã xác nhận'
-            ]
-        ];
+        return [];
     }
 }

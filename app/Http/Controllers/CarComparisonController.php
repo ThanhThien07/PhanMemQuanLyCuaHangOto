@@ -14,13 +14,13 @@ class CarComparisonController extends Controller
     public function compare(Request $request, $id = null)
     {
         $allCars = Car::getAllCars();
-        
+
         // Find selected car
         $selectedId = $id ?? $request->query('car_id', '1');
-        
+
         $car = collect($allCars)->first(function ($c) use ($selectedId) {
-            return (string)$c['id'] === (string)$selectedId
-                || (string)$c['id'] === 'car-' . str_pad($selectedId, 2, '0', STR_PAD_LEFT)
+            return (string) $c['id'] === (string) $selectedId
+                || (string) $c['id'] === 'car-'.str_pad($selectedId, 2, '0', STR_PAD_LEFT)
                 || (isset($c['name']) && stripos($c['name'], $selectedId) !== false);
         }) ?? ($allCars[0] ?? null);
 
@@ -41,7 +41,7 @@ class CarComparisonController extends Controller
             ->get();
 
         // Calculate market analytics
-        $primeLuxPrice = (float)($car['price'] ?? 0);
+        $primeLuxPrice = (float) ($car['price'] ?? 0);
         $minPrice = $sources->min('price') ?? $primeLuxPrice;
         $maxPrice = $sources->max('price') ?? $primeLuxPrice;
         $avgPrice = $sources->avg('price') ?? $primeLuxPrice;
@@ -63,6 +63,7 @@ class CarComparisonController extends Controller
     public function index(Request $request)
     {
         $carId = $request->query('car_id', 1);
+
         return $this->compare($request, $carId);
     }
 

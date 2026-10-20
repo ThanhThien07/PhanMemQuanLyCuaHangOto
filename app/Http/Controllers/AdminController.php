@@ -24,34 +24,34 @@ class AdminController extends Controller
         if ($customers->count() === 0) {
             // Fallback default customers if not yet seeded
             $customers = collect([
-                (object)[
+                (object) [
                     'ma_kh' => 'KH001',
                     'ho_ten' => 'Nguyễn Văn A',
                     'sdt' => '0901234567',
                     'email' => 'khachhang@gmail.com',
                     'diem_tich_luy' => 12500,
                     'tong_chi_tieu' => 31980000000,
-                    'tier' => (object)['ten_hang' => 'Hạng Kim Cương (Diamond VIP)', 'mau_badge' => 'primary', 'ti_le_chiet_khau' => 3.0]
+                    'tier' => (object) ['ten_hang' => 'Hạng Kim Cương (Diamond VIP)', 'mau_badge' => 'primary', 'ti_le_chiet_khau' => 3.0],
                 ],
-                (object)[
+                (object) [
                     'ma_kh' => 'KH002',
                     'ho_ten' => 'Trần Thị Mai',
                     'sdt' => '0912987654',
                     'email' => 'mai.tran@gmail.com',
                     'diem_tich_luy' => 2800,
                     'tong_chi_tieu' => 9550000000,
-                    'tier' => (object)['ten_hang' => 'Hạng Vàng (Gold)', 'mau_badge' => 'warning', 'ti_le_chiet_khau' => 1.0]
-                ]
+                    'tier' => (object) ['ten_hang' => 'Hạng Vàng (Gold)', 'mau_badge' => 'warning', 'ti_le_chiet_khau' => 1.0],
+                ],
             ]);
         }
 
         $tiers = LoyaltyTier::all();
         if ($tiers->count() === 0) {
             $tiers = collect([
-                (object)['ma_hang' => 'SILVER', 'ten_hang' => 'Hạng Bạc', 'diem_toi_thieu' => 0, 'ti_le_chiet_khau' => 0, 'dac_quyen' => 'Tích 1% điểm, giảm 5% phụ kiện', 'mau_badge' => 'secondary'],
-                (object)['ma_hang' => 'GOLD', 'ten_hang' => 'Hạng Vàng', 'diem_toi_thieu' => 1000, 'ti_le_chiet_khau' => 1, 'dac_quyen' => 'Giảm 1% giá xe, tặng 1 năm bảo dưỡng', 'mau_badge' => 'warning'],
-                (object)['ma_hang' => 'PLATINUM', 'ten_hang' => 'Hạng Bạch Kim', 'diem_toi_thieu' => 5000, 'ti_le_chiet_khau' => 2, 'dac_quyen' => 'Giảm 2% giá xe, tặng bảo hiểm thân vỏ', 'mau_badge' => 'info'],
-                (object)['ma_hang' => 'DIAMOND', 'ten_hang' => 'Hạng Kim Cương', 'diem_toi_thieu' => 10000, 'ti_le_chiet_khau' => 3, 'dac_quyen' => 'Giảm 3% mọi siêu xe, phủ Ceramic, VIP quốc tế', 'mau_badge' => 'primary']
+                (object) ['ma_hang' => 'SILVER', 'ten_hang' => 'Hạng Bạc', 'diem_toi_thieu' => 0, 'ti_le_chiet_khau' => 0, 'dac_quyen' => 'Tích 1% điểm, giảm 5% phụ kiện', 'mau_badge' => 'secondary'],
+                (object) ['ma_hang' => 'GOLD', 'ten_hang' => 'Hạng Vàng', 'diem_toi_thieu' => 1000, 'ti_le_chiet_khau' => 1, 'dac_quyen' => 'Giảm 1% giá xe, tặng 1 năm bảo dưỡng', 'mau_badge' => 'warning'],
+                (object) ['ma_hang' => 'PLATINUM', 'ten_hang' => 'Hạng Bạch Kim', 'diem_toi_thieu' => 5000, 'ti_le_chiet_khau' => 2, 'dac_quyen' => 'Giảm 2% giá xe, tặng bảo hiểm thân vỏ', 'mau_badge' => 'info'],
+                (object) ['ma_hang' => 'DIAMOND', 'ten_hang' => 'Hạng Kim Cương', 'diem_toi_thieu' => 10000, 'ti_le_chiet_khau' => 3, 'dac_quyen' => 'Giảm 3% mọi siêu xe, phủ Ceramic, VIP quốc tế', 'mau_badge' => 'primary'],
             ]);
         }
 
@@ -81,11 +81,11 @@ class AdminController extends Controller
     public function adjustPoints(Request $request)
     {
         $custCode = $request->input('ma_kh');
-        $points = (int)$request->input('so_diem');
+        $points = (int) $request->input('so_diem');
         $reason = $request->input('ly_do', 'Quản trị viên điều chỉnh điểm');
 
         $customer = Customer::where('ma_kh', $custCode)->first();
-        if (!$customer) {
+        if (! $customer) {
             return response()->json(['success' => false, 'message' => 'Không tìm thấy khách hàng']);
         }
 
@@ -113,7 +113,7 @@ class AdminController extends Controller
             'success' => true,
             'message' => 'Cập nhật điểm thành công!',
             'new_points' => $customer->diem_tich_luy,
-            'new_tier' => $customer->tier ? $customer->tier->ten_hang : $customer->ma_hang
+            'new_tier' => $customer->tier ? $customer->tier->ten_hang : $customer->ma_hang,
         ]);
     }
 }

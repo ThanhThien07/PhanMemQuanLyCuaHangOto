@@ -10,6 +10,7 @@ class CarController extends Controller
     public function index(Request $request)
     {
         $cars = Car::getAllCars();
+
         return view('cars.index', compact('cars'));
     }
 
@@ -19,8 +20,8 @@ class CarController extends Controller
         $cars = Car::getAllCars();
 
         $car = collect($cars)->first(function ($c) use ($carId) {
-            return $c['id'] == $carId 
-                || $c['id'] == 'car-' . str_pad($carId, 2, '0', STR_PAD_LEFT)
+            return $c['id'] == $carId
+                || $c['id'] == 'car-'.str_pad($carId, 2, '0', STR_PAD_LEFT)
                 || (isset($c['name']) && stripos($c['name'], $carId) !== false);
         }) ?? ($cars[0] ?? null);
 

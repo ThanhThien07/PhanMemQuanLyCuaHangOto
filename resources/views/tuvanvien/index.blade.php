@@ -742,11 +742,25 @@
                             }
                             this.fetchThreadMessages();
                         } else {
-                            alert("Lỗi: " + (res.message || "Không thể gửi phản hồi."));
+                            if (window.PrimeLuxSync) {
+                                window.PrimeLuxSync.showToast({
+                                    title: 'Lỗi Phản Hồi',
+                                    message: res.message || "Không thể gửi phản hồi.",
+                                    icon: 'fa-triangle-exclamation',
+                                    type: 'danger'
+                                });
+                            }
                         }
                     } catch (err) {
                         console.error(err);
-                        alert("Đã xảy ra lỗi khi gửi yêu cầu.");
+                        if (window.PrimeLuxSync) {
+                            window.PrimeLuxSync.showToast({
+                                title: 'Lỗi Kết Nối',
+                                message: 'Đã xảy ra lỗi khi gửi yêu cầu tới máy chủ.',
+                                icon: 'fa-wifi',
+                                type: 'danger'
+                            });
+                        }
                     } finally {
                         this.isSubmitting = false;
                     }
@@ -760,8 +774,12 @@
                         const data = await res.json();
 
                         if (data.success && Array.isArray(data.inquiries)) {
-                            // Kiểm tra có tin nhắn mới xuất hiện không
-                            if (data.inquiries.length > this.inquiries.length) {
+                            // Kiểm tra có tin nhắn mới xuất hiện không (so sánh cả Max ID và Length)
+                            const currentMaxId = this.inquiries.length > 0 ? Math.max(...this.inquiries.map(i => parseInt(i.id) || 0)) : 0;
+                            const newMaxId = data.inquiries.length > 0 ? Math.max(...data.inquiries.map(i => parseInt(i.id) || 0)) : 0;
+                            const hasNewInquiry = (newMaxId > currentMaxId && currentMaxId > 0) || (data.inquiries.length > this.inquiries.length && this.inquiries.length > 0);
+
+                            if (hasNewInquiry && data.inquiries.length > 0) {
                                 const newest = data.inquiries[0];
                                 this.latestMessagePreview = (newest.nguoi_gui || 'Khách hàng') + ': ' + (newest.noi_dung || '');
                                 this.newInquiryAlert = true;
@@ -773,7 +791,8 @@
                             this.inquiries = data.inquiries;
                             this.lastSyncTime = data.timestamp;
 
-                            if (!this.inquiries.some(i => i.ma_tin === this.activeInquiryId) && this.inquiries.length > 0) {
+                            // Tự động chọn cuộc trò chuyện nếu chưa có hoặc id hiện tại không còn
+                            if ((!this.activeInquiryId || !this.inquiries.some(i => i.ma_tin === this.activeInquiryId)) && this.inquiries.length > 0) {
                                 this.activeInquiryId = this.inquiries[0].ma_tin;
                             }
 
@@ -806,6 +825,15 @@
                 if (this.pollTimer) clearInterval(this.pollTimer);
             }
         }).mount('#advisorApp');
+    </script>
+
+    <!-- CHỐNG BROWSER BACK-BUTTON CACHE (BFCACHE) SAU LOGOUT -->
+    <script>
+        window.addEventListener('pageshow', function (event) {
+            if (event.persisted || (window.performance && window.performance.navigation && window.performance.navigation.type === 2)) {
+                window.location.reload();
+            }
+        });
     </script>
 </body>
 

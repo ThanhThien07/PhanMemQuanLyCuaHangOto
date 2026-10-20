@@ -1,5 +1,11 @@
 // PRIMELUX LIVE MESSENGER & AI ADVISOR CHATBOT ENGINE
-// Hoạt động như Messenger thời gian thực: Khách nhắn tin -> Tư vấn viên nhận ngay, Tư vấn viên trả lời -> Khách thấy tức thì.
+// Chuẩn thiết kế widget hiện đại (Crisp / Intercom / LiveChat):
+// - Avatar chuyên viên online, badge tin nhắn chưa đọc
+// - Gợi ý câu hỏi 1 chạm (Quick chips)
+// - AI phản hồi tức thời từ cơ sở dữ liệu xe thực tế qua /api/ai/ask
+// - Kết nối trực tiếp bàn trực Tư Vấn Viên qua /api/consultant
+// - Lưu trữ lịch sử trò chuyện trong localStorage
+// - Hiệu ứng typing 3 chấm nhấp nháy, âm thanh thông báo Web Audio API
 
 (function () {
     // 1. QUẢN LÝ SESSION VÀ THÔNG TIN KHÁCH HÀNG
@@ -20,7 +26,7 @@
     let lastKnownMessageId = parseInt(localStorage.getItem("primelux_last_msg_id") || "0");
     let unreadCount = 0;
 
-    // 2. TẠO ÂM THANH THÔNG BÁO BẰNG WEB AUDIO API (KHÔNG CẦN TẢI FILE MP3)
+    // 2. TẠO ÂM THANH THÔNG BÁO BẰNG WEB AUDIO API (KHÔNG CẦN FILE MP3 NGOÀI)
     let audioCtx = null;
     function getAudioContext() {
         if (!audioCtx) {
@@ -33,7 +39,7 @@
         return audioCtx;
     }
 
-    // Tiếng "pop/ting" khi khách gửi
+    // Tiếng "pop" khi khách gửi tin nhắn
     function playSendSound() {
         try {
             const ctx = getAudioContext();
@@ -52,17 +58,16 @@
         } catch (e) {}
     }
 
-    // Tiếng "ding-dong" êm ái khi Tư Vấn Viên phản hồi
+    // Tiếng "ding-dong" êm ái khi bot hoặc chuyên viên trả lời
     function playReceiveSound() {
         try {
             const ctx = getAudioContext();
             if (!ctx) return;
             const now = ctx.currentTime;
-            // Tone 1
             const osc1 = ctx.createOscillator();
             const gain1 = ctx.createGain();
             osc1.type = "sine";
-            osc1.frequency.setValueAtTime(659.25, now); // E5
+            osc1.frequency.setValueAtTime(659.25, now);
             gain1.gain.setValueAtTime(0.18, now);
             gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
             osc1.connect(gain1);
@@ -70,11 +75,10 @@
             osc1.start(now);
             osc1.stop(now + 0.25);
 
-            // Tone 2
             const osc2 = ctx.createOscillator();
             const gain2 = ctx.createGain();
             osc2.type = "sine";
-            osc2.frequency.setValueAtTime(880, now + 0.12); // A5
+            osc2.frequency.setValueAtTime(880, now + 0.12);
             gain2.gain.setValueAtTime(0.18, now + 0.12);
             gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.45);
             osc2.connect(gain2);
@@ -86,7 +90,7 @@
 
     // 3. TẠO HTML WIDGET VÀO BODY
     const widgetHTML = `
-        <div class="chatbot-widget-btn" id="chatbotToggleBtn" title="Trò chuyện với Tư Vấn Viên & Trợ Lý PrimeLux">
+        <div class="chatbot-widget-btn" id="chatbotToggleBtn" title="Trò chuyện với Tư Vấn Viên & Trợ Lý PrimeLux AI">
             <i class="fa-solid fa-comments"></i>
             <span class="chatbot-unread-dot d-none" id="chatbotUnreadBadge">0</span>
         </div>
@@ -107,17 +111,17 @@
                             </div>
                         </div>
                     </div>
-                    <div style="display: flex; gap: 8px; align-items: center;">
-                        <a href="/consultant" target="_blank" style="color: #93c5fd; font-size: 11.5px; text-decoration: none;" title="Cổng Bàn trực dành cho Chuyên viên">
-                            <i class="fa-solid fa-desktop"></i> Cổng Bàn Trực
-                        </a>
-                        <button id="chatbotCloseBtn" style="background: none; border: none; color: #94a3b8; font-size: 18px; cursor: pointer; padding: 2px 6px;">
+                    <div style="display: flex; gap: 6px; align-items: center;">
+                        <button class="chatbot-header-btn" id="chatbotResetBtn" title="Làm mới cuộc trò chuyện">
+                            <i class="fa-solid fa-rotate-right"></i>
+                        </button>
+                        <button class="chatbot-header-btn" id="chatbotCloseBtn" title="Đóng cửa sổ chat">
                             <i class="fa-solid fa-xmark"></i>
                         </button>
                     </div>
                 </div>
 
-                <!-- TABS CHUYỂN CHẾ ĐỘ: TƯ VẤN TRỰC TIẾP (MESSENGER) vs TRỢ LÝ AI (FAQ) -->
+                <!-- TABS CHUYỂN CHẾ ĐỘ: TƯ VẤN TRỰC TIẾP vs TRỢ LÝ AI -->
                 <div class="chatbot-mode-tabs">
                     <button type="button" class="chatbot-mode-tab ${currentMode === 'live' ? 'active' : ''}" id="tabModeLive">
                         <i class="fa-solid fa-user-tie"></i> 💬 Tư Vấn Trực Tiếp (Live Chat)
@@ -130,8 +134,8 @@
 
             <!-- THANH THÔNG TIN KHÁCH HÀNG NHANH -->
             <div class="chatbot-customer-bar" id="customerInfoBar">
-                <span id="customerLabel"><i class="fa-solid fa-user-tag me-1 text-warning"></i> Đang trò chuyện với tư cách: <strong class="text-white" id="displayCustomerName">${customerName}</strong></span>
-                <a id="btnEditCustomerInfo"><i class="fa-solid fa-pen-to-square me-1"></i>Đổi Tên/SĐT</a>
+                <span id="customerLabel"><i class="fa-solid fa-user-tag me-1 text-warning"></i> Khách hàng: <strong class="text-white" id="displayCustomerName">${customerName}</strong></span>
+                <a id="btnEditCustomerInfo" style="cursor: pointer;"><i class="fa-solid fa-pen-to-square me-1"></i>Đổi Tên/SĐT</a>
             </div>
 
             <!-- NỘI DUNG CUỘC TRÒ CHUYỆN (MESSENGER STREAM) -->
@@ -143,14 +147,14 @@
             <div class="chatbot-footer">
                 <div class="chatbot-input-row">
                     <input type="text" id="chatbotInput" class="chatbot-input" 
-                           placeholder="Nhập tin nhắn gửi tư vấn viên..." 
+                           placeholder="Nhập câu hỏi hoặc chọn gợi ý bên trên..." 
                            autocomplete="off">
                     <button class="chatbot-send-btn" id="chatbotSendBtn" title="Gửi tin nhắn (Enter)">
                         <i class="fa-solid fa-paper-plane"></i>
                     </button>
                 </div>
                 <div class="chatbot-hint">
-                    <span id="modeHintText">⚡ Nhấn <b>Enter</b> để gửi ngay tới bàn trực Chuyên viên VIP</span>
+                    <span id="modeHintText">⚡ Nhấn <b>Enter</b> để gửi ngay tới chuyên viên</span>
                     <span id="sessionTag" style="font-family: monospace; font-size: 10px; color: #64748b;">${sessionId.slice(0, 10)}</span>
                 </div>
             </div>
@@ -162,6 +166,7 @@
     // 4. THAM CHIẾU DOM ELEMENTS
     const toggleBtn = document.getElementById("chatbotToggleBtn");
     const closeBtn = document.getElementById("chatbotCloseBtn");
+    const resetBtn = document.getElementById("chatbotResetBtn");
     const chatBox = document.getElementById("chatbotBox");
     const chatBody = document.getElementById("chatbotBody");
     const chatInput = document.getElementById("chatbotInput");
@@ -176,7 +181,25 @@
     const displayCustomerName = document.getElementById("displayCustomerName");
     const modeHintText = document.getElementById("modeHintText");
 
-    // 5. CÁC HÀM HIỂN THỊ TIN NHẮN TRONG STREAM
+    // 5. QUẢN LÝ LỊCH SỬ TIN NHẮN TRONG LOCAL STORAGE
+    function getStoredHistory() {
+        try {
+            return JSON.parse(localStorage.getItem("primelux_chat_history_v2") || "[]");
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function saveMessageToHistory(sender, text, meta = {}) {
+        try {
+            const hist = getStoredHistory();
+            hist.push({ sender, text, meta, time: meta.time || new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) });
+            if (hist.length > 50) hist.shift();
+            localStorage.setItem("primelux_chat_history_v2", JSON.stringify(hist));
+        } catch (e) {}
+    }
+
+    // 6. CÁC HÀM HIỂN THỊ TIN NHẮN TRONG STREAM
     function appendBubble(sender, text, meta = {}) {
         const row = document.createElement("div");
         row.className = `chat-bubble-row ${sender}`;
@@ -209,13 +232,32 @@
                 <div class="chat-msg">${text}</div>
                 <div class="chat-bubble-meta">
                     <span>${time}</span>
-                    <span class="text-secondary ms-1">• Trợ lý tự động</span>
+                    <span class="text-secondary ms-1">• Trợ lý AI PrimeLux</span>
                 </div>
             `;
         }
 
         chatBody.appendChild(row);
         chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    function renderTypingIndicator() {
+        removeTypingIndicator();
+        const row = document.createElement("div");
+        row.className = "chat-bubble-row bot";
+        row.id = "chatTypingRow";
+        row.innerHTML = `
+            <div class="chat-msg chat-typing-dots">
+                <span></span><span></span><span></span>
+            </div>
+        `;
+        chatBody.appendChild(row);
+        chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    function removeTypingIndicator() {
+        const el = document.getElementById("chatTypingRow");
+        if (el) el.remove();
     }
 
     function escapeHtml(string) {
@@ -225,7 +267,7 @@
         return div.innerHTML;
     }
 
-    // 6. KHỞI TẠO NỘI DUNG CHÀO ĐẦU TIÊN
+    // 7. KHỞI TẠO NỘI DUNG CHÀO ĐẦU TIÊN
     function renderWelcomeMessage() {
         chatBody.innerHTML = '';
 
@@ -233,14 +275,15 @@
             headerTitle.textContent = "PrimeLux VIP Advisor";
             headerSubtitle.innerHTML = `<span style="display:inline-block; width:6px; height:6px; background:#22c55e; border-radius:50%;"></span> Chuyên viên trực tuyến • Nhắn là nhận ngay`;
             headerAvatarIcon.className = "fa-solid fa-headset";
-            modeHintText.innerHTML = `⚡ Nhấn <b>Enter</b> để nhắn tin trực tiếp tới Bàn trực Chuyên Viên`;
+            modeHintText.innerHTML = `⚡ Nhấn <b>Enter</b> để nhắn tin trực tiếp tới Chuyên Viên`;
 
             const welcomeHTML = `
                 👋 <b>Dạ kính chào Quý khách!</b> Em là Chuyên viên Trực tuyến của <b>PrimeLux Auto Showroom</b>.
                 <br><br>
                 Quý khách đang tìm kiếm mẫu xe nào hoặc cần nhận <b>Bảng báo giá lăn bánh, Gói vay trả góp 80%</b> hay <b>Đặt lịch lái thử tận nơi</b>, cứ nhắn trực tiếp tại đây em hỗ trợ ngay tức thì nhé ạ!
                 <div class="quick-chips">
-                    <button class="chip-btn" data-quick="Báo giá xe Maybach S680 sẵn giao ngay">🚗 Maybach S680</button>
+                    <button class="chip-btn" data-quick="Báo giá xe Mercedes-Maybach S680 sẵn giao ngay">🚗 Maybach S680</button>
+                    <button class="chip-btn" data-quick="Báo giá xe Porsche Taycan Turbo S">⚡ Porsche Taycan</button>
                     <button class="chip-btn" data-quick="Tư vấn gói vay trả góp 80% lãi suất ưu đãi">💳 Gói vay 80%</button>
                     <button class="chip-btn" data-quick="Cách tính giá lăn bánh tại TP.HCM & Hà Nội">🧮 Giá lăn bánh</button>
                     <button class="chip-btn" data-quick="Đặt lịch lái thử xe tận nơi miễn phí">🏎️ Lái thử tận nơi</button>
@@ -256,41 +299,53 @@
             const botHTML = `
                 👋 <b>Chào mừng Quý khách!</b> Tôi là Trợ lý Thông Minh AI của <b>PrimeLux Auto</b>.
                 <br><br>
-                Quý khách có thể bấm chọn nhanh các chủ đề dưới đây hoặc gõ câu hỏi để được tra cứu tức thời:
+                Hệ thống tra cứu tự động thông số kỹ thuật, bảng giá lăn bánh và các chính sách ưu đãi showroom:
                 <div class="quick-chips">
-                    <button class="chip-btn" data-quick="Tư vấn dòng xe sang theo ngân sách">💰 Theo ngân sách</button>
-                    <button class="chip-btn" data-quick="Cách tính giá lăn bánh xe?">🧮 Bảng tính lăn bánh</button>
-                    <button class="chip-btn" data-quick="Chính sách tích điểm VIP PrimeLux Club">💎 Tích điểm VIP</button>
-                    <button class="chip-btn" data-quick="Thủ tục mua xe trả góp và lãi suất">💳 Mua xe trả góp</button>
-                    <button class="chip-btn" data-quick="Dịch vụ thu cũ đổi mới Trade-In">🔄 Thu cũ đổi mới</button>
-                    <button class="chip-btn special" data-quick="chuyen_sang_tu_van_vien">👨‍💼 Gặp Chuyên Viên Tư Vấn VIP</button>
+                    <button class="chip-btn" data-quick="Giá lăn bánh Mercedes-Maybach S680">🚗 Maybach S680</button>
+                    <button class="chip-btn" data-quick="Thông số siêu xe Porsche 911 GT3 RS">🏎️ Porsche 911 GT3</button>
+                    <button class="chip-btn" data-quick="Gói vay ngân hàng mua xe sang trả góp 80%">💳 Vay trả góp 80%</button>
+                    <button class="chip-btn" data-quick="Chương trình thu cũ đổi mới Trade-In">🔄 Thu cũ đổi mới</button>
+                    <button class="chip-btn" data-quick="Chính sách bảo hành điện tử VIN">🛡️ Sổ bảo hành VIN</button>
+                    <button class="chip-btn special" data-quick="chuyen_sang_tu_van_vien">👨‍💼 Kết Nối Chuyên Viên VIP</button>
                 </div>
             `;
             appendBubble('bot', botHTML);
         }
 
-        // Tải lại lịch sử tin nhắn trong session nếu có
+        // Tải lịch sử đã lưu nếu có
+        loadLocalHistory();
         loadSessionHistory();
     }
 
-    // 7. TẢI LỊCH SỬ TIN NHẮN TỪ SERVER ĐỂ DUY TRÌ CUỘC TRÒ CHUYỆN
+    // Tải tin nhắn từ LocalStorage
+    function loadLocalHistory() {
+        const hist = getStoredHistory();
+        if (hist.length > 0) {
+            hist.forEach(item => {
+                appendBubble(item.sender, item.text, item.meta);
+            });
+        }
+    }
+
+    // TẢI LỊCH SỬ TIN NHẮN TỪ SERVER ĐỂ ĐỒNG BỘ NẾU CÓ
     async function loadSessionHistory() {
         try {
             const res = await fetch(`/api/consultant/thread-messages?session_id=${encodeURIComponent(sessionId)}`);
             const data = await res.json();
             if (data.success && Array.isArray(data.messages) && data.messages.length > 0) {
-                // Xóa nội dung chào mẫu và vẽ lại toàn bộ lịch sử thực tế
-                chatBody.innerHTML = '';
                 data.messages.forEach(msg => {
                     const isAdvisor = msg.sender_type === 'consultant';
                     const sender = isAdvisor ? 'advisor' : 'user';
-                    appendBubble(sender, msg.noi_dung, {
-                        id: msg.id,
-                        advisorName: msg.nguoi_gui || 'Chuyên Viên Tư Vấn PrimeLux',
-                        time: msg.thoi_gian
-                    });
+                    // Kiểm tra xem message đã có trong DOM chưa
+                    const existing = chatBody.querySelector(`[data-msg-id="${msg.id}"]`);
+                    if (!existing) {
+                        appendBubble(sender, msg.noi_dung, {
+                            id: msg.id,
+                            advisorName: msg.nguoi_gui || 'Chuyên Viên Tư Vấn PrimeLux',
+                            time: msg.thoi_gian
+                        });
+                    }
 
-                    // Cập nhật ID lớn nhất
                     if (msg.id > lastKnownMessageId) {
                         lastKnownMessageId = msg.id;
                         localStorage.setItem("primelux_last_msg_id", lastKnownMessageId.toString());
@@ -298,7 +353,7 @@
                 });
             }
         } catch (e) {
-            console.log("Load history note:", e);
+            // Không ngắt mạch nếu có lỗi kết nối
         }
     }
 
@@ -307,7 +362,7 @@
         const text = customText || chatInput.value.trim();
         if (!text) return;
 
-        // Xử lý chuyển chế độ nhanh nếu bấm chip đặc biệt
+        // Xử lý chuyển chế độ nhanh nếu bấm chip chuyển sang tư vấn viên
         if (text === "chuyen_sang_tu_van_vien") {
             switchMode("live");
             return;
@@ -316,30 +371,82 @@
         // 1. Hiển thị ngay lên màn hình bên phía khách hàng (optimistic UI)
         playSendSound();
         appendBubble('user', text);
+        saveMessageToHistory('user', text);
         if (!customText) chatInput.value = '';
-
-        // 2. Kiểm tra nếu đang ở chế độ Trợ lý AI và có câu trả lời mẫu
-        if (currentMode === 'bot') {
-            const botReply = findPredefinedAnswer(text);
-            if (botReply) {
-                setTimeout(() => {
-                    playReceiveSound();
-                    appendBubble('bot', botReply);
-                }, 400);
-                return;
-            }
-        }
-
-        // 3. GỬI TỚI BÀN TRỰC TƯ VẤN VIÊN (REALTIME BACKEND SYNC)
-        const csrfMeta = document.querySelector('meta[name="csrf-token"]');
-        const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
 
         // Tự động nhận diện số điện thoại trong tin nhắn nếu khách nhập
         const phoneMatch = text.match(/(0[3|5|7|8|9][0-9]{8})/);
         if (phoneMatch && !customerPhone) {
             customerPhone = phoneMatch[0];
             localStorage.setItem("primelux_customer_phone", customerPhone);
+            displayCustomerName.textContent = customerName + ` (${customerPhone})`;
         }
+
+        // 2. Chế độ Trợ lý AI (Bot Mode) -> Gọi API AI hỏi đáp trực tiếp
+        if (currentMode === 'bot') {
+            renderTypingIndicator();
+            try {
+                const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+                const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
+
+                const aiRes = await fetch('/api/ai/ask', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify({
+                        session_id: sessionId,
+                        question: text,
+                        phone: customerPhone || null,
+                        name: customerName || null
+                    })
+                });
+
+                const aiData = await aiRes.json();
+                removeTypingIndicator();
+
+                if (aiData && aiData.answer) {
+                    playReceiveSound();
+                    let responseHTML = aiData.answer;
+
+                    // Thêm gợi ý tiếp theo nếu có
+                    if (Array.isArray(aiData.suggestedQuestions) && aiData.suggestedQuestions.length > 0) {
+                        responseHTML += `<div class="quick-chips" style="margin-top: 10px;">`;
+                        aiData.suggestedQuestions.forEach(q => {
+                            responseHTML += `<button class="chip-btn" data-quick="${escapeHtml(q)}">${escapeHtml(q)}</button>`;
+                        });
+                        responseHTML += `</div>`;
+                    }
+
+                    appendBubble('bot', responseHTML);
+                    saveMessageToHistory('bot', responseHTML);
+
+                    // Khi câu hỏi được chuyển tới chuyên viên tư vấn -> kích hoạt ngay realtime polling
+                    if (aiData.should_escalate) {
+                        startFastPolling();
+                    }
+
+                    return;
+                }
+            } catch (err) {
+                removeTypingIndicator();
+            }
+
+            // Fallback nếu API có sự cố
+            const fallbackReply = findPredefinedAnswer(text);
+            if (fallbackReply) {
+                playReceiveSound();
+                appendBubble('bot', fallbackReply);
+                saveMessageToHistory('bot', fallbackReply);
+                return;
+            }
+        }
+
+        // 3. GỬI TỚI BÀN TRỰC TƯ VẤN VIÊN (LIVE CHAT HOẶC ĐỒNG BỘ THREAD)
+        const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+        const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
 
         try {
             const response = await fetch('/api/consultant/submit-question', {
@@ -366,7 +473,7 @@
                 }
             }
 
-            // Kích hoạt ngay polling kiểm tra phản hồi từ tư vấn viên
+            // Kích hoạt ngay polling nhận phản hồi từ chuyên viên
             startFastPolling();
         } catch (err) {
             console.error("Gửi tin nhắn thất bại:", err);
@@ -388,9 +495,13 @@
                             lastKnownMessageId = msg.id;
                             localStorage.setItem("primelux_last_msg_id", lastKnownMessageId.toString());
 
-                            // Hiển thị tin nhắn của chuyên viên
                             playReceiveSound();
                             appendBubble('advisor', msg.noi_dung, {
+                                id: msg.id,
+                                advisorName: msg.nguoi_gui || 'Chuyên Viên Tư Vấn PrimeLux',
+                                time: msg.thoi_gian
+                            });
+                            saveMessageToHistory('advisor', msg.noi_dung, {
                                 id: msg.id,
                                 advisorName: msg.nguoi_gui || 'Chuyên Viên Tư Vấn PrimeLux',
                                 time: msg.thoi_gian
@@ -406,9 +517,9 @@
                     });
                 }
             } catch (e) {
-                // Ignore network glitch
+                // Tự động bỏ qua lỗi mạng tạm thời
             }
-        }, 1500); // 1.5s nhạy như Messenger
+        }, 1500);
     }
 
     // 10. CHUYỂN ĐỔI CHẾ ĐỘ GIỮA TƯ VẤN TRỰC TIẾP & TRỢ LÝ TỰ ĐỘNG
@@ -444,7 +555,7 @@
         displayCustomerName.textContent = customerName + (customerPhone ? ` (${customerPhone})` : '');
     }
 
-    // 12. BỘ CÂU TRẢ LỜI MẪU CỦA BOT TỰ ĐỘNG
+    // 12. BỘ CÂU TRẢ LỜI MẪU DỰ PHÒNG
     function findPredefinedAnswer(input) {
         const lower = input.toLowerCase();
         if (lower.includes("ngân sách") || lower.includes("tư vấn dòng xe")) {
@@ -464,7 +575,7 @@
         if (lower.includes("lái thử")) {
             return `🏎️ <b>Dịch vụ lái thử VIP tận nơi:</b> PrimeLux mang siêu xe đến tận tư gia hoặc cơ quan Quý khách trải nghiệm hoàn toàn miễn phí!`;
         }
-        return null;
+        return `Dạ, thông tin câu hỏi của Quý khách đã được chuyển tới chuyên viên tư vấn PrimeLux. Quý khách có thể chuyển qua tab <b>Tư Vấn Trực Tiếp</b> hoặc để lại Số điện thoại để nhận catalogue chi tiết nhé!`;
     }
 
     // 13. LẮNG NGHE SỰ KIỆN GIAO DIỆN
@@ -474,13 +585,22 @@
             unreadCount = 0;
             unreadBadge.classList.add("d-none");
             chatInput.focus();
-            getAudioContext(); // kích hoạt audio
+            getAudioContext();
             startFastPolling();
         }
     });
 
     closeBtn.addEventListener("click", () => {
         chatBox.classList.remove("active");
+    });
+
+    resetBtn.addEventListener("click", () => {
+        if (confirm("Làm mới và xóa toàn bộ lịch sử tin nhắn trò chuyện này?")) {
+            localStorage.removeItem("primelux_chat_history_v2");
+            localStorage.removeItem("primelux_last_msg_id");
+            lastKnownMessageId = 0;
+            renderWelcomeMessage();
+        }
     });
 
     tabModeLive.addEventListener("click", () => switchMode("live"));

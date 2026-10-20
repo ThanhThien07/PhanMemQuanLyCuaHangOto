@@ -20,7 +20,7 @@ class LoyaltyController extends Controller
         $pointsToNextTier = 0;
         $progressPercent = 0;
 
-        if (!empty($query)) {
+        if (! empty($query)) {
             $customer = Customer::where('sdt', $query)
                 ->orWhere('email', $query)
                 ->orWhere('ma_kh', $query)
@@ -64,10 +64,10 @@ class LoyaltyController extends Controller
             ->orWhere('ma_kh', $phone)
             ->first();
 
-        if (!$customer) {
+        if (! $customer) {
             return response()->json([
                 'success' => false,
-                'message' => 'Không tìm thấy thông tin thành viên với SĐT này'
+                'message' => 'Không tìm thấy thông tin thành viên với SĐT này',
             ]);
         }
 
@@ -82,9 +82,9 @@ class LoyaltyController extends Controller
                 'points' => $customer->diem_tich_luy,
                 'tier_code' => $customer->ma_hang,
                 'tier_name' => $tier ? $tier->ten_hang : 'Hạng Bạc',
-                'discount_percent' => $tier ? (float)$tier->ti_le_chiet_khau : 0,
+                'discount_percent' => $tier ? (float) $tier->ti_le_chiet_khau : 0,
                 'badge' => $tier ? $tier->mau_badge : 'secondary',
-            ]
+            ],
         ]);
     }
 }

@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Quản Lý Lịch Lái Thử - PrimeLux Auto Admin (test-drive-list.html)')
+@section('title', 'Quản Lý Lịch Lái Thử - PrimeLux Auto Admin')
 
 @section('content')
 <div class="container-fluid px-3 px-md-4 py-2">
@@ -14,8 +14,8 @@
             <p class="text-secondary small mb-0">Theo dõi quy trình tư vấn chăm sóc khách hàng: <strong>Chờ duyệt → Đã liên hệ → Đã hoàn thành</strong></p>
         </div>
         <div class="d-flex gap-2">
-            <a href="{{ url('/test-drive.html') }}" target="_blank" class="btn btn-outline-warning btn-sm">
-                <i class="fa-solid fa-plus-circle me-1"></i> Trang Đặt Lịch Web (test-drive.html)
+            <a href="{{ url('/test-drive') }}" target="_blank" class="btn btn-outline-warning btn-sm">
+                <i class="fa-solid fa-plus-circle me-1"></i> Trang Đặt Lịch Web
             </a>
         </div>
     </div>
@@ -361,7 +361,7 @@
 
         // GỬI REQUEST CẬP NHẬT DATABASE
         try {
-            await fetch(`/admin/test-drives/${id}/status`, {
+            const response = await fetch(`/admin/test-drives/${id}/status`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -370,6 +370,20 @@
                 },
                 body: JSON.stringify({ trang_thai: newStatus })
             });
+
+            const data = await response.json();
+            if (data.success) {
+                if (data.stats) applyTestDriveStats(data.stats);
+                if (window.PrimeLuxSync) {
+                    window.PrimeLuxSync.showToast({
+                        title: 'Đã Cập Nhật Lịch Hẹn',
+                        message: `Lịch lái thử #${id} đã chuyển sang: ${newStatus}`,
+                        icon: 'fa-check-circle',
+                        type: 'success'
+                    });
+                    window.PrimeLuxSync.broadcast('TEST_DRIVE_STATUS_CHANGED', { id, newStatus, stats: data.stats });
+                }
+            }
         } catch(e) {
             console.error(e);
         }
@@ -390,7 +404,7 @@
             if (row) row.remove();
 
             try {
-                await fetch(`/admin/test-drives/${id}/delete`, {
+                const response = await fetch(`/admin/test-drives/${id}/delete`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -398,10 +412,137 @@
                         "X-CSRF-TOKEN": "{{ csrf_token() }}"
                     }
                 });
+
+                const data = await response.json();
+                if (data.success) {
+                    if (data.stats) applyTestDriveStats(data.stats);
+                    if (window.PrimeLuxSync) {
+                        window.PrimeLuxSync.showToast({
+                            title: 'Đã Xóa Bản Ghi',
+                            message: `Đã xóa yêu cầu lái thử ${code || id} khỏi hệ thống.`,
+                            icon: 'fa-trash',
+                            type: 'info'
+                        });
+                        window.PrimeLuxSync.broadcast('TEST_DRIVE_DELETED', { id, stats: data.stats });
+                    }
+                }
             } catch(e) {
                 console.error(e);
             }
         }
+    }
+
+    function applyTestDriveStats(stats) {
+        if (!stats) return;
+        const sTotal = document.getElementById('statTotalDrives');
+        const sPending = document.getElementById('statPendingDrives');
+        const sContacted = document.getElementById('statContactedDrives');
+        const sCompleted = document.getElementById('statCompletedDrives');
+
+        if (sTotal && stats.total !== undefined) sTotal.textContent = stats.total;
+        if (sPending && stats.pending !== undefined) sPending.textContent = stats.pending;
+        if (sContacted && stats.contacted !== undefined) sContacted.textContent = stats.contacted;
+        if (sCompleted && stats.completed !== undefined) sCompleted.textContent = stats.completed;
+    }
+
+    function renderTestDriveRowHtml(td) {
+        const rawStatus = td.trang_thai || 'Chờ duyệt';
+        const normalizedStatus = (rawStatus === 'Đang chờ duyệt') ? 'Chờ duyệt' : (rawStatus === 'Đã xác nhận' ? 'Đã hoàn thành' : rawStatus);
+        const badgeClass = getStatusBadgeClass(normalizedStatus);
+        const id = td.id;
+        const code = td.code || td.ma_lich || ('TD-' + id);
+        const thoiGian = (td.thoi_gian || '').substring(0, 16);
+
+        return `
+            <tr class="drive-table-row table-row-highlight-new" 
+                id="drive-row-${id}"
+                data-id="${id}"
+                data-code="${code}"
+                data-name="${(td.ho_ten || '').toLowerCase()}"
+                data-phone="${td.sdt || ''}"
+                data-car="${(td.ten_xe || '').toLowerCase()}"
+                data-status="${normalizedStatus}">
+                <td class="font-monospace fw-bold text-info">
+                    ${code}
+                </td>
+                <td>
+                    <div class="fw-bold text-white">${td.ho_ten}</div>
+                    ${td.ghi_chu ? `<small class="text-secondary italic" title="${td.ghi_chu}"><i class="fa-solid fa-comment-dots text-warning me-1"></i>${td.ghi_chu.substring(0, 30)}</small>` : ''}
+                </td>
+                <td>
+                    <strong class="text-warning"><i class="fa-solid fa-phone me-1"></i>${td.sdt}</strong>
+                    <br><small class="text-secondary">${td.email || 'N/A'}</small>
+                </td>
+                <td class="text-white fw-bold">
+                    <i class="fa-solid fa-car text-primary me-1"></i> ${td.ten_xe}
+                </td>
+                <td>
+                    <span class="badge bg-secondary bg-opacity-50 text-white">${td.showroom}</span>
+                </td>
+                <td class="small text-light">
+                    <i class="fa-regular fa-clock text-info me-1"></i> ${thoiGian}
+                </td>
+                <td>
+                    <span class="badge ${badgeClass} px-2.5 py-1.5" id="drive-badge-${id}">
+                        ${normalizedStatus}
+                    </span>
+                </td>
+                <td class="text-end">
+                    <div class="d-inline-flex gap-1" id="action-group-${id}">
+                        <button type="button" class="btn btn-outline-info btn-sm fw-bold" onclick="updateDriveStatusStep('${id}', 'Đã liên hệ')" title="Chuyển sang: Đã liên hệ khách hàng">
+                            <i class="fa-solid fa-phone me-1"></i> Đã Liên Hệ
+                        </button>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"></button>
+                            <ul class="dropdown-menu dropdown-menu-dark shadow">
+                                <li><h6 class="dropdown-header text-secondary small">Chọn Trạng Thái</h6></li>
+                                <li><a class="dropdown-item" href="javascript:void(0)" onclick="updateDriveStatusStep('${id}', 'Chờ duyệt')"><i class="fa-solid fa-clock text-warning me-2"></i> Chờ duyệt</a></li>
+                                <li><a class="dropdown-item" href="javascript:void(0)" onclick="updateDriveStatusStep('${id}', 'Đã liên hệ')"><i class="fa-solid fa-phone text-info me-2"></i> Đã liên hệ</a></li>
+                                <li><a class="dropdown-item" href="javascript:void(0)" onclick="updateDriveStatusStep('${id}', 'Đã hoàn thành')"><i class="fa-solid fa-circle-check text-success me-2"></i> Đã hoàn thành</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="javascript:void(0)" onclick="updateDriveStatusStep('${id}', 'Đã hủy')"><i class="fa-solid fa-ban me-2"></i> Đã hủy</a></li>
+                            </ul>
+                        </div>
+                        <button type="button" class="btn btn-outline-danger btn-sm" onclick="deleteTestDriveRecord('${id}', '${code}')" title="Xóa lịch hẹn">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }
+
+    // LẮNG NGHE SỰ KIỆN TEST DRIVE REALTIME (TỨC THÌ 0ms)
+    if (window.PrimeLuxSync) {
+        window.PrimeLuxSync.on('TEST_DRIVE_BOOKED', (td) => {
+            if (!td) return;
+            const tbody = document.getElementById('testDrivesTableBody');
+            if (tbody) {
+                const existingRow = document.getElementById(`drive-row-${td.id}`);
+                if (!existingRow) {
+                    const tempTable = document.createElement('tbody');
+                    tempTable.innerHTML = renderTestDriveRowHtml(td);
+                    const newRow = tempTable.firstElementChild;
+                    tbody.prepend(newRow);
+                }
+            }
+
+            if (td.stats) {
+                applyTestDriveStats(td.stats);
+            } else {
+                const sTotal = document.getElementById('statTotalDrives');
+                const sPending = document.getElementById('statPendingDrives');
+                if (sTotal) sTotal.textContent = (parseInt(sTotal.textContent || '0') + 1);
+                if (sPending) sPending.textContent = (parseInt(sPending.textContent || '0') + 1);
+            }
+
+            window.PrimeLuxSync.showToast({
+                title: 'Lịch Lái Thử Mới!',
+                message: `Khách hàng <b>${td.ho_ten}</b> (${td.sdt}) vừa đăng ký lái thử xe <b>${td.ten_xe}</b> lúc ${td.thoi_gian}.`,
+                icon: 'fa-calendar-plus',
+                type: 'warning'
+            });
+        });
     }
 </script>
 @endpush

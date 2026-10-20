@@ -116,7 +116,7 @@
                     <label class="form-label text-secondary small fw-bold mb-1">1. Tên Webhook:</label>
                     <div class="input-group">
                         <input type="text" class="form-control form-control-custom text-white" value="Xác thực thanh toán" readonly>
-                        <button class="btn btn-outline-secondary" onclick="navigator.clipboard.writeText('Xác thực thanh toán'); alert('Đã sao chép Tên webhook!');">
+                        <button class="btn btn-outline-secondary" onclick="navigator.clipboard.writeText('Xác thực thanh toán'); if(window.PrimeLuxSync) window.PrimeLuxSync.showToast({ title: 'Đã Sao Chép', message: 'Đã sao chép Tên Webhook!', icon: 'fa-copy', type: 'info' });">
                             <i class="fa-regular fa-copy"></i>
                         </button>
                     </div>
@@ -144,7 +144,7 @@
                     <label class="form-label text-secondary small fw-bold mb-1">4. SePay API Key / Token:</label>
                     <div class="input-group">
                         <input type="text" id="sepayApiKeyInput" class="form-control form-control-custom text-info fw-bold" value="Rp.4hxVyw@zA2@p" readonly>
-                        <button class="btn btn-outline-info" onclick="navigator.clipboard.writeText('Rp.4hxVyw@zA2@p'); alert('Đã sao chép SePay API Key!');">
+                        <button class="btn btn-outline-info" onclick="navigator.clipboard.writeText('Rp.4hxVyw@zA2@p'); if(window.PrimeLuxSync) window.PrimeLuxSync.showToast({ title: 'Đã Sao Chép', message: 'Đã sao chép SePay API Key!', icon: 'fa-key', type: 'info' });">
                             <i class="fa-regular fa-copy"></i>
                         </button>
                     </div>
@@ -342,7 +342,15 @@
     function copyWebhookUrl() {
         const urlInput = document.getElementById("webhookUrlInput");
         navigator.clipboard.writeText(urlInput.value).then(() => {
-            alert("Đã sao chép URL Webhook:\n" + urlInput.value + "\n\nBạn hãy dán URL này vào mục 'URL nhận webhook' trên SePay!");
+            if (window.PrimeLuxSync) {
+                window.PrimeLuxSync.showToast({
+                    title: 'Đã Sao Chép Webhook URL',
+                    message: 'Bạn hãy dán URL này vào mục "URL nhận webhook" trên trang cấu hình SePay!',
+                    icon: 'fa-link',
+                    type: 'info',
+                    duration: 6000
+                });
+            }
         });
     }
 
@@ -369,15 +377,26 @@
         .then(data => {
             btn.disabled = false;
             btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-down me-1.5"></i> Request Thông Tin Từ SePay API';
-            alert(data.message || "Đã kiểm tra SePay API thành công!");
-            if (data.synced_count > 0) {
-                setTimeout(() => location.reload(), 1000);
+            if (window.PrimeLuxSync) {
+                window.PrimeLuxSync.showToast({
+                    title: 'Đồng Bộ SePay API',
+                    message: data.message || "Đã kiểm tra SePay API thành công!",
+                    icon: 'fa-cloud-arrow-down',
+                    type: 'success'
+                });
             }
         })
         .catch(err => {
             btn.disabled = false;
             btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-down me-1.5"></i> Request Thông Tin Từ SePay API';
-            alert("Lỗi kết nối tới SePay API. Vui lòng kiểm tra lại kết nối mạng!");
+            if (window.PrimeLuxSync) {
+                window.PrimeLuxSync.showToast({
+                    title: 'Lỗi Kết Nối',
+                    message: 'Lỗi kết nối tới SePay API. Vui lòng kiểm tra lại kết nối mạng!',
+                    icon: 'fa-wifi',
+                    type: 'danger'
+                });
+            }
         });
     }
 
@@ -403,23 +422,58 @@
             this.innerHTML = '<i class="fa-solid fa-paper-plane me-1"></i> Bắn Webhook Ngay';
 
             const alertEl = document.getElementById("simResultAlert");
-            alertEl.classList.remove("d-none");
-            document.getElementById("simResultMsg").textContent = data.message || "Webhook đã được tiếp nhận và xử lý!";
+            if (alertEl) {
+                alertEl.classList.remove("d-none");
+                document.getElementById("simResultMsg").textContent = data.message || "Webhook đã được tiếp nhận và xử lý!";
+            }
 
-            // Kích hoạt ngay form popup thông báo nhỏ góc phải màn hình admin
             if (window.showAdminPaymentToast && data.transaction) {
                 window.showAdminPaymentToast(data.transaction);
             }
 
-            setTimeout(() => {
-                location.reload();
-            }, 1800);
+            if (window.PrimeLuxSync) {
+                window.PrimeLuxSync.showToast({
+                    title: 'Đã Bắn Webhook Giả Lập',
+                    message: data.message || 'Webhook giao dịch đã gửi thành công tới cổng tiếp nhận!',
+                    icon: 'fa-paper-plane',
+                    type: 'success'
+                });
+                if (data.transaction) {
+                    window.PrimeLuxSync.broadcast('PAYMENT_RECEIVED', {
+                        transaction_id: data.transaction.transaction_id || 'SP-' + Date.now(),
+                        amount: data.transaction.amount_in,
+                        customer_name: document.getElementById("simCustName").value,
+                        car_name: 'Showroom SePay'
+                    });
+                }
+            }
         })
         .catch(err => {
             this.disabled = false;
             this.innerHTML = '<i class="fa-solid fa-paper-plane me-1"></i> Bắn Webhook Ngay';
-            alert("Lỗi gửi webhook giả lập!");
+            if (window.PrimeLuxSync) {
+                window.PrimeLuxSync.showToast({
+                    title: 'Lỗi Gửi Webhook',
+                    message: 'Không thể gửi webhook giả lập. Vui lòng kiểm tra lại!',
+                    icon: 'fa-triangle-exclamation',
+                    type: 'danger'
+                });
+            }
         });
     });
+
+    // Lắng nghe thanh toán realtime
+    if (window.PrimeLuxSync) {
+        window.PrimeLuxSync.on('PAYMENT_RECEIVED', (pay) => {
+            if (!pay) return;
+            window.PrimeLuxSync.showToast({
+                title: 'Biến Động Số Dư Mới (SePay)',
+                message: `Khách hàng <b>${pay.customer_name || 'Khách'}</b> vừa thanh toán <b>${parseInt(pay.amount || 0).toLocaleString('vi-VN')} VNĐ</b> cho xe <b>${pay.car_name || ''}</b>!`,
+                icon: 'fa-money-bill-transfer',
+                type: 'success',
+                duration: 8000
+            });
+        });
+    }
 </script>
 @endpush

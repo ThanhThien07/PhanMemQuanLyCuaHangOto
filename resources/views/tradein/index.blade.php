@@ -145,11 +145,11 @@
 
                         <div class="col-md-6">
                             <label class="form-label text-secondary small fw-bold">Họ Và Tên <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control form-control-custom" name="ho_ten" placeholder="Nguyễn Văn A" required>
+                            <input type="text" class="form-control form-control-custom" name="ho_ten" placeholder="Nguyễn Văn A" value="{{ session('user.name') ?? '' }}" required>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label text-secondary small fw-bold">Số Điện Thoại <span class="text-danger">*</span></label>
-                            <input type="tel" class="form-control form-control-custom" name="sdt" placeholder="0901234567" required>
+                            <input type="tel" class="form-control form-control-custom" name="sdt" placeholder="0901234567" value="{{ session('user.phone') ?? '' }}" required>
                         </div>
                         <div class="col-12">
                             <label class="form-label text-secondary small fw-bold">Ghi Chú Thêm Về Tình Trạng Xe (Tùy chọn)</label>
@@ -251,17 +251,40 @@ document.getElementById('tradeInForm').addEventListener('submit', function(e) {
         btn.disabled = false;
         btn.innerHTML = '<i class="fa-solid fa-paper-plane me-2"></i> Gửi Yêu Cầu Thẩm Định';
         if (data.success) {
-            alert('🎉 ' + data.message + '\n\n• Mã yêu cầu: ' + data.data.ma_yeu_cau + '\n• Định giá sơ bộ: ' + data.data.gia_dinh_gia_so_bo);
+            if (window.PrimeLuxSync) {
+                window.PrimeLuxSync.showToast({
+                    title: 'Đã Tiếp Nhận Yêu Cầu',
+                    message: `${data.message} • Mã: <b>${data.data.ma_yeu_cau}</b> (Định giá: <b>${data.data.gia_dinh_gia_so_bo}</b>)`,
+                    icon: 'fa-handshake',
+                    type: 'success',
+                    duration: 8000
+                });
+                window.PrimeLuxSync.broadcast('TRADEIN_SUBMITTED', data.data);
+            }
             document.getElementById('tradeInForm').reset();
             updateEstimatedPrice();
         } else {
-            alert(data.message || 'Có lỗi xảy ra, vui lòng thử lại.');
+            if (window.PrimeLuxSync) {
+                window.PrimeLuxSync.showToast({
+                    title: 'Lỗi Gửi Yêu Cầu',
+                    message: data.message || 'Có lỗi xảy ra, vui lòng thử lại.',
+                    icon: 'fa-triangle-exclamation',
+                    type: 'danger'
+                });
+            }
         }
     })
     .catch(err => {
         btn.disabled = false;
         btn.innerHTML = '<i class="fa-solid fa-paper-plane me-2"></i> Gửi Yêu Cầu Thẩm Định';
-        alert('Đã gửi yêu cầu thẩm định thành công! Nhân viên sẽ liên hệ Quý khách.');
+        if (window.PrimeLuxSync) {
+            window.PrimeLuxSync.showToast({
+                title: 'Đã Gửi Yêu Cầu',
+                message: 'Đã gửi yêu cầu thẩm định thành công! Chuyên viên sẽ liên hệ Quý khách.',
+                icon: 'fa-check-circle',
+                type: 'success'
+            });
+        }
     });
 });
 

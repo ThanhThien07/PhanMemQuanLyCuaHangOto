@@ -124,6 +124,7 @@
             <div class="row" id="carsGridContainer">
                 @foreach($cars as $car)
                 <div class="col-lg-4 col-md-6 mb-4 car-item-box"
+                     id="car-box-{{ $car['id'] }}"
                      data-id="{{ $car['id'] }}"
                      data-brand="{{ $car['brand'] }}"
                      data-fuel="{{ $car['fuel'] }}"
@@ -143,22 +144,22 @@
                                      loading="lazy" 
                                      decoding="async">
                             </a>
-                            <span class="car-tag {{ $car['tagClass'] ?? 'tag-hot' }} position-absolute top-0 end-0 m-3 pe-none">
-                                {{ $car['tag'] }}
-                            </span>
-                            @if(!empty($car['year']))
-                            <span class="badge bg-dark bg-opacity-75 text-white position-absolute top-0 start-0 m-3 border border-secondary pe-none">
-                                Đời {{ $car['year'] }}
-                            </span>
-                            @endif
                         </div>
                         <div class="car-body d-flex flex-column flex-grow-1 p-3">
                             <div class="d-flex justify-content-between align-items-center mb-1">
                                 <span class="car-brand text-primary fw-bold small text-uppercase">{{ $car['brand'] }}</span>
-                                <span class="badge bg-secondary bg-opacity-25 text-secondary small">{{ $car['type'] }}</span>
+                                <div class="d-flex align-items-center gap-1">
+                                    @if(!empty($car['year']))
+                                    <span class="badge bg-dark border border-secondary text-light" style="font-size: 11px;">Đời {{ $car['year'] }}</span>
+                                    @endif
+                                    <span class="badge bg-secondary text-white small px-2 py-1">{{ $car['type'] }}</span>
+                                </div>
                             </div>
-                            <h3 class="car-title fs-5 fw-bold text-white mb-2">
+                            <h3 class="car-title fs-5 fw-bold text-white mb-2 d-flex align-items-center">
                                 <a href="{{ url('/cars/' . $car['id']) }}" class="text-white text-decoration-none" title="Xem chi tiết {{ $car['name'] }}">{{ $car['name'] }}</a>
+                                @if(!empty($car['tag']))
+                                <span class="status-indicator-dot {{ $car['tagClass'] ?? 'tag-hot' }} ms-2" title="{{ $car['tag'] }}"></span>
+                                @endif
                             </h3>
                             <div class="car-specs text-secondary small mb-3 d-flex flex-wrap gap-2">
                                 <span><i class="fa-solid fa-gas-pump text-primary me-1"></i> {{ $car['fuel'] }}</span>
@@ -167,14 +168,14 @@
                             </div>
                             <div class="car-price text-warning fw-bold fs-5 mt-auto mb-3">{{ $car['priceText'] }}</div>
                             <div class="car-actions d-flex gap-2">
-                                <a href="{{ url('/cars/' . $car['id']) }}" class="btn btn-accent flex-grow-1 text-center py-2" title="Xem chi tiết xe">
+                                <a href="{{ url('/cars/' . $car['id']) }}" class="btn btn-accent flex-fill text-center py-2 px-1 small fw-bold" title="Xem chi tiết {{ $car['name'] }}">
                                     <i class="fa-solid fa-eye me-1"></i> Chi Tiết
                                 </a>
-                                <a href="{{ url('/cars/' . $car['id'] . '/compare') }}" class="btn btn-outline-info text-center py-2 px-2.5" title="So Sánh Giá Đa Sàn (PO)">
-                                    <i class="fa-solid fa-scale-balanced"></i>
+                                <a href="{{ url('/cars/' . $car['id'] . '/compare') }}" class="btn btn-outline-info flex-fill text-center py-2 px-1 small fw-bold" title="So Sánh Giá Đa Sàn">
+                                    <i class="fa-solid fa-scale-balanced me-1"></i> So Sánh
                                 </a>
-                                <a href="{{ url('/test-drive?car=' . urlencode($car['name'])) }}" class="btn btn-gold text-center py-2 px-2.5" title="Đặt Lái Thử Xe">
-                                    <i class="fa-solid fa-steering-wheel"></i>
+                                <a href="{{ url('/test-drive?car=' . urlencode($car['name'])) }}" class="btn btn-gold flex-fill text-center py-2 px-1 small fw-bold" title="Đặt Lái Thử Xe">
+                                    <i class="fa-solid fa-car me-1"></i> Lái Thử
                                 </a>
                             </div>
                         </div>
@@ -212,8 +213,6 @@
         const gridContainer = document.getElementById("carsGridContainer");
         const noResults = document.getElementById("noResultsAlert");
 
-        const carBoxes = Array.from(document.querySelectorAll(".car-item-box"));
-
         // HÀM LỌC VÀ SẮP XẾP XE REALTIME
         function filterAndSortCars() {
             const query = searchInput ? searchInput.value.toLowerCase().trim() : "";
@@ -224,7 +223,9 @@
             const typeVal = filterType ? filterType.value : "all";
             const sortVal = sortBy ? sortBy.value : "default";
 
-            let matchedCars = carBoxes.filter(box => {
+            const currentCarBoxes = Array.from(document.querySelectorAll(".car-item-box"));
+
+            let matchedCars = currentCarBoxes.filter(box => {
                 const brand = box.dataset.brand;
                 const fuel = box.dataset.fuel;
                 const trans = box.dataset.transmission;
@@ -233,7 +234,7 @@
                 const name = box.dataset.name;
 
                 // 1. Kiểm tra từ khóa
-                if (query && !name.includes(query) && !brand.toLowerCase().includes(query)) {
+                if (query && !name.includes(query) && !(brand && brand.toLowerCase().includes(query))) {
                     return false;
                 }
 
@@ -275,11 +276,11 @@
             }
 
             // HIỂN THỊ KẾT QUẢ RA DOM
-            carBoxes.forEach(b => b.style.display = "none");
+            currentCarBoxes.forEach(b => b.style.display = "none");
 
             matchedCars.forEach(b => {
                 b.style.display = "";
-                gridContainer.appendChild(b);
+                if (gridContainer) gridContainer.appendChild(b);
             });
 
             if (countBadge) {
@@ -293,6 +294,198 @@
                     noResults.classList.add("d-none");
                 }
             }
+        }
+
+        // Tạo thẻ card xe cho trang danh sách khi Admin thêm xe mới
+        function renderDanhSachCarCard(car) {
+            const col = document.createElement("div");
+            col.className = "col-lg-4 col-md-6 mb-4 car-item-box car-card-highlight-new";
+            col.id = `car-box-${car.id}`;
+            col.dataset.id = car.id;
+            col.dataset.brand = car.brand || '';
+            col.dataset.fuel = car.fuel || 'Xăng';
+            col.dataset.transmission = car.transmission || 'Tự động';
+            col.dataset.price = car.price || 0;
+            col.dataset.year = car.year || 2026;
+            col.dataset.type = car.type || 'Sedan';
+            col.dataset.name = (car.name || '').toLowerCase();
+
+            const priceText = car.priceText || (parseFloat(car.price || 0).toLocaleString('vi-VN') + ' VNĐ');
+            const tagClass = car.tagClass || 'tag-hot';
+
+            col.innerHTML = `
+                <div class="car-card h-100 d-flex flex-column">
+                    <div class="car-thumb position-relative overflow-hidden">
+                        <a href="/cars/${car.id}" class="d-block w-100 h-100" title="Xem chi tiết ${car.name}">
+                            <img src="${car.image}" 
+                                 alt="Mẫu xe ${car.name} - ${car.brand} chính hãng tại PrimeLux Auto" 
+                                 class="w-100 object-fit-cover" 
+                                 width="400" 
+                                 height="220" 
+                                 loading="lazy" 
+                                 decoding="async">
+                        </a>
+                    </div>
+                    <div class="car-body d-flex flex-column flex-grow-1 p-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="car-brand text-primary fw-bold small text-uppercase">${car.brand}</span>
+                            <div class="d-flex align-items-center gap-1">
+                                ${car.year ? `<span class="badge bg-dark border border-secondary text-light" style="font-size: 11px;">Đời ${car.year}</span>` : ''}
+                                <span class="badge bg-secondary text-white small px-2 py-1">${car.type}</span>
+                            </div>
+                        </div>
+                        <h3 class="car-title fs-5 fw-bold text-white mb-2 d-flex align-items-center">
+                            <a href="/cars/${car.id}" class="text-white text-decoration-none" title="Xem chi tiết ${car.name}">${car.name}</a>
+                            ${car.tag ? `<span class="status-indicator-dot ${tagClass} ms-2" title="${car.tag}"></span>` : ''}
+                        </h3>
+                        <div class="car-specs text-secondary small mb-3 d-flex flex-wrap gap-2">
+                            <span><i class="fa-solid fa-gas-pump text-primary me-1"></i> ${car.fuel || 'Xăng'}</span>
+                            <span><i class="fa-solid fa-gear text-success me-1"></i> ${car.transmission || 'Tự động'}</span>
+                            <span><i class="fa-solid fa-bolt text-warning me-1"></i> ${car.power || '400 Mã lực'}</span>
+                        </div>
+                        <div class="car-price text-warning fw-bold fs-5 mt-auto mb-3">${priceText}</div>
+                        <div class="car-actions d-flex gap-2">
+                            <a href="/cars/${car.id}" class="btn btn-accent flex-fill text-center py-2 px-1 small fw-bold" title="Xem chi tiết ${car.name}">
+                                <i class="fa-solid fa-eye me-1"></i> Chi Tiết
+                            </a>
+                            <a href="/cars/${car.id}/compare" class="btn btn-outline-info flex-fill text-center py-2 px-1 small fw-bold" title="So Sánh Giá Đa Sàn">
+                                <i class="fa-solid fa-scale-balanced me-1"></i> So Sánh
+                            </a>
+                            <a href="/test-drive?car=${encodeURIComponent(car.name)}" class="btn btn-gold flex-fill text-center py-2 px-1 small fw-bold" title="Đặt Lái Thử Xe">
+                                <i class="fa-solid fa-car me-1"></i> Lái Thử
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `;
+            return col;
+        }
+
+        // Cập nhật thẻ xe đã có trong DOM trang danh sách
+        function updateDanhSachCarCard(car) {
+            const existing = document.getElementById(`car-box-${car.id}`);
+            if (!existing) return;
+
+            existing.dataset.brand = car.brand || '';
+            existing.dataset.fuel = car.fuel || 'Xăng';
+            existing.dataset.transmission = car.transmission || 'Tự động';
+            existing.dataset.price = car.price || 0;
+            existing.dataset.year = car.year || 2026;
+            existing.dataset.type = car.type || 'Sedan';
+            existing.dataset.name = (car.name || '').toLowerCase();
+
+            const priceText = car.priceText || (parseFloat(car.price || 0).toLocaleString('vi-VN') + ' VNĐ');
+            const tagClass = car.tagClass || 'tag-hot';
+
+            const img = existing.querySelector('.car-thumb img');
+            if (img && car.image) img.src = car.image;
+
+            const brandEl = existing.querySelector('.car-brand');
+            if (brandEl) brandEl.textContent = car.brand;
+
+            const titleLink = existing.querySelector('.car-title a');
+            if (titleLink) titleLink.textContent = car.name;
+
+            let dot = existing.querySelector('.status-indicator-dot');
+            if (car.tag) {
+                if (!dot) {
+                    dot = document.createElement('span');
+                    existing.querySelector('.car-title').appendChild(dot);
+                }
+                dot.className = `status-indicator-dot ${tagClass} ms-2`;
+                dot.title = car.tag || '';
+            } else if (dot) {
+                dot.remove();
+            }
+
+            const priceEl = existing.querySelector('.car-price');
+            if (priceEl) priceEl.textContent = priceText;
+
+            existing.classList.remove('car-card-highlight-update');
+            void existing.offsetWidth;
+            existing.classList.add('car-card-highlight-update');
+        }
+
+        // LẮNG NGHE SỰ KIỆN REAL-TIME TỪ ADMIN (KHÔNG CẦN F5)
+        if (window.PrimeLuxSync) {
+            window.PrimeLuxSync.listen((event) => {
+                const action = event.action;
+                const data = event.data || {};
+
+                if (action === 'CAR_ADDED' && data.car) {
+                    if (gridContainer && !document.getElementById(`car-box-${data.car.id}`)) {
+                        const newCard = renderDanhSachCarCard(data.car);
+                        gridContainer.insertBefore(newCard, gridContainer.firstChild);
+                        filterAndSortCars();
+
+                        window.PrimeLuxSync.showToast({
+                            title: 'Showroom PrimeLux',
+                            message: `Đã có mẫu xe mới: <strong>${data.car.name}</strong> (${data.car.priceText || ''})`,
+                            icon: 'fa-sparkles',
+                            type: 'success',
+                            actionUrl: `/cars/${data.car.id}`,
+                            actionText: 'Xem ngay'
+                        });
+                    }
+                } else if (action === 'CAR_UPDATED' && data.car) {
+                    updateDanhSachCarCard(data.car);
+                    filterAndSortCars();
+                    window.PrimeLuxSync.showToast({
+                        title: 'Showroom Cập Nhật',
+                        message: `Thông tin mẫu xe <strong>${data.car.name}</strong> đã được đồng bộ mới.`,
+                        icon: 'fa-pen-to-square',
+                        type: 'info',
+                        actionUrl: `/cars/${data.car.id}`
+                    });
+                } else if (action === 'CAR_DELETED' && data.carId) {
+                    const el = document.getElementById(`car-box-${data.carId}`);
+                    if (el) {
+                        el.style.transition = 'all 0.4s ease';
+                        el.style.opacity = '0';
+                        el.style.transform = 'scale(0.9)';
+                        setTimeout(() => {
+                            el.remove();
+                            filterAndSortCars();
+                        }, 400);
+                    }
+                }
+            });
+
+            // BẬT SMART BACKGROUND POLLING CHO KHÁCH TRÊN CÁC THIẾT BỊ KHÁC
+            window.PrimeLuxSync.startFeedPolling((carsList) => {
+                if (!gridContainer || !Array.isArray(carsList)) return;
+
+                let hasNew = false;
+                carsList.forEach(car => {
+                    const existing = document.getElementById(`car-box-${car.id}`);
+                    if (!existing) {
+                        const newCard = renderDanhSachCarCard(car);
+                        gridContainer.insertBefore(newCard, gridContainer.firstChild);
+                        hasNew = true;
+                    } else {
+                        updateDanhSachCarCard(car);
+                    }
+                });
+
+                const currentCarIds = carsList.map(c => String(c.id));
+                document.querySelectorAll(".car-item-box").forEach(box => {
+                    const cid = box.dataset.id;
+                    if (cid && !currentCarIds.includes(String(cid))) {
+                        box.remove();
+                    }
+                });
+
+                filterAndSortCars();
+
+                if (hasNew) {
+                    window.PrimeLuxSync.showToast({
+                        title: 'Showroom Cập Nhật',
+                        message: 'Danh sách xe vừa cập nhật thêm mẫu xe mới!',
+                        icon: 'fa-crown',
+                        type: 'success'
+                    });
+                }
+            });
         }
 
         // Hàm Debounce tối ưu hiệu năng Runtime theo Chương 8

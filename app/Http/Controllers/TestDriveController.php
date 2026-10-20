@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Car;
+use App\Models\TestDrive;
 use Illuminate\Http\Request;
 
 class TestDriveController extends Controller
@@ -14,7 +15,7 @@ class TestDriveController extends Controller
 
         $existingBookings = [];
         try {
-            $existingBookings = \App\Models\TestDrive::where('trang_thai', '!=', 'Đã hủy')
+            $existingBookings = TestDrive::where('trang_thai', '!=', 'Đã hủy')
                 ->select('showroom', 'thoi_gian')
                 ->get()
                 ->map(function ($b) {
@@ -23,7 +24,8 @@ class TestDriveController extends Controller
                         'thoi_gian' => substr($b->thoi_gian, 0, 16),
                     ];
                 })->toArray();
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) {
+        }
 
         return view('test-drive', compact('cars', 'selectedCar', 'existingBookings'));
     }
@@ -45,9 +47,9 @@ class TestDriveController extends Controller
             $thoiGian .= ':00';
         }
 
-        $code = 'TD-' . strtoupper(substr(uniqid(), -5));
+        $code = 'TD-'.strtoupper(substr(uniqid(), -5));
 
-        $testDrive = \App\Models\TestDrive::create([
+        $testDrive = TestDrive::create([
             'ma_lich' => $code,
             'ho_ten' => $validated['ho_ten'],
             'sdt' => $validated['sdt'],
@@ -70,8 +72,7 @@ class TestDriveController extends Controller
                 'showroom' => $testDrive->showroom,
                 'date' => $testDrive->thoi_gian,
                 'status' => $testDrive->trang_thai,
-            ]
+            ],
         ]);
     }
 }
-

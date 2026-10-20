@@ -70,26 +70,38 @@ class RoadmapFeaturesTest extends TestCase
 
     public function test_admin_export_endpoints_return_downloadable_files()
     {
-        $resCars = $this->get('/admin/export/cars');
+        // Khách vãng lai bị chặn
+        $this->get('/admin/export/cars')->assertStatus(302);
+
+        // Admin tải file xuất thành công
+        $adminSession = ['user' => ['role' => 'admin', 'name' => 'Admin']];
+
+        $resCars = $this->withSession($adminSession)->get('/admin/export/cars');
         $resCars->assertStatus(200);
         $resCars->assertHeader('content-type', 'text/csv; charset=UTF-8');
 
-        $resDrives = $this->get('/admin/export/test-drives');
+        $resDrives = $this->withSession($adminSession)->get('/admin/export/test-drives');
         $resDrives->assertStatus(200);
         $resDrives->assertHeader('content-type', 'text/csv; charset=UTF-8');
 
-        $resInvoices = $this->get('/admin/export/invoices');
+        $resInvoices = $this->withSession($adminSession)->get('/admin/export/invoices');
         $resInvoices->assertStatus(200);
         $resInvoices->assertHeader('content-type', 'text/csv; charset=UTF-8');
     }
 
     public function test_admin_tradein_and_audit_log_views_load_successfully()
     {
-        $resTradeIn = $this->get('/admin/trade-in');
+        // Khách vãng lai bị chặn
+        $this->get('/admin/trade-in')->assertStatus(302);
+
+        // Admin truy cập thành công
+        $adminSession = ['user' => ['role' => 'admin', 'name' => 'Admin']];
+
+        $resTradeIn = $this->withSession($adminSession)->get('/admin/trade-in');
         $resTradeIn->assertStatus(200);
         $resTradeIn->assertSee('Thu Cũ Đổi Mới');
 
-        $resAudit = $this->get('/admin/audit-logs');
+        $resAudit = $this->withSession($adminSession)->get('/admin/audit-logs');
         $resAudit->assertStatus(200);
         $resAudit->assertSee('Nhật Ký Hoạt Động (Audit Log)');
         $resAudit->assertSee('Google Authenticator');

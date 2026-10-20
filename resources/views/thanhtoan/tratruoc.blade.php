@@ -137,10 +137,10 @@
                 <h5 class="fw-bold text-white mb-2 fs-6"><i class="fa-solid fa-user-check text-info me-1"></i> Thông Tin Người Mua Xe</h5>
                 <div class="row g-2 mb-3">
                     <div class="col-md-6">
-                        <input type="text" id="custName" class="form-control form-control-custom text-white" placeholder="Họ và tên..." value="{{ session('user.name') ?? 'Nguyễn Văn Long' }}" required>
+                        <input type="text" id="custName" class="form-control form-control-custom text-white" placeholder="Họ và tên..." value="{{ session('user.name') ?? '' }}" required>
                     </div>
                     <div class="col-md-6">
-                        <input type="tel" id="custPhone" class="form-control form-control-custom text-white" placeholder="Số điện thoại..." value="{{ session('user.phone') ?? '0901234567' }}" required>
+                        <input type="tel" id="custPhone" class="form-control form-control-custom text-white" placeholder="Số điện thoại..." value="{{ session('user.phone') ?? '' }}" required>
                     </div>
                 </div>
 
@@ -384,7 +384,14 @@
             isDepositMode = true;
             document.getElementById("summaryPercent").textContent = "Cọc Giữ Xe";
             calculateDownPayment();
-            alert("Đã chuyển sang chế độ: Đặt Cọc Trước 100.000.000 VNĐ giữ xe!");
+            if (window.PrimeLuxSync) {
+                window.PrimeLuxSync.showToast({
+                    title: 'Chế Độ Cọc Giữ Xe',
+                    message: 'Đã chuyển sang chế độ: Đặt Cọc Trước 100.000.000 VNĐ giữ xe!',
+                    icon: 'fa-shield-halved',
+                    type: 'warning'
+                });
+            }
         });
 
         // Nút Tạo Mã QR
@@ -435,6 +442,22 @@
             successBox.classList.remove("d-none");
             document.getElementById("successMsg").innerHTML = `Giao dịch <b>${data.transaction_id || currentTransCode}</b> với số tiền <b>${formatVnd(currentAmount)}</b> đã được SePay xác minh thành công! Thông báo đã được gửi tức thì đến Quản trị viên Showroom.`;
             document.getElementById("receiptBadge").textContent = "Mã Biên Lai Điện Tử: " + (data.receipt_number || ("BL-SEPAY-" + Math.floor(100000 + Math.random() * 900000)));
+
+            if (window.PrimeLuxSync) {
+                window.PrimeLuxSync.broadcast('PAYMENT_RECEIVED', {
+                    transaction_id: data.transaction_id || currentTransCode,
+                    amount: currentAmount,
+                    customer_name: document.getElementById("custName")?.value || 'Khách Hàng',
+                    car_name: carSelect?.options[carSelect.selectedIndex]?.dataset?.name || 'Mẫu Xe'
+                });
+
+                window.PrimeLuxSync.showToast({
+                    title: 'Xác Minh Thành Công',
+                    message: `Khoản thanh toán ${formatVnd(currentAmount)} đã được SePay ghi nhận thành công!`,
+                    icon: 'fa-shield-check',
+                    type: 'success'
+                });
+            }
         }
 
         btnVerify.addEventListener("click", () => {
@@ -485,14 +508,28 @@
             .catch(err => {
                 btnVerify.disabled = false;
                 btnVerify.innerHTML = '<i class="fa-solid fa-arrows-rotate me-2"></i> Tôi Đã Chuyển Khoản — Xác Minh Từ SePay Ngay';
-                alert("Đã kết nối SePay API. Đang chờ ngân hàng cập nhật số dư...");
+                if (window.PrimeLuxSync) {
+                    window.PrimeLuxSync.showToast({
+                        title: 'Đang Kết Nối SePay',
+                        message: 'Đã kết nối SePay API. Đang chờ ngân hàng cập nhật số dư...',
+                        icon: 'fa-clock',
+                        type: 'info'
+                    });
+                }
             });
         });
 
         // Copy helpers
         window.copyToClipboard = function(text, successMsg) {
             navigator.clipboard.writeText(text).then(() => {
-                alert(successMsg || "Đã sao chép vào bộ nhớ tạm!");
+                if (window.PrimeLuxSync) {
+                    window.PrimeLuxSync.showToast({
+                        title: 'Đã Sao Chép',
+                        message: successMsg || "Đã sao chép vào bộ nhớ tạm!",
+                        icon: 'fa-copy',
+                        type: 'info'
+                    });
+                }
             });
         };
 
@@ -503,6 +540,31 @@
         document.getElementById("btnCopyContent").addEventListener("click", () => {
             copyToClipboard(document.getElementById("dispContent").textContent, "Đã sao chép nội dung chuyển khoản!");
         });
+
+        // Lắng nghe xe mới được thêm từ Admin
+        if (window.PrimeLuxSync) {
+            window.PrimeLuxSync.on('CAR_ADDED', (car) => {
+                if (!car || !carSelect) return;
+                const exists = Array.from(carSelect.options).some(opt => opt.value == car.id);
+                if (!exists) {
+                    const opt = document.createElement('option');
+                    opt.value = car.id;
+                    opt.dataset.name = car.name || car.ten_xe;
+                    opt.dataset.price = car.price || car.gia_ban;
+                    opt.dataset.brand = car.brand || car.hang_xe || '';
+                    opt.dataset.image = car.image || car.hinh_anh || '';
+                    opt.textContent = `${car.name || car.ten_xe} - ${car.priceText || car.gia_text || ''}`;
+                    carSelect.appendChild(opt);
+
+                    window.PrimeLuxSync.showToast({
+                        title: 'Mẫu Xe Mới',
+                        message: `Showroom vừa bổ sung ${car.name || car.ten_xe} vào danh sách trả trước!`,
+                        icon: 'fa-sparkles',
+                        type: 'info'
+                    });
+                }
+            });
+        }
 
         // Đếm ngược 15 phút
         let timeLeft = 15 * 60;

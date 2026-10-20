@@ -59,8 +59,13 @@ class LiveChatMessengerTest extends TestCase
         ]);
         $this->assertEquals('Tư vấn giúp tôi thủ tục trả góp', $resThread->json('messages.0.noi_dung'));
 
-        // 2. Realtime feed endpoint
-        $resFeed = $this->getJson('/api/consultant/realtime-feed');
+        // 2. Realtime feed endpoint (Bảo mật: khách vãng lai bị chặn 403)
+        $resGuest = $this->getJson('/api/consultant/realtime-feed');
+        $resGuest->assertStatus(403);
+
+        // 3. Tư vấn viên đã đăng nhập truy cập thành công
+        $resFeed = $this->withSession(['user' => ['role' => 'advisor', 'name' => 'Chuyên Viên']])
+            ->getJson('/api/consultant/realtime-feed');
         $resFeed->assertStatus(200);
         $resFeed->assertJson([
             'success' => true,
@@ -92,7 +97,13 @@ class LiveChatMessengerTest extends TestCase
             'trang_thai' => 'Đã trả lời',
         ];
 
-        $replyResponse = $this->postJson('/consultant/reply', $replyPayload);
+        // Khách vãng lai không được phép trả lời (bảo vệ bằng AdvisorAuth, trả về 403 Forbidden)
+        $unauthReply = $this->postJson('/consultant/reply', $replyPayload);
+        $unauthReply->assertStatus(403);
+
+        // Chuyên viên đã đăng nhập thực hiện trả lời thành công
+        $replyResponse = $this->withSession(['user' => ['role' => 'advisor', 'name' => 'Chuyên Viên Hoàng Long']])
+            ->postJson('/consultant/reply', $replyPayload);
         $replyResponse->assertStatus(200);
         $replyResponse->assertJson(['success' => true]);
 
@@ -114,11 +125,16 @@ class LiveChatMessengerTest extends TestCase
 
     public function test_consultant_and_tuvanvien_portals_load_ok(): void
     {
-        $res1 = $this->get('/consultant');
+        // Khách chưa đăng nhập bị chặn (Yêu cầu 2)
+        $guestRes = $this->get('/consultant');
+        $guestRes->assertStatus(302);
+
+        // Chuyên viên đã đăng nhập vào thành công
+        $res1 = $this->withSession(['user' => ['role' => 'advisor', 'name' => 'Advisor']])->get('/consultant');
         $res1->assertStatus(200);
         $res1->assertSee('PrimeLux');
 
-        $res2 = $this->get('/tuvanvien');
+        $res2 = $this->withSession(['user' => ['role' => 'advisor', 'name' => 'Advisor']])->get('/tuvanvien');
         $res2->assertStatus(200);
         $res2->assertSee('PrimeLux');
     }

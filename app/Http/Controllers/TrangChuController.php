@@ -10,6 +10,7 @@ class TrangChuController extends Controller
     public function index(Request $request)
     {
         $cars = Xe::getAllCars();
+
         return view('trangchu', compact('cars'));
     }
 }

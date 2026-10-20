@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Trang Tổng Quan Quản Trị - PrimeLux Auto (dashboard.html)')
+@section('title', 'Trang Tổng Quan Quản Trị - PrimeLux Auto')
 
 @section('content')
 <div class="container-fluid px-3 px-md-4 py-2">
@@ -60,7 +60,7 @@
                 <div>
                     <div class="stat-title">Số Lượng Xe Trong Kho</div>
                     <div class="stat-value text-white">
-                        <span>{{ $totalCars }}</span>
+                        <span id="dashTotalCars">{{ $totalCars }}</span>
                         <span class="stat-unit">mẫu xe</span>
                     </div>
                     <div class="stat-sub text-success">
@@ -82,7 +82,7 @@
                 <div>
                     <div class="stat-title">Đơn Hàng / Hóa Đơn Mới</div>
                     <div class="stat-value text-info">
-                        <span>{{ $totalInvoices }}</span>
+                        <span id="dashTotalInvoices">{{ $totalInvoices }}</span>
                         <span class="stat-unit">giao dịch</span>
                     </div>
                     <div class="stat-sub text-info">
@@ -104,7 +104,7 @@
                 <div>
                     <div class="stat-title">Lịch Lái Thử Chờ Duyệt</div>
                     <div class="stat-value text-warning">
-                        <span>{{ $pendingDrives }}</span>
+                        <span id="dashPendingDrives">{{ $pendingDrives }}</span>
                         <span class="stat-unit">yêu cầu</span>
                     </div>
                     <div class="stat-sub text-warning">
@@ -126,7 +126,7 @@
                 <div>
                     <div class="stat-title">Doanh Thu Bán Xe</div>
                     <div class="stat-value revenue-val text-success">
-                        <span>{{ number_format($totalRevenue, 0, ',', '.') }}</span>
+                        <span id="dashTotalRevenue">{{ number_format($totalRevenue, 0, ',', '.') }}</span>
                         <span class="stat-unit text-success fw-bold">VNĐ</span>
                     </div>
                     <div class="stat-sub text-secondary">
@@ -283,7 +283,7 @@
                     </h5>
                     <p class="text-secondary small mb-0">Các mẫu siêu xe sang sẵn sàng bàn giao và phục vụ khách lái thử</p>
                 </div>
-                <a href="{{ url('/admin/cars-management.html') }}" class="btn btn-outline-primary btn-sm">
+                <a href="{{ url('/admin/cars-management') }}" class="btn btn-outline-primary btn-sm">
                     <i class="fa-solid fa-boxes-stacked me-1"></i> Quản Lý Chi Tiết Kho Xe <i class="fa-solid fa-arrow-right ms-1"></i>
                 </a>
             </div>
@@ -347,8 +347,8 @@
                         </h5>
                         <p class="text-secondary small mb-0">Các giao dịch xe sang vừa được xác nhận</p>
                     </div>
-                    <a href="{{ url('/invoices') }}" target="_blank" class="btn btn-outline-secondary btn-sm">
-                        Xem Tất Cả Hóa Đơn <i class="fa-solid fa-arrow-right ms-1"></i>
+                    <a href="{{ route('admin.invoices.index') }}" class="btn btn-outline-info btn-sm">
+                        Quản Lý & Chi Tiết Hóa Đơn <i class="fa-solid fa-arrow-right ms-1"></i>
                     </a>
                 </div>
 
@@ -361,12 +361,20 @@
                                 <th>Mẫu Xe Mua</th>
                                 <th>Thanh Toán</th>
                                 <th>Trạng Thái</th>
+                                <th class="text-end">Chi Tiết</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($invoices->take(5) as $inv)
+                            @php
+                                $invCode = $inv['code'] ?? $inv->ma_hd;
+                            @endphp
                             <tr>
-                                <td class="font-monospace fw-bold text-info">{{ $inv['code'] ?? $inv->ma_hd }}</td>
+                                <td class="font-monospace fw-bold text-info">
+                                    <a href="{{ route('admin.invoices.index', ['search' => $invCode]) }}" class="text-info text-decoration-none hover-underline">
+                                        {{ $invCode }}
+                                    </a>
+                                </td>
                                 <td>
                                     <strong>{{ $inv['customer_name'] ?? ($inv->customer->ho_ten ?? 'VIP Customer') }}</strong>
                                     <br><small class="text-secondary">{{ $inv['customer_phone'] ?? ($inv->customer->sdt ?? '') }}</small>
@@ -374,6 +382,11 @@
                                 <td>{{ $inv['car_name'] ?? 'Mercedes-Maybach S 680' }}</td>
                                 <td class="text-warning fw-bold">{{ $inv['total_price'] ?? (number_format($inv->tong_tien_thanh_toan, 0, ',', '.') . ' VNĐ') }}</td>
                                 <td><span class="badge bg-success">Đã thanh toán</span></td>
+                                <td class="text-end">
+                                    <a href="{{ route('admin.invoices.index', ['search' => $invCode]) }}" class="btn btn-xs btn-outline-secondary" title="Xem chi tiết hóa đơn">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </a>
+                                </td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -392,7 +405,7 @@
                         </h5>
                         <p class="text-secondary small mb-0">Yêu cầu từ khách hàng đăng ký trực tuyến</p>
                     </div>
-                    <a href="{{ url('/admin/test-drive-list.html') }}" class="btn btn-warning text-dark btn-sm fw-bold">
+                    <a href="{{ url('/admin/test-drive-list') }}" class="btn btn-warning text-dark btn-sm fw-bold">
                         Quản Lý Lịch <i class="fa-solid fa-arrow-right ms-1"></i>
                     </a>
                 </div>
@@ -683,6 +696,47 @@
 
         // Export ra window để gọi từ link ngoài
         window.applyDashboardFilter = applyFilter;
+    }
+
+    // Lắng nghe sự kiện đồng bộ toàn hệ thống thời gian thực cho Bảng Quản Trị
+    if (window.PrimeLuxSync) {
+        window.PrimeLuxSync.on('CAR_ADDED', (car) => {
+            const el = document.getElementById('dashTotalCars');
+            if (el) el.textContent = parseInt(el.textContent || '0') + 1;
+            window.PrimeLuxSync.showToast({
+                title: 'Kho Xe: Xe Mới',
+                message: `Mẫu xe <b>${car.name || car.ten_xe}</b> vừa được nhập vào kho Showroom!`,
+                icon: 'fa-car-side',
+                type: 'info'
+            });
+        });
+
+        window.PrimeLuxSync.on('CAR_DELETED', (car) => {
+            const el = document.getElementById('dashTotalCars');
+            if (el) el.textContent = Math.max(0, parseInt(el.textContent || '0') - 1);
+        });
+
+        window.PrimeLuxSync.on('TEST_DRIVE_BOOKED', (td) => {
+            const el = document.getElementById('dashPendingDrives');
+            if (el) el.textContent = parseInt(el.textContent || '0') + 1;
+            window.PrimeLuxSync.showToast({
+                title: 'Lịch Lái Thử Mới Cần Duyệt',
+                message: `Khách hàng <b>${td.ho_ten}</b> vừa đặt lái thử xe <b>${td.ten_xe}</b>!`,
+                icon: 'fa-calendar-plus',
+                type: 'warning'
+            });
+        });
+
+        window.PrimeLuxSync.on('PAYMENT_RECEIVED', (pay) => {
+            const el = document.getElementById('dashTotalInvoices');
+            if (el) el.textContent = parseInt(el.textContent || '0') + 1;
+            window.PrimeLuxSync.showToast({
+                title: 'Thanh Toán Thành Công (SePay)',
+                message: `Nhận <b>${parseInt(pay.amount || 0).toLocaleString('vi-VN')} VNĐ</b> từ khách hàng <b>${pay.customer_name || 'Khách'}</b>!`,
+                icon: 'fa-file-invoice-dollar',
+                type: 'success'
+            });
+        });
     }
 </script>
 @endpush

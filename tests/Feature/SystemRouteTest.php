@@ -43,13 +43,13 @@ class SystemRouteTest extends TestCase
     public function test_test_drive_booking_submission(): void
     {
         $payload = [
-            'ho_ten'    => 'Nguyễn Văn Test',
-            'sdt'       => '0988776655',
-            'email'     => 'test@example.com',
-            'ten_xe'    => 'Mercedes-Maybach S 680',
-            'showroom'  => 'Showroom 1 - Quận 1 TP.HCM',
+            'ho_ten' => 'Nguyễn Văn Test',
+            'sdt' => '0988776655',
+            'email' => 'test@example.com',
+            'ten_xe' => 'Mercedes-Maybach S 680',
+            'showroom' => 'Showroom 1 - Quận 1 TP.HCM',
             'thoi_gian' => '2026-10-01 09:00:00',
-            'ghi_chu'   => 'Lái thử trải nghiệm xe mới',
+            'ghi_chu' => 'Lái thử trải nghiệm xe mới',
         ];
 
         $response = $this->post('/laithu', $payload);
@@ -67,7 +67,7 @@ class SystemRouteTest extends TestCase
         $payload = [
             'nguoi_gui' => 'Khách VIP Demo',
             'sdt_khach' => '0912345678',
-            'noi_dung'  => 'Tư vấn giúp tôi chương trình khuyến mãi tháng này',
+            'noi_dung' => 'Tư vấn giúp tôi chương trình khuyến mãi tháng này',
         ];
 
         $response = $this->postJson('/api/consultant/submit-question', $payload);

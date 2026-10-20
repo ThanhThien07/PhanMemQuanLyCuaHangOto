@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\HoaDonXacNhanMail;
 use App\Models\AuditLog;
 use App\Models\DatLichDichVu;
 use App\Models\HangThanhVien;
@@ -14,6 +15,8 @@ use App\Models\SepayTransaction;
 use App\Models\ThongBaoDaKenh;
 use App\Models\Xe;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Mail;
 
 class QuanTriController extends Controller
 {
@@ -131,17 +134,41 @@ class QuanTriController extends Controller
     }
 
     /**
+     * Lấy dữ liệu thống kê kho xe thời gian thực
+     */
+    public static function getWarehouseStats(): array
+    {
+        $cars = Xe::getAllCars();
+        $totalCars = count($cars);
+        $inStockCount = collect($cars)->filter(fn ($c) => in_array($c['status'] ?? '', ['Sẵn sàng giao', 'Sẵn hàng']))->count();
+        $inTransitCount = collect($cars)->filter(fn ($c) => ($c['status'] ?? '') === 'Đang vận chuyển')->count();
+        $reservedCount = collect($cars)->filter(fn ($c) => in_array($c['status'] ?? '', ['Đã đặt cọc', 'Tạm hết hàng']))->count();
+        $totalWarehouseValue = (float) array_sum(array_column($cars, 'price'));
+
+        return [
+            'totalCars' => $totalCars,
+            'inStockCount' => $inStockCount,
+            'inTransitCount' => $inTransitCount,
+            'reservedCount' => $reservedCount,
+            'transitOrReservedCount' => $inTransitCount + $reservedCount,
+            'totalWarehouseValue' => $totalWarehouseValue,
+            'totalWarehouseValueFormatted' => number_format($totalWarehouseValue, 0, ',', '.'),
+        ];
+    }
+
+    /**
      * Trang Quản lý kho xe (admin/cars-management.html)
      */
     public function carsManagement(Request $request)
     {
         $cars = Xe::getAllCars();
+        $stats = self::getWarehouseStats();
 
-        $totalCars = count($cars);
-        $inStockCount = collect($cars)->filter(fn ($c) => in_array($c['status'] ?? '', ['Sẵn sàng giao', 'Sẵn hàng']))->count();
-        $inTransitCount = collect($cars)->filter(fn ($c) => ($c['status'] ?? '') === 'Đang vận chuyển')->count();
-        $reservedCount = collect($cars)->filter(fn ($c) => in_array($c['status'] ?? '', ['Đã đặt cọc', 'Tạm hết hàng']))->count();
-        $totalWarehouseValue = array_sum(array_column($cars, 'price'));
+        $totalCars = $stats['totalCars'];
+        $inStockCount = $stats['inStockCount'];
+        $inTransitCount = $stats['inTransitCount'];
+        $reservedCount = $stats['reservedCount'];
+        $totalWarehouseValue = $stats['totalWarehouseValue'];
 
         return view('admin.cars-management', compact(
             'cars',
@@ -202,6 +229,12 @@ class QuanTriController extends Controller
         ]);
 
         $code = 'car-'.strtoupper(substr(uniqid(), -4));
+        $tag = $validated['nhan_tag'] ?? 'Mới Về';
+        $tagClass = match ($tag) {
+            'HOT' => 'tag-hot',
+            'Ưu Đãi' => 'tag-sale',
+            default => 'tag-new',
+        };
 
         try {
             $newCar = Xe::create([
@@ -215,24 +248,36 @@ class QuanTriController extends Controller
                 'cong_suat' => $validated['cong_suat'] ?? '400 Mã lực',
                 'so_cho' => $validated['so_cho'] ?? '5 Chỗ',
                 'nam_sx' => $validated['nam_sx'] ?? 2026,
-                'nhan_tag' => $validated['nhan_tag'] ?? 'Mới Về',
-                'tag_class' => 'tag-new',
+                'nhan_tag' => $tag,
+                'tag_class' => $tagClass,
                 'hinh_anh' => $validated['hinh_anh'],
                 'mo_ta' => $validated['mo_ta'] ?? '',
                 'so_luong_kho' => $validated['so_luong_kho'] ?? 1,
                 'trang_thai' => $validated['trang_thai'] ?? 'Sẵn sàng giao',
             ]);
 
+            Cache::forever('primelux_cars_version', (string) now()->timestamp);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Thêm mẫu xe mới vào kho thành công!',
                 'car' => Xe::formatCar($newCar),
+                'stats' => self::getWarehouseStats(),
             ]);
         } catch (\Throwable $e) {
+            Cache::forever('primelux_cars_version', (string) now()->timestamp);
+
+            $formattedDemo = Xe::formatCar(array_merge($validated, [
+                'id' => $code,
+                'ma_xe' => $code,
+                'tag_class' => $tagClass,
+            ]));
+
             return response()->json([
                 'success' => true,
                 'message' => 'Lưu mẫu xe mới thành công (chế độ demo/local)!',
-                'car' => array_merge($validated, ['id' => $code]),
+                'car' => $formattedDemo,
+                'stats' => self::getWarehouseStats(),
             ]);
         }
     }
@@ -258,6 +303,13 @@ class QuanTriController extends Controller
             'trang_thai' => 'nullable|string|max:50',
         ]);
 
+        $tag = $validated['nhan_tag'] ?? 'Mới Về';
+        $tagClass = match ($tag) {
+            'HOT' => 'tag-hot',
+            'Ưu Đãi' => 'tag-sale',
+            default => 'tag-new',
+        };
+
         try {
             $car = Xe::where('id', $id)->orWhere('ma_xe', $id)->first();
             if ($car) {
@@ -271,26 +323,39 @@ class QuanTriController extends Controller
                     'cong_suat' => $validated['cong_suat'] ?? $car->cong_suat,
                     'so_cho' => $validated['so_cho'] ?? $car->so_cho,
                     'nam_sx' => $validated['nam_sx'] ?? $car->nam_sx,
-                    'nhan_tag' => $validated['nhan_tag'] ?? $car->nhan_tag,
+                    'nhan_tag' => $tag,
+                    'tag_class' => $tagClass,
                     'hinh_anh' => $validated['hinh_anh'],
                     'mo_ta' => $validated['mo_ta'] ?? $car->mo_ta,
                     'so_luong_kho' => $validated['so_luong_kho'] ?? $car->so_luong_kho,
                     'trang_thai' => $validated['trang_thai'] ?? $car->trang_thai,
                 ]);
 
+                Cache::forever('primelux_cars_version', (string) now()->timestamp);
+
                 return response()->json([
                     'success' => true,
                     'message' => 'Cập nhật thông tin mẫu xe thành công!',
                     'car' => Xe::formatCar($car),
+                    'stats' => self::getWarehouseStats(),
                 ]);
             }
         } catch (\Throwable $e) {
         }
 
+        Cache::forever('primelux_cars_version', (string) now()->timestamp);
+
+        $formattedDemo = Xe::formatCar(array_merge($validated, [
+            'id' => $id,
+            'ma_xe' => $id,
+            'tag_class' => $tagClass,
+        ]));
+
         return response()->json([
             'success' => true,
             'message' => 'Cập nhật thông tin xe thành công!',
-            'car' => array_merge($validated, ['id' => $id]),
+            'car' => $formattedDemo,
+            'stats' => self::getWarehouseStats(),
         ]);
     }
 
@@ -303,13 +368,18 @@ class QuanTriController extends Controller
             $car = Xe::where('id', $id)->orWhere('ma_xe', $id)->first();
             if ($car) {
                 $car->delete();
-
-                return response()->json(['success' => true, 'message' => 'Đã xóa mẫu xe khỏi kho!']);
             }
         } catch (\Throwable $e) {
         }
 
-        return response()->json(['success' => true, 'message' => 'Đã xóa mẫu xe thành công!']);
+        Cache::forever('primelux_cars_version', (string) now()->timestamp);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Đã xóa mẫu xe khỏi kho!',
+            'carId' => $id,
+            'stats' => self::getWarehouseStats(),
+        ]);
     }
 
     /**
@@ -324,13 +394,19 @@ class QuanTriController extends Controller
             if ($car) {
                 $car->trang_thai = $status;
                 $car->save();
-
-                return response()->json(['success' => true, 'message' => 'Cập nhật trạng thái xe thành công!', 'status' => $status]);
             }
         } catch (\Throwable $e) {
         }
 
-        return response()->json(['success' => true, 'message' => 'Cập nhật trạng thái thành công!', 'status' => $status]);
+        Cache::forever('primelux_cars_version', (string) now()->timestamp);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Cập nhật trạng thái xe thành công!',
+            'status' => $status,
+            'carId' => $id,
+            'stats' => self::getWarehouseStats(),
+        ]);
     }
 
     /**
@@ -578,5 +654,122 @@ class QuanTriController extends Controller
         $notifications = ThongBaoDaKenh::orderBy('id', 'desc')->take(10)->get();
 
         return view('admin.audit', compact('logs', 'notifications'));
+    }
+
+    /**
+     * Quản lý hóa đơn bán xe & đơn hàng trong Showroom (Dành riêng cho Admin)
+     */
+    public function invoices(Request $request)
+    {
+        $status = $request->query('status', 'all');
+        $search = trim($request->query('search', ''));
+
+        $query = HoaDon::with(['customer.tier', 'details']);
+
+        if (! empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('ma_hd', 'like', "%{$search}%")
+                    ->orWhereHas('customer', function ($cq) use ($search) {
+                        $cq->where('ho_ten', 'like', "%{$search}%")
+                            ->orWhere('sdt', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        if ($status !== 'all' && ! empty($status)) {
+            if ($status === 'paid') {
+                $query->where('trang_thai', 'like', '%thanh toán%')
+                    ->where('trang_thai', 'not like', '%chờ%');
+            } elseif ($status === 'pending') {
+                $query->where(function ($q) {
+                    $q->where('trang_thai', 'like', '%chờ%')
+                        ->orWhere('trang_thai', 'like', '%chưa%');
+                });
+            }
+        }
+
+        $invoices = $query->orderBy('id', 'desc')->paginate(12)->withQueryString();
+
+        // Thống kê tổng hợp trực tiếp từ CSDL
+        $totalInvoices = HoaDon::count();
+        $totalRevenue = HoaDon::sum('tong_tien_thanh_toan');
+        $paidInvoices = HoaDon::where('trang_thai', 'like', '%thanh toán%')->where('trang_thai', 'not like', '%chờ%')->count();
+        $pendingInvoices = HoaDon::where('trang_thai', 'like', '%chờ%')->orWhere('trang_thai', 'like', '%chưa%')->count();
+
+        return view('admin.invoices', compact(
+            'invoices',
+            'status',
+            'search',
+            'totalInvoices',
+            'totalRevenue',
+            'paidInvoices',
+            'pendingInvoices'
+        ));
+    }
+
+    /**
+     * Chi tiết 1 hóa đơn cụ thể (Truy vấn DB trực tiếp, không gọi API khách vãng lai)
+     */
+    public function invoiceDetail($id)
+    {
+        $invoice = HoaDon::with(['customer.tier', 'details'])->where('ma_hd', $id)->orWhere('id', $id)->firstOrFail();
+
+        $car = null;
+        if ($invoice->details && $invoice->details->count() > 0) {
+            $carId = $invoice->details->first()->ma_xe;
+            $cars = Xe::getAllCars();
+            foreach ($cars as $c) {
+                if ($c['id'] === $carId) {
+                    $car = $c;
+                    break;
+                }
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'invoice' => $invoice,
+            'car' => $car,
+        ]);
+    }
+
+    /**
+     * Cập nhật trạng thái hóa đơn
+     */
+    public function updateInvoiceStatus(Request $request, $id)
+    {
+        $invoice = HoaDon::where('ma_hd', $id)->orWhere('id', $id)->firstOrFail();
+        $newStatus = $request->input('trang_thai', 'Đã thanh toán 100%');
+        $invoice->trang_thai = $newStatus;
+        $invoice->save();
+
+        return back()->with('success', 'Đã cập nhật trạng thái hóa đơn #'.$invoice->ma_hd.' thành công!');
+    }
+
+    /**
+     * Gửi lại email hóa đơn tới Gmail khách hàng
+     */
+    public function resendInvoiceEmail($id)
+    {
+        $invoice = HoaDon::with(['customer', 'details'])->where('ma_hd', $id)->orWhere('id', $id)->firstOrFail();
+        $email = $invoice->customer->email ?? request()->input('email');
+
+        if (empty($email)) {
+            return back()->with('error', 'Khách hàng này chưa có địa chỉ email để gửi hóa đơn.');
+        }
+
+        try {
+            Mail::to($email)->send(new HoaDonXacNhanMail($invoice, [
+                'customer_name' => $invoice->customer->ho_ten ?? 'Quý Khách',
+                'customer_phone' => $invoice->customer->sdt ?? '',
+                'customer_email' => $email,
+                'paid_amount' => $invoice->tong_tien_thanh_toan,
+            ]));
+
+            return back()->with('success', 'Đã gửi lại hóa đơn mua xe thành công tới email '.$email.'!');
+        } catch (\Throwable $e) {
+            return back()->with('error', 'Lỗi gửi email: '.$e->getMessage());
+        }
     }
 }

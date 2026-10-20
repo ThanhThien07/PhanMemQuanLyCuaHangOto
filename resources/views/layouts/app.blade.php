@@ -23,7 +23,7 @@
                 <div class="sidebar-header">
                     <div class="d-flex justify-content-between">
                         <div class="logo">
-                            <a href="index.html"><img src="assets/images/logo/logo.png" alt="Logo" srcset=""></a>
+                            <a href="{{ url('/') }}"><img src="assets/images/logo/logo.png" alt="Logo" srcset=""></a>
                         </div>
                         <div class="toggler">
                             <a href="#" class="sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></a>
@@ -35,7 +35,7 @@
                         <li class="sidebar-title">Menu</li>
 
                         <li class="sidebar-item  ">
-                            <a href="index.html" class='sidebar-link'>
+                            <a href="{{ url('/admin') }}" class='sidebar-link'>
                                 <i class="bi bi-grid-fill"></i>
                                 <span>Dashboard</span>
                             </a>
@@ -50,16 +50,16 @@
                             </a>
                             <ul class="submenu active">
                                 <li class="submenu-item active">
-                                    <a href="layout-default.html">Default Layout</a>
+                                    <a href="#">Default Layout</a>
                                 </li>
                                 <li class="submenu-item ">
-                                    <a href="layout-vertical-1-column.html">1 Column</a>
+                                    <a href="#">1 Column</a>
                                 </li>
                                 <li class="submenu-item ">
-                                    <a href="layout-vertical-navbar.html">Vertical with Navbar</a>
+                                    <a href="#">Vertical with Navbar</a>
                                 </li>
                                 <li class="submenu-item ">
-                                    <a href="layout-horizontal.html">Horizontal Menu</a>
+                                    <a href="#">Horizontal Menu</a>
                                 </li>
                             </ul>
                         </li>
@@ -88,7 +88,7 @@
                         <div class="col-12 col-md-6 order-md-2 order-first">
                             <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
                                 <ol class="breadcrumb">
-                                    <li class="breadcrumb-item"><a href="index.html">Dashboard</a></li>
+                                    <li class="breadcrumb-item"><a href="{{ url('/admin') }}">Dashboard</a></li>
                                     <li class="breadcrumb-item active" aria-current="page">Layout Default</li>
                                 </ol>
                             </nav>

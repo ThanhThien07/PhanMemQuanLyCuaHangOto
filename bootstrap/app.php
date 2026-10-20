@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Middleware\AdminAuth;
+use App\Http\Middleware\AdvisorAuth;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -16,6 +18,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'api/*',
             'hooks/*',
             'webhook/*',
+        ]);
+
+        $middleware->alias([
+            'admin.auth' => AdminAuth::class,
+            'advisor.auth' => AdvisorAuth::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

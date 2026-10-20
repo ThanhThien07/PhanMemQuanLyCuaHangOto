@@ -177,16 +177,18 @@ function renderCarCards(carsToRender, containerId) {
                     <a href="/cars/${car.id}" class="d-block w-100 h-100" title="Xem chi tiết ${car.name}">
                         <img src="${car.image}" alt="${car.name}" class="w-100 object-fit-cover" style="height: 230px;">
                     </a>
-                    <span class="car-tag ${car.tagClass || 'tag-hot'} position-absolute top-0 end-0 m-3 pe-none">${car.tag}</span>
-                    ${car.year ? `<span class="badge bg-dark bg-opacity-75 text-white position-absolute top-0 start-0 m-3 border border-secondary pe-none">Đời ${car.year}</span>` : ''}
                 </div>
                 <div class="car-body d-flex flex-column flex-grow-1 p-3">
                     <div class="d-flex justify-content-between align-items-center mb-1">
                         <span class="car-brand text-primary fw-bold small text-uppercase">${car.brand}</span>
-                        <span class="badge bg-secondary bg-opacity-25 text-secondary small">${car.type}</span>
+                        <div class="d-flex align-items-center gap-1">
+                            ${car.year ? `<span class="badge bg-dark border border-secondary text-secondary" style="font-size: 11px;">Đời ${car.year}</span>` : ''}
+                            <span class="badge bg-secondary bg-opacity-25 text-secondary small">${car.type}</span>
+                        </div>
                     </div>
-                    <h3 class="car-title fs-5 fw-bold text-white mb-2">
+                    <h3 class="car-title fs-5 fw-bold text-white mb-2 d-flex align-items-center">
                         <a href="/cars/${car.id}" class="text-white text-decoration-none" title="Xem chi tiết ${car.name}">${car.name}</a>
+                        ${car.tag ? `<span class="status-indicator-dot ${car.tagClass || 'tag-hot'} ms-2" title="${car.tag}"></span>` : ''}
                     </h3>
                     <div class="car-specs text-secondary small mb-3 d-flex flex-wrap gap-2">
                         <span><i class="fa-solid fa-gas-pump text-primary me-1"></i> ${car.fuel}</span>
@@ -195,14 +197,14 @@ function renderCarCards(carsToRender, containerId) {
                     </div>
                     <div class="car-price text-warning fw-bold fs-5 mt-auto mb-3">${car.priceText || formatCurrency(car.price)}</div>
                     <div class="car-actions d-flex gap-2">
-                        <a href="/cars/${car.id}" class="btn btn-accent flex-grow-1 text-center py-2" title="Chi tiết xe">
+                        <a href="/cars/${car.id}" class="btn btn-accent flex-fill text-center py-2 px-1 small fw-bold" title="Xem chi tiết ${car.name}">
                             <i class="fa-solid fa-eye me-1"></i> Chi Tiết
                         </a>
-                        <a href="/cars/${car.id}/compare" class="btn btn-outline-info text-center py-2 px-2.5" title="So Sánh Giá Đa Sàn (PO)">
-                            <i class="fa-solid fa-scale-balanced"></i>
+                        <a href="/cars/${car.id}/compare" class="btn btn-outline-info flex-fill text-center py-2 px-1 small fw-bold" title="So Sánh Giá Đa Sàn">
+                            <i class="fa-solid fa-scale-balanced me-1"></i> So Sánh
                         </a>
-                        <a href="/test-drive?car=${encodeURIComponent(car.name)}" class="btn btn-gold text-center py-2 px-2.5" title="Đặt Lái Thử Xe">
-                            <i class="fa-solid fa-steering-wheel"></i>
+                        <a href="/test-drive?car=${encodeURIComponent(car.name)}" class="btn btn-gold flex-fill text-center py-2 px-1 small fw-bold" title="Đặt Lái Thử Xe">
+                            <i class="fa-solid fa-car me-1"></i> Lái Thử
                         </a>
                     </div>
                 </div>

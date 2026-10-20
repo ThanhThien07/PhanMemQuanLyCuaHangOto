@@ -39,7 +39,7 @@ class DatabaseSeeder extends Seeder
                 'dac_quyen' => 'Tích lũy điểm 1% trên mỗi giao dịch. Miễn phí kiểm tra xe 165 điểm định kỳ. Giảm 5% chi phí phụ kiện chính hãng.',
                 'mau_badge' => 'secondary',
                 'created_at' => now(),
-                'updated_at' => now()
+                'updated_at' => now(),
             ],
             [
                 'ma_hang' => 'GOLD',
@@ -49,7 +49,7 @@ class DatabaseSeeder extends Seeder
                 'dac_quyen' => 'Chiết khấu 1% trực tiếp khi mua xe tiếp theo (tiết kiệm đến hàng trăm triệu VNĐ). Tặng 1 năm bảo dưỡng miễn phí. Giảm 10% phụ kiện cao cấp. Ưu tiên bàn giao xe.',
                 'mau_badge' => 'warning',
                 'created_at' => now(),
-                'updated_at' => now()
+                'updated_at' => now(),
             ],
             [
                 'ma_hang' => 'PLATINUM',
@@ -59,7 +59,7 @@ class DatabaseSeeder extends Seeder
                 'dac_quyen' => 'Chiết khấu 2% trực tiếp khi mua xe. Tặng gói Bảo hiểm thân vỏ 1 năm (trị giá lên đến 100.000.000 VNĐ). Giao xe tận nhà bằng xe chuyên dụng VIP. Cứu hộ riêng 24/7 toàn quốc.',
                 'mau_badge' => 'info',
                 'created_at' => now(),
-                'updated_at' => now()
+                'updated_at' => now(),
             ],
             [
                 'ma_hang' => 'DIAMOND',
@@ -69,8 +69,8 @@ class DatabaseSeeder extends Seeder
                 'dac_quyen' => 'Đặc quyền chiết khấu 3% giá trị mọi siêu xe. Tặng gói phủ Ceramic cao cấp & dán film cách nhiệt chính hãng. Vé mời VIP tham dự sự kiện ra mắt xe quốc tế. Chăm sóc xe trọn đời tại Flagship.',
                 'mau_badge' => 'primary',
                 'created_at' => now(),
-                'updated_at' => now()
-            ]
+                'updated_at' => now(),
+            ],
         ]);
 
         // 4. KHÁCH HÀNG & ĐIỂM TÍCH LŨY
@@ -87,7 +87,7 @@ class DatabaseSeeder extends Seeder
                 'tong_chi_tieu' => 31980000000,
                 'ma_hang' => 'DIAMOND',
                 'created_at' => now(),
-                'updated_at' => now()
+                'updated_at' => now(),
             ],
             [
                 'ma_kh' => 'KH002',
@@ -101,7 +101,7 @@ class DatabaseSeeder extends Seeder
                 'tong_chi_tieu' => 9550000000,
                 'ma_hang' => 'GOLD',
                 'created_at' => now(),
-                'updated_at' => now()
+                'updated_at' => now(),
             ],
             [
                 'ma_kh' => 'KH003',
@@ -115,7 +115,7 @@ class DatabaseSeeder extends Seeder
                 'tong_chi_tieu' => 17998000000,
                 'ma_hang' => 'PLATINUM',
                 'created_at' => now(),
-                'updated_at' => now()
+                'updated_at' => now(),
             ],
             [
                 'ma_kh' => 'KH004',
@@ -129,8 +129,8 @@ class DatabaseSeeder extends Seeder
                 'tong_chi_tieu' => 5200000000,
                 'ma_hang' => 'SILVER',
                 'created_at' => now(),
-                'updated_at' => now()
-            ]
+                'updated_at' => now(),
+            ],
         ]);
 
         // 5. MẪU XE
@@ -153,7 +153,7 @@ class DatabaseSeeder extends Seeder
                 'so_luong_kho' => 3,
                 'trang_thai' => 'Sẵn hàng',
                 'created_at' => now(),
-                'updated_at' => now()
+                'updated_at' => now(),
             ],
             [
                 'ma_xe' => 'car-02',
@@ -173,7 +173,7 @@ class DatabaseSeeder extends Seeder
                 'so_luong_kho' => 2,
                 'trang_thai' => 'Sẵn hàng',
                 'created_at' => now(),
-                'updated_at' => now()
+                'updated_at' => now(),
             ],
             [
                 'ma_xe' => 'car-03',
@@ -193,7 +193,7 @@ class DatabaseSeeder extends Seeder
                 'so_luong_kho' => 4,
                 'trang_thai' => 'Sẵn hàng',
                 'created_at' => now(),
-                'updated_at' => now()
+                'updated_at' => now(),
             ],
             [
                 'ma_xe' => 'car-04',
@@ -213,7 +213,7 @@ class DatabaseSeeder extends Seeder
                 'so_luong_kho' => 2,
                 'trang_thai' => 'Sẵn hàng',
                 'created_at' => now(),
-                'updated_at' => now()
+                'updated_at' => now(),
             ],
             [
                 'ma_xe' => 'car-05',
@@ -233,7 +233,7 @@ class DatabaseSeeder extends Seeder
                 'so_luong_kho' => 1,
                 'trang_thai' => 'Sẵn hàng',
                 'created_at' => now(),
-                'updated_at' => now()
+                'updated_at' => now(),
             ],
             [
                 'ma_xe' => 'car-06',
@@ -253,148 +253,12 @@ class DatabaseSeeder extends Seeder
                 'so_luong_kho' => 2,
                 'trang_thai' => 'Sẵn hàng',
                 'created_at' => now(),
-                'updated_at' => now()
-            ]
+                'updated_at' => now(),
+            ],
         ]);
 
-        // 6. HÓA ĐƠN & CHI TIẾT
-        DB::table('hoa_don')->insert([
-            [
-                'ma_hd' => 'HD0001',
-                'ma_kh' => 'KH001',
-                'ngay_lap' => '2026-09-16 10:30:00',
-                'tong_tien_goc' => 15990000000,
-                'giam_gia_hang' => 479700000, // 3% VIP Diamond
-                'tong_tien_thanh_toan' => 15510300000,
-                'diem_thuong_nhan' => 1551,
-                'phuong_thuc_tt' => 'Chuyển khoản Vietcombank VIP',
-                'thoi_gian_bh' => '36 Tháng',
-                'trang_thai' => 'Đã thanh toán',
-                'created_at' => now(),
-                'updated_at' => now()
-            ],
-            [
-                'ma_hd' => 'HD0002',
-                'ma_kh' => 'KH002',
-                'ngay_lap' => '2026-09-18 15:45:00',
-                'tong_tien_goc' => 9550000000,
-                'giam_gia_hang' => 95500000, // 1% Gold
-                'tong_tien_thanh_toan' => 9454500000,
-                'diem_thuong_nhan' => 945,
-                'phuong_thuc_tt' => 'Chuyển khoản MB Bank',
-                'thoi_gian_bh' => '36 Tháng',
-                'trang_thai' => 'Đã thanh toán',
-                'created_at' => now(),
-                'updated_at' => now()
-            ]
-        ]);
-
-        DB::table('ct_hoa_don')->insert([
-            ['ma_hd' => 'HD0001', 'ma_xe' => 'car-01', 'so_luong' => 1, 'don_gia' => 15990000000, 'thanh_tien' => 15990000000, 'created_at' => now(), 'updated_at' => now()],
-            ['ma_hd' => 'HD0002', 'ma_xe' => 'car-02', 'so_luong' => 1, 'don_gia' => 9550000000, 'thanh_tien' => 9550000000, 'created_at' => now(), 'updated_at' => now()],
-        ]);
-
-        // 7. LỊCH ĐĂNG KÝ LÁI THỬ
-        DB::table('dang_ky_lai_thu')->insert([
-            [
-                'ma_lich' => 'TD-101',
-                'ho_ten' => 'Nguyễn Văn Hùng',
-                'sdt' => '0908123456',
-                'email' => 'hung.nguyen@gmail.com',
-                'ten_xe' => 'Mercedes-Maybach S 680 4MATIC',
-                'showroom' => 'Showroom TP. Hồ Chí Minh',
-                'thoi_gian' => '2026-09-20 10:00:00',
-                'ghi_chu' => 'Yêu cầu mang xe tận nhà trải nghiệm riêng tư.',
-                'trang_thai' => 'Đang chờ duyệt',
-                'created_at' => now(),
-                'updated_at' => now()
-            ],
-            [
-                'ma_lich' => 'TD-102',
-                'ho_ten' => 'Trần Thị Mai',
-                'sdt' => '0912987654',
-                'email' => 'mai.tran@gmail.com',
-                'ten_xe' => 'Porsche Taycan Turbo S',
-                'showroom' => 'Showroom Hà Nội',
-                'thoi_gian' => '2026-09-21 14:30:00',
-                'ghi_chu' => 'Cần tư vấn thêm gói sạc tại nhà.',
-                'trang_thai' => 'Đã xác nhận',
-                'created_at' => now(),
-                'updated_at' => now()
-            ]
-        ]);
-
-        // 8. LỊCH SỬ TÍCH ĐIỂM
-        DB::table('lich_su_diem')->insert([
-            ['ma_kh' => 'KH001', 'ma_hd' => 'HD0001', 'so_diem' => 1551, 'hanh_dong' => 'Mua xe Mercedes-Maybach S 680 tích điểm', 'ngay_tao' => now(), 'created_at' => now(), 'updated_at' => now()],
-            ['ma_kh' => 'KH001', 'ma_hd' => null, 'so_diem' => 1000, 'hanh_dong' => 'Thưởng thăng hạng Kim Cương (Diamond VIP)', 'ngay_tao' => now(), 'created_at' => now(), 'updated_at' => now()],
-            ['ma_kh' => 'KH002', 'ma_hd' => 'HD0002', 'so_diem' => 945, 'hanh_dong' => 'Mua xe Porsche Taycan Turbo S tích điểm', 'ngay_tao' => now(), 'created_at' => now(), 'updated_at' => now()],
-        ]);
-
-        // 9. NHẬT KÝ CHATBOT & YÊU CẦU TƯ VẤN VIÊN
-        DB::table('chat_logs')->truncate();
-        DB::table('chat_logs')->insert([
-            [
-                'ma_tin' => 'MSG-2001',
-                'thoi_gian' => '08:45',
-                'nguoi_gui' => 'Nguyễn Văn A',
-                'sdt_khach' => '0901234567',
-                'noi_dung' => 'Xe Mercedes-Maybach S680 bên mình có sẵn màu đen Ruby nội thất Nappa be không? Tôi muốn đặt cọc và giao xe trước Tết tại Quận 2.',
-                'loai_cau_hoi' => 'cau_hoi_rieng',
-                'phan_hoi_bot' => 'Yêu cầu tùy chọn xe riêng đã được chuyển tới Chuyên viên tư vấn VIP.',
-                'trang_thai' => 'Chờ phản hồi',
-                'tra_loi_tu_van' => null,
-                'ten_tu_van' => null,
-                'thoi_gian_tra_loi' => null,
-                'created_at' => now()->subMinutes(45),
-                'updated_at' => now()->subMinutes(45),
-            ],
-            [
-                'ma_tin' => 'MSG-2002',
-                'thoi_gian' => '09:20',
-                'nguoi_gui' => 'Trần Thị Mai',
-                'sdt_khach' => '0912987654',
-                'noi_dung' => 'Tôi đang phân vân giữa Porsche Taycan Turbo S và Audi e-tron GT về thời gian sạc tại nhà và độ bền pin khi đi đường dài. Tư vấn giúp tôi ưu nhược điểm từng dòng.',
-                'loai_cau_hoi' => 'cau_hoi_rieng',
-                'phan_hoi_bot' => 'Chuyên viên tư vấn xe điện EV đang chuẩn bị bảng so sánh kỹ thuật gửi quý khách.',
-                'trang_thai' => 'Đang tư vấn',
-                'tra_loi_tu_van' => 'Chào chị Mai! Chuyên viên tư vấn EV PrimeLux xin so sánh nhanh: Taycan Turbo S thiên về cảm giác lái thể thao 750 mã lực, tăng tốc 2.8s; trong khi Audi e-tron GT êm ái hơn và không gian hàng ghế sau rộng rãi hơn. Cả 2 mẫu đều được tặng kèm bộ sạc Wallbox 22kW 3 pha tại nhà và miễn phí sạc 1 năm tại hệ thống trạm đối tác.',
-                'ten_tu_van' => 'Lê Tuấn Kiệt (Chuyên viên EV)',
-                'thoi_gian_tra_loi' => now()->subMinutes(25),
-                'created_at' => now()->subMinutes(35),
-                'updated_at' => now()->subMinutes(25),
-            ],
-            [
-                'ma_tin' => 'MSG-2003',
-                'thoi_gian' => '10:05',
-                'nguoi_gui' => 'Lê Hoàng Long',
-                'sdt_khach' => '0933892901',
-                'noi_dung' => 'Gói bảo hiểm thân vỏ tặng kèm cho thành viên Bạch Kim có bao gồm bảo hiểm thủy kích ngập nước và mất cắp phụ tùng không?',
-                'loai_cau_hoi' => 'cau_hoi_rieng',
-                'phan_hoi_bot' => 'Chuyên viên phụ trách bảo hiểm & đặc quyền VIP đang giải đáp.',
-                'trang_thai' => 'Đã trả lời',
-                'tra_loi_tu_van' => 'Dạ có thưa anh Long! Gói bảo hiểm thân vỏ đặc quyền dành cho Hạng Bạch Kim tại PrimeLux được liên kết cùng Bảo Việt/PVI với điều khoản toàn diện nhất: bao gồm 100% thủy kích ngập nước, bồi thường mất cắp bộ phận và cứu hộ không giới hạn 24/7 trên toàn quốc.',
-                'ten_tu_van' => 'Nguyễn Minh Thư (Chuyên viên CSKH VIP)',
-                'thoi_gian_tra_loi' => now()->subMinutes(10),
-                'created_at' => now()->subMinutes(20),
-                'updated_at' => now()->subMinutes(10),
-            ],
-            [
-                'ma_tin' => 'MSG-2004',
-                'thoi_gian' => '10:30',
-                'nguoi_gui' => 'Hoàng Đức Trọng',
-                'sdt_khach' => '0988665544',
-                'noi_dung' => 'Showroom có nhận thu cũ đổi mới chiếc Range Rover Vogue 2021 lên bản Autobiography mới không? Quy trình định giá xe cũ tại nhà thế nào?',
-                'loai_cau_hoi' => 'cau_hoi_rieng',
-                'phan_hoi_bot' => 'Hệ thống đã kết nối bạn với bộ phận Thu cũ đổi mới (Trade-in) PrimeLux.',
-                'trang_thai' => 'Chờ phản hồi',
-                'tra_loi_tu_van' => null,
-                'ten_tu_van' => null,
-                'thoi_gian_tra_loi' => null,
-                'created_at' => now()->subMinutes(5),
-                'updated_at' => now()->subMinutes(5),
-            ]
-        ]);
+        // 6. HÓA ĐƠN, LÁI THỬ & CHAT LOGS
+        // Để trống CSDL sẵn sàng cho người dùng thực hiện các thao tác Demo thực tế.
 
         $this->call(CarPriceSourceSeeder::class);
         $this->call(ServiceSeeder::class);

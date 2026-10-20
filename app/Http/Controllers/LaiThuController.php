@@ -31,6 +31,25 @@ class LaiThuController extends Controller
         return view('laithu', compact('cars', 'selectedCar', 'existingBookings'));
     }
 
+    public static function getStats(): array
+    {
+        try {
+            $totalDrives = LaiThu::count();
+            $pendingCount = LaiThu::whereIn('trang_thai', ['Chờ duyệt', 'Đang chờ duyệt'])->count();
+            $contactedCount = LaiThu::where('trang_thai', 'Đã liên hệ')->count();
+            $completedCount = LaiThu::whereIn('trang_thai', ['Đã hoàn thành', 'Đã xác nhận'])->count();
+
+            return [
+                'total' => $totalDrives,
+                'pending' => $pendingCount,
+                'contacted' => $contactedCount,
+                'completed' => $completedCount,
+            ];
+        } catch (\Throwable $e) {
+            return ['total' => 0, 'pending' => 0, 'contacted' => 0, 'completed' => 0];
+        }
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -74,18 +93,24 @@ class LaiThuController extends Controller
         } catch (\Throwable $e) {
         }
 
+        $stats = self::getStats();
+
         return response()->json([
             'success' => true,
             'message' => 'Đăng ký lịch lái thử thành công! Thông báo xác nhận Zalo ZNS / SMS đã được gửi tức thì.',
             'data' => [
-                'id' => $code,
-                'name' => $testDrive->ho_ten,
-                'phone' => $testDrive->sdt,
-                'carName' => $testDrive->ten_xe,
+                'id' => $testDrive->id,
+                'code' => $code,
+                'ho_ten' => $testDrive->ho_ten,
+                'sdt' => $testDrive->sdt,
+                'email' => $testDrive->email ?? '',
+                'ten_xe' => $testDrive->ten_xe,
                 'showroom' => $testDrive->showroom,
-                'date' => $testDrive->thoi_gian,
-                'status' => $testDrive->trang_thai,
+                'thoi_gian' => $testDrive->thoi_gian,
+                'trang_thai' => $testDrive->trang_thai,
+                'created_at' => $testDrive->created_at ? $testDrive->created_at->format('d/m/Y H:i') : now()->format('d/m/Y H:i'),
             ],
+            'stats' => $stats,
         ]);
     }
 
@@ -97,7 +122,12 @@ class LaiThuController extends Controller
             $drive->trang_thai = $status;
             $drive->save();
 
-            return response()->json(['success' => true, 'message' => 'Cập nhật trạng thái thành công!', 'status' => $status]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Cập nhật trạng thái thành công!',
+                'status' => $status,
+                'stats' => self::getStats(),
+            ]);
         }
 
         return response()->json(['success' => false, 'message' => 'Không tìm thấy lịch lái thử'], 404);
@@ -109,7 +139,11 @@ class LaiThuController extends Controller
         if ($drive) {
             $drive->delete();
 
-            return response()->json(['success' => true, 'message' => 'Đã xóa lịch lái thử thành công!']);
+            return response()->json([
+                'success' => true,
+                'message' => 'Đã xóa lịch lái thử thành công!',
+                'stats' => self::getStats(),
+            ]);
         }
 
         return response()->json(['success' => false, 'message' => 'Không tìm thấy lịch lái thử'], 404);

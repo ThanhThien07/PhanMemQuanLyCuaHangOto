@@ -607,17 +607,38 @@
             submitBtn.disabled = false;
             if (data.success) {
                 bootstrap.Modal.getInstance(document.getElementById('bookingModal')).hide();
-                alert("🎉 " + data.message + "\nMÃ ĐẶT LỊCH: " + data.data.ma_dat_lich);
+                if (window.PrimeLuxSync) {
+                    window.PrimeLuxSync.showToast({
+                        title: 'Đặt Lịch Dịch Vụ Thành Công',
+                        message: `${data.message} • MÃ ĐẶT LỊCH: <b>${data.data.ma_dat_lich}</b>`,
+                        icon: 'fa-calendar-check',
+                        type: 'success'
+                    });
+                }
                 document.getElementById('lookupQuery').value = data.data.ma_dat_lich;
                 document.getElementById('lookupForm').dispatchEvent(new Event('submit'));
                 window.location.hash = 'tra-cuu';
             } else {
-                alert("❌ Đã có lỗi xảy ra. Vui lòng kiểm tra lại!");
+                if (window.PrimeLuxSync) {
+                    window.PrimeLuxSync.showToast({
+                        title: 'Lỗi Đặt Lịch',
+                        message: data.message || 'Đã có lỗi xảy ra. Vui lòng kiểm tra lại!',
+                        icon: 'fa-triangle-exclamation',
+                        type: 'danger'
+                    });
+                }
             }
         })
         .catch(err => {
             submitBtn.disabled = false;
-            alert("❌ Lỗi kết nối máy chủ.");
+            if (window.PrimeLuxSync) {
+                window.PrimeLuxSync.showToast({
+                    title: 'Lỗi Kết Nối',
+                    message: 'Không thể kết nối máy chủ dịch vụ. Vui lòng thử lại!',
+                    icon: 'fa-wifi',
+                    type: 'danger'
+                });
+            }
         });
     });
 
@@ -640,7 +661,15 @@
             submitBtn.disabled = false;
             if (data.success) {
                 bootstrap.Modal.getInstance(document.getElementById('sosModal')).hide();
-                alert("🚨 " + data.message + "\nMÃ CỨU HỘ: " + data.data.ma_dat_lich);
+                if (window.PrimeLuxSync) {
+                    window.PrimeLuxSync.showToast({
+                        title: 'Tiếp Nhận Cứu Hộ Khẩn Cấp',
+                        message: `🚨 ${data.message} • MÃ CỨU HỘ: <b>${data.data.ma_dat_lich}</b>. Đội cơ động đang xuất phát!`,
+                        icon: 'fa-truck-medical',
+                        type: 'warning',
+                        duration: 8000
+                    });
+                }
                 document.getElementById('lookupQuery').value = data.data.ma_dat_lich;
                 document.getElementById('lookupForm').dispatchEvent(new Event('submit'));
                 window.location.hash = 'tra-cuu';
@@ -648,7 +677,14 @@
         })
         .catch(err => {
             submitBtn.disabled = false;
-            alert("❌ Lỗi kết nối máy chủ.");
+            if (window.PrimeLuxSync) {
+                window.PrimeLuxSync.showToast({
+                    title: 'Lỗi Kết Nối',
+                    message: 'Không thể gửi yêu cầu cứu hộ qua web. Quý khách vui lòng gọi Hotline 0338 929 013 để được ứng cứu ngay!',
+                    icon: 'fa-phone-volume',
+                    type: 'danger'
+                });
+            }
         });
     });
 

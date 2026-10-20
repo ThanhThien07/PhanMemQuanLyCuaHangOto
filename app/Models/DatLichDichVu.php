@@ -34,11 +34,11 @@ class DatLichDichVu extends Model
     {
         return match ($this->trang_thai) {
             'Đang chờ tiếp nhận' => ['label' => 'Đang Chờ Tiếp Nhận', 'class' => 'bg-warning text-dark'],
-            'Đã xác nhận'       => ['label' => 'Đã Xác Nhận', 'class' => 'bg-info text-dark'],
-            'Đang xử lý'        => ['label' => 'Đang Tiến Hành', 'class' => 'bg-primary'],
-            'Hoàn tất'          => ['label' => 'Hoàn Tất', 'class' => 'bg-success'],
-            'Đã hủy'            => ['label' => 'Đã Hủy', 'class' => 'bg-danger'],
-            default             => ['label' => $this->trang_thai, 'class' => 'bg-secondary'],
+            'Đã xác nhận' => ['label' => 'Đã Xác Nhận', 'class' => 'bg-info text-dark'],
+            'Đang xử lý' => ['label' => 'Đang Tiến Hành', 'class' => 'bg-primary'],
+            'Hoàn tất' => ['label' => 'Hoàn Tất', 'class' => 'bg-success'],
+            'Đã hủy' => ['label' => 'Đã Hủy', 'class' => 'bg-danger'],
+            default => ['label' => $this->trang_thai, 'class' => 'bg-secondary'],
         };
     }
 }

@@ -13,6 +13,7 @@ class AuthController extends Controller
     public function index(Request $request)
     {
         $role = $request->query('role', 'customer');
+
         return view('auth.login', compact('role'));
     }
 
@@ -32,8 +33,9 @@ class AuthController extends Controller
                     'badge' => 'Administrator',
                     'email' => $account ?: 'admin@primelux.vn',
                     'avatar' => 'https://ui-avatars.com/api/?name=Admin&background=f59e0b&color=000&bold=true',
-                ]
+                ],
             ]);
+
             return redirect('/admin')->with('success', 'Đăng nhập thành công với quyền Quản Trị Viên!');
         }
 
@@ -45,8 +47,9 @@ class AuthController extends Controller
                     'badge' => 'Advisor Desk',
                     'email' => $account ?: 'tuvanvien@primelux.vn',
                     'avatar' => 'https://ui-avatars.com/api/?name=Advisor&background=06b6d4&color=fff&bold=true',
-                ]
+                ],
             ]);
+
             return redirect('/consultant')->with('success', 'Đăng nhập thành công vào Bàn Tư Vấn Realtime!');
         }
 
@@ -56,8 +59,8 @@ class AuthController extends Controller
             ->orWhere('email', $account)
             ->first();
 
-        $custName  = $customer?->ho_ten ?? 'Nguyễn Văn A';
-        $custTier  = $customer?->tier?->ten_hang ?? 'Diamond VIP';
+        $custName = $customer?->ho_ten ?? 'Nguyễn Văn A';
+        $custTier = $customer?->tier?->ten_hang ?? 'Diamond VIP';
         $custPhone = $customer?->sdt ?? ($account ?: '0901234567');
 
         session([
@@ -68,11 +71,11 @@ class AuthController extends Controller
                 'phone' => $custPhone,
                 'email' => $customer->email ?? 'khachhang@gmail.com',
                 'points' => $customer->diem_tich_luy ?? 12500,
-                'avatar' => 'https://ui-avatars.com/api/?name=' . urlencode($custName) . '&background=2563eb&color=fff&bold=true',
-            ]
+                'avatar' => 'https://ui-avatars.com/api/?name='.urlencode($custName).'&background=2563eb&color=fff&bold=true',
+            ],
         ]);
 
-        return redirect('/loyalty?phone=' . urlencode($custPhone))->with('success', 'Đăng nhập thành công vào Cổng Khách Hàng VIP!');
+        return redirect('/loyalty?phone='.urlencode($custPhone))->with('success', 'Đăng nhập thành công vào Cổng Khách Hàng VIP!');
     }
 
     /**

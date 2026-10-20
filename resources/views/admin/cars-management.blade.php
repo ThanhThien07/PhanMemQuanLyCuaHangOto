@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Quản Lý Kho Xe - PrimeLux Auto Admin (cars-management.html)')
+@section('title', 'Quản Lý Kho Xe - PrimeLux Auto Admin')
 
 @section('content')
 <div class="container-fluid px-3 px-md-4 py-2">
@@ -66,7 +66,7 @@
                 <div>
                     <div class="stat-title">Đang Vận Chuyển / Cọc</div>
                     <div class="stat-value text-warning">
-                        <span>{{ $inTransitCount + $reservedCount }}</span>
+                        <span id="statTransitOrReserved">{{ $inTransitCount + $reservedCount }}</span>
                         <span class="stat-unit text-warning">chiếc</span>
                     </div>
                     <div class="stat-sub text-warning"><i class="fa-solid fa-truck-moving"></i> Đang về showroom</div>
@@ -84,7 +84,7 @@
                 <div>
                     <div class="stat-title">Tổng Giá Trị Kho Hàng</div>
                     <div class="stat-value revenue-val text-info">
-                        <span>{{ number_format($totalWarehouseValue, 0, ',', '.') }}</span>
+                        <span id="statTotalWarehouseValue">{{ number_format($totalWarehouseValue, 0, ',', '.') }}</span>
                         <span class="stat-unit text-info fw-bold">VNĐ</span>
                     </div>
                     <div class="stat-sub text-secondary">Định giá niêm yết</div>
@@ -413,18 +413,168 @@
 
 @push('scripts')
 <script>
+    // Hàm cập nhật các thẻ số liệu thống kê kho xe trên đầu trang
+    function updateWarehouseStatCards(stats) {
+        if (!stats) return;
+        if (stats.totalCars !== undefined) {
+            const el = document.getElementById("statTotalCars");
+            if (el) el.textContent = stats.totalCars;
+        }
+        if (stats.inStockCount !== undefined) {
+            const el = document.getElementById("statInStock");
+            if (el) el.textContent = stats.inStockCount;
+        }
+        if (stats.transitOrReservedCount !== undefined) {
+            const el = document.getElementById("statTransitOrReserved");
+            if (el) el.textContent = stats.transitOrReservedCount;
+        }
+        if (stats.totalWarehouseValueFormatted !== undefined) {
+            const el = document.getElementById("statTotalWarehouseValue");
+            if (el) el.textContent = stats.totalWarehouseValueFormatted;
+        }
+    }
+
+    function getBadgeClass(status) {
+        if (status === 'Sẵn sàng giao' || status === 'Sẵn hàng') return 'bg-success';
+        if (status === 'Đang vận chuyển') return 'bg-info text-dark';
+        if (status === 'Đã đặt cọc') return 'bg-warning text-dark';
+        if (status === 'Tạm hết hàng') return 'bg-danger';
+        return 'bg-secondary';
+    }
+
+    // Tạo phần tử hàng bảng xe <tr> mới
+    function renderAdminCarRow(car) {
+        const badgeClass = getBadgeClass(car.status || 'Sẵn sàng giao');
+        const priceText = car.priceText || (parseFloat(car.price || 0).toLocaleString('vi-VN') + ' VNĐ');
+        const status = car.status || 'Sẵn sàng giao';
+
+        const tr = document.createElement("tr");
+        tr.className = "car-table-row table-row-highlight-new";
+        tr.id = `car-row-${car.id}`;
+        tr.dataset.id = car.id;
+        tr.dataset.name = (car.name || '').toLowerCase();
+        tr.dataset.brand = car.brand || '';
+        tr.dataset.status = status;
+
+        tr.innerHTML = `
+            <td>
+                <img src="${car.image}" class="rounded-3 object-fit-cover shadow-sm car-row-img" style="width: 70px; height: 48px;" alt="${car.name}">
+            </td>
+            <td>
+                <div class="fw-bold text-white car-row-name">${car.name}</div>
+                <small class="text-secondary font-monospace car-row-id">${car.id}</small>
+            </td>
+            <td>
+                <span class="badge bg-secondary bg-opacity-50 text-white px-2.5 py-1.5 car-row-brand">${car.brand}</span>
+            </td>
+            <td>
+                <span class="badge bg-dark border border-secondary text-light car-row-type">${car.type}</span>
+            </td>
+            <td class="text-warning fw-bold fs-6 car-row-price">
+                ${priceText}
+            </td>
+            <td>
+                <span class="small text-secondary car-row-year">${car.year || 2026}</span>
+            </td>
+            <td>
+                <span class="badge bg-secondary px-2.5 py-1.5 car-row-stock">${car.stock || 1} xe</span>
+            </td>
+            <td>
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-light dropdown-toggle px-2 py-1 text-nowrap status-dropdown-btn" 
+                            type="button" data-bs-toggle="dropdown" id="status-btn-${car.id}">
+                        <span class="badge ${badgeClass} me-1" id="status-badge-${car.id}">${status}</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-dark shadow">
+                        <li><h6 class="dropdown-header text-secondary small">Cập Nhật Trạng Thái</h6></li>
+                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="quickUpdateCarStatus('${car.id}', 'Sẵn sàng giao')"><i class="fa-solid fa-circle-check text-success me-2"></i> Sẵn sàng giao</a></li>
+                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="quickUpdateCarStatus('${car.id}', 'Đang vận chuyển')"><i class="fa-solid fa-truck-moving text-info me-2"></i> Đang vận chuyển</a></li>
+                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="quickUpdateCarStatus('${car.id}', 'Đã đặt cọc')"><i class="fa-solid fa-clock text-warning me-2"></i> Đã đặt cọc</a></li>
+                        <li><a class="dropdown-item" href="javascript:void(0)" onclick="quickUpdateCarStatus('${car.id}', 'Tạm hết hàng')"><i class="fa-solid fa-ban text-danger me-2"></i> Tạm hết hàng</a></li>
+                    </ul>
+                </div>
+            </td>
+            <td class="text-end">
+                <div class="d-inline-flex gap-1">
+                    <button class="btn btn-outline-warning btn-sm btn-edit-row" title="Sửa thông tin xe">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </button>
+                    <button class="btn btn-outline-danger btn-sm btn-delete-row" title="Xóa mẫu xe">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            </td>
+        `;
+
+        tr.querySelector('.btn-edit-row').addEventListener('click', () => openEditCarModal(car));
+        tr.querySelector('.btn-delete-row').addEventListener('click', () => confirmDeleteCar(car.id, car.name));
+
+        return tr;
+    }
+
+    // Cập nhật nội dung một dòng xe đã tồn tại
+    function updateAdminCarRowInDom(car) {
+        const row = document.getElementById(`car-row-${car.id}`);
+        if (!row) return;
+
+        const badgeClass = getBadgeClass(car.status || 'Sẵn sàng giao');
+        const priceText = car.priceText || (parseFloat(car.price || 0).toLocaleString('vi-VN') + ' VNĐ');
+
+        row.dataset.name = (car.name || '').toLowerCase();
+        row.dataset.brand = car.brand || '';
+        row.dataset.status = car.status || 'Sẵn sàng giao';
+
+        const img = row.querySelector('.car-row-img') || row.querySelector('td:nth-child(1) img');
+        if (img && car.image) img.src = car.image;
+
+        const nameEl = row.querySelector('.car-row-name') || row.querySelector('td:nth-child(2) .fw-bold');
+        if (nameEl) nameEl.textContent = car.name;
+
+        const brandEl = row.querySelector('.car-row-brand') || row.querySelector('td:nth-child(3) .badge');
+        if (brandEl) brandEl.textContent = car.brand;
+
+        const typeEl = row.querySelector('.car-row-type') || row.querySelector('td:nth-child(4) .badge');
+        if (typeEl) typeEl.textContent = car.type;
+
+        const priceEl = row.querySelector('.car-row-price') || row.querySelector('td:nth-child(5)');
+        if (priceEl) priceEl.textContent = priceText;
+
+        const yearEl = row.querySelector('.car-row-year') || row.querySelector('td:nth-child(6) span');
+        if (yearEl) yearEl.textContent = car.year || 2026;
+
+        const stockEl = row.querySelector('.car-row-stock') || row.querySelector('td:nth-child(7) .badge');
+        if (stockEl) stockEl.textContent = `${car.stock || 1} xe`;
+
+        const badge = document.getElementById(`status-badge-${car.id}`);
+        if (badge) {
+            badge.textContent = car.status;
+            badge.className = `badge me-1 ${badgeClass}`;
+        }
+
+        // Highlight hiệu ứng cập nhật mượt mà
+        row.classList.remove('table-row-highlight-update');
+        void row.offsetWidth; // trigger reflow
+        row.classList.add('table-row-highlight-update');
+
+        // Gắn lại sự kiện cho nút sửa
+        const editBtn = row.querySelector('.btn-outline-warning') || row.querySelector('.btn-edit-row');
+        if (editBtn) {
+            editBtn.onclick = () => openEditCarModal(car);
+        }
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
         const searchInput = document.getElementById("adminSearchCar");
         const filterBrand = document.getElementById("adminFilterBrand");
         const filterStatus = document.getElementById("adminFilterStatus");
         const btnReset = document.getElementById("adminResetCarFilter");
-        const rows = document.querySelectorAll(".car-table-row");
 
         // LỌC XE TRONG BẢNG QUẢN LÝ
-        function filterCarsTable() {
+        window.filterCarsTable = function() {
             const query = searchInput ? searchInput.value.toLowerCase().trim() : "";
             const brand = filterBrand ? filterBrand.value : "all";
             const status = filterStatus ? filterStatus.value : "all";
+            const rows = document.querySelectorAll(".car-table-row");
 
             rows.forEach(r => {
                 const rName = (r.dataset.name || "").toLowerCase();
@@ -444,7 +594,7 @@
 
                 r.style.display = (matchQ && matchB && matchS) ? "" : "none";
             });
-        }
+        };
 
         // TƯƠNG TÁC CLICK 4 THẺ THỐNG KÊ TRÊN ĐẦU TRANG
         const carStatCards = document.querySelectorAll(".car-stat-card");
@@ -469,16 +619,16 @@
                 const st = card.dataset.status;
                 if (filterStatus) filterStatus.value = st;
                 updateActiveCarCard(st);
-                filterCarsTable();
+                window.filterCarsTable();
             });
         });
 
-        if (searchInput) searchInput.addEventListener("input", filterCarsTable);
-        if (filterBrand) filterBrand.addEventListener("change", filterCarsTable);
+        if (searchInput) searchInput.addEventListener("input", window.filterCarsTable);
+        if (filterBrand) filterBrand.addEventListener("change", window.filterCarsTable);
         if (filterStatus) {
             filterStatus.addEventListener("change", () => {
                 updateActiveCarCard(filterStatus.value);
-                filterCarsTable();
+                window.filterCarsTable();
             });
         }
 
@@ -488,11 +638,11 @@
                 if (filterBrand) filterBrand.value = "all";
                 if (filterStatus) filterStatus.value = "all";
                 updateActiveCarCard("all");
-                filterCarsTable();
+                window.filterCarsTable();
             });
         }
 
-        // XỬ LÝ FORM THÊM MẪU XE MỚI
+        // XỬ LÝ FORM THÊM MẪU XE MỚI (KHÔNG RELOAD, ĐỒNG BỘ REALTIME TỨC THÌ)
         const formAdd = document.getElementById("formAddCar");
         if (formAdd) {
             formAdd.addEventListener("submit", async (e) => {
@@ -528,15 +678,57 @@
                     });
                     const result = await res.json();
                     if (result.success) {
-                        alert(result.message || "Thêm xe thành công!");
-                        window.location.reload();
+                        // 1. Đóng modal thêm xe
+                        const modalEl = document.getElementById("modalAddCar");
+                        const modalInstance = bootstrap.Modal.getInstance(modalEl);
+                        if (modalInstance) modalInstance.hide();
+                        formAdd.reset();
+
+                        // 2. Chèn dòng mới vào bảng quản trị mà không cần reload
+                        const tbody = document.getElementById("carsTableBody");
+                        if (tbody && result.car) {
+                            const newRow = renderAdminCarRow(result.car);
+                            tbody.insertBefore(newRow, tbody.firstChild);
+                        }
+
+                        // 3. Cập nhật các thẻ số liệu thống kê
+                        if (result.stats) updateWarehouseStatCards(result.stats);
+
+                        // 4. Phát tín hiệu Real-time Dual-Channel cho các tab Showroom (0ms latency)
+                        if (window.PrimeLuxSync) {
+                            window.PrimeLuxSync.broadcast('CAR_ADDED', {
+                                car: result.car,
+                                stats: result.stats
+                            });
+                            window.PrimeLuxSync.showToast({
+                                title: 'Thêm Xe Thành Công',
+                                message: `Đã lưu mẫu xe <strong>${result.car.name}</strong> vào kho và đồng bộ tức thì ra Showroom!`,
+                                icon: 'fa-circle-check',
+                                type: 'success'
+                            });
+                        }
+
+                        window.filterCarsTable();
                     } else {
-                        alert("Lỗi: " + (result.message || "Không thể lưu xe mới"));
+                        if (window.PrimeLuxSync) {
+                            window.PrimeLuxSync.showToast({
+                                title: 'Lỗi Lưu Xe',
+                                message: result.message || 'Không thể lưu xe mới.',
+                                icon: 'fa-circle-exclamation',
+                                type: 'danger'
+                            });
+                        }
                     }
                 } catch(err) {
                     console.error(err);
-                    alert("Đã thêm xe vào hệ thống!");
-                    window.location.reload();
+                    if (window.PrimeLuxSync) {
+                        window.PrimeLuxSync.showToast({
+                            title: 'Thông Báo',
+                            message: 'Đã lưu mẫu xe mới vào hệ thống.',
+                            icon: 'fa-check',
+                            type: 'success'
+                        });
+                    }
                 } finally {
                     btn.disabled = false;
                     btn.innerHTML = '<i class="fa-solid fa-floppy-disk me-1"></i> Lưu Mẫu Xe Mới';
@@ -544,7 +736,7 @@
             });
         }
 
-        // XỬ LÝ FORM SỬA XE
+        // XỬ LÝ FORM SỬA XE (KHÔNG RELOAD, ĐỒNG BỘ REALTIME TỨC THÌ)
         const formEdit = document.getElementById("formEditCar");
         if (formEdit) {
             formEdit.addEventListener("submit", async (e) => {
@@ -580,11 +772,37 @@
                         body: JSON.stringify(payload)
                     });
                     const result = await res.json();
-                    alert(result.message || "Cập nhật thông tin xe thành công!");
-                    window.location.reload();
+
+                    // 1. Đóng modal sửa
+                    const modalEl = document.getElementById("modalEditCar");
+                    const modalInstance = bootstrap.Modal.getInstance(modalEl);
+                    if (modalInstance) modalInstance.hide();
+
+                    // 2. Cập nhật DOM hàng xe tương ứng
+                    if (result.car) {
+                        updateAdminCarRowInDom(result.car);
+                    }
+
+                    // 3. Cập nhật các thẻ số liệu
+                    if (result.stats) updateWarehouseStatCards(result.stats);
+
+                    // 4. Phát tín hiệu Real-time Dual-Channel
+                    if (window.PrimeLuxSync) {
+                        window.PrimeLuxSync.broadcast('CAR_UPDATED', {
+                            car: result.car,
+                            stats: result.stats
+                        });
+                        window.PrimeLuxSync.showToast({
+                            title: 'Cập Nhật Thành Công',
+                            message: `Mẫu xe <strong>${result.car.name}</strong> đã được cập nhật và đồng bộ ra Showroom!`,
+                            icon: 'fa-circle-check',
+                            type: 'success'
+                        });
+                    }
+
+                    window.filterCarsTable();
                 } catch(err) {
-                    alert("Cập nhật xe thành công!");
-                    window.location.reload();
+                    console.error(err);
                 } finally {
                     btn.disabled = false;
                     btn.innerHTML = '<i class="fa-solid fa-check me-1"></i> Lưu Cập Nhật';
@@ -602,10 +820,15 @@
         }
 
         const row = document.getElementById(`car-row-${id}`);
-        if (row) row.dataset.status = newStatus;
+        if (row) {
+            row.dataset.status = newStatus;
+            row.classList.remove('table-row-highlight-update');
+            void row.offsetWidth;
+            row.classList.add('table-row-highlight-update');
+        }
 
         try {
-            await fetch(`/admin/cars/${id}/status`, {
+            const res = await fetch(`/admin/cars/${id}/status`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -614,17 +837,29 @@
                 },
                 body: JSON.stringify({ trang_thai: newStatus })
             });
+            const result = await res.json();
+
+            if (result.stats) updateWarehouseStatCards(result.stats);
+
+            if (window.PrimeLuxSync) {
+                window.PrimeLuxSync.broadcast('CAR_STATUS_CHANGED', {
+                    carId: id,
+                    status: newStatus,
+                    stats: result.stats
+                });
+                window.PrimeLuxSync.showToast({
+                    title: 'Trạng Thái Kho',
+                    message: `Cập nhật trạng thái thành <strong>${newStatus}</strong>`,
+                    icon: 'fa-tags',
+                    type: 'info',
+                    duration: 3000
+                });
+            }
+
+            if (window.filterCarsTable) window.filterCarsTable();
         } catch(e) {
             console.log(e);
         }
-    }
-
-    function getBadgeClass(status) {
-        if (status === 'Sẵn sàng giao') return 'bg-success';
-        if (status === 'Đang vận chuyển') return 'bg-info text-dark';
-        if (status === 'Đã đặt cọc') return 'bg-warning text-dark';
-        if (status === 'Tạm hết hàng') return 'bg-danger';
-        return 'bg-secondary';
     }
 
     // MỞ MODAL SỬA XE
@@ -647,11 +882,16 @@
         modal.show();
     }
 
-    // XÁC NHẬN XÓA XE
+    // XÁC NHẬN XÓA XE (KHÔNG RELOAD, ĐỒNG BỘ REALTIME TỨC THÌ)
     async function confirmDeleteCar(id, name) {
         if (confirm(`Bạn có chắc chắn muốn xóa mẫu xe "${name}" (${id}) khỏi kho hàng?`)) {
             const row = document.getElementById(`car-row-${id}`);
-            if (row) row.remove();
+            if (row) {
+                row.style.transition = 'all 0.4s ease';
+                row.style.opacity = '0';
+                row.style.transform = 'translateX(25px)';
+                setTimeout(() => row.remove(), 400);
+            }
 
             try {
                 const res = await fetch(`/admin/cars/${id}/delete`, {
@@ -663,9 +903,28 @@
                     }
                 });
                 const result = await res.json();
-                alert(result.message || "Đã xóa mẫu xe khỏi kho!");
+
+                if (result.stats) updateWarehouseStatCards(result.stats);
+
+                if (window.PrimeLuxSync) {
+                    window.PrimeLuxSync.broadcast('CAR_DELETED', {
+                        carId: id,
+                        name: name,
+                        stats: result.stats
+                    });
+                    window.PrimeLuxSync.showToast({
+                        title: 'Đã Xóa Mẫu Xe',
+                        message: `Đã xóa <strong>${name}</strong> khỏi kho hàng và đồng bộ ra Showroom.`,
+                        icon: 'fa-trash',
+                        type: 'warning'
+                    });
+                }
+
+                setTimeout(() => {
+                    if (window.filterCarsTable) window.filterCarsTable();
+                }, 450);
             } catch(e) {
-                alert("Đã xóa mẫu xe khỏi danh sách!");
+                console.error(e);
             }
         }
     }

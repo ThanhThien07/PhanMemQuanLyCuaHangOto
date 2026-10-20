@@ -31,12 +31,12 @@ class DichVu extends Model
     public function getLoaiDvBadgeAttribute()
     {
         return match ($this->loai_dv) {
-            'bao_tri'  => ['label' => 'Bảo Trì Định Kỳ', 'class' => 'bg-primary'],
+            'bao_tri' => ['label' => 'Bảo Trì Định Kỳ', 'class' => 'bg-primary'],
             'bao_hiem' => ['label' => 'Bảo Hiểm Thân Vỏ', 'class' => 'bg-info text-dark'],
-            'cuu_ho'   => ['label' => 'Hỗ Trợ & Cứu Hộ 24/7', 'class' => 'bg-danger'],
+            'cuu_ho' => ['label' => 'Hỗ Trợ & Cứu Hộ 24/7', 'class' => 'bg-danger'],
             'sua_chua' => ['label' => 'Sửa Chữa & Sơn Hấp', 'class' => 'bg-warning text-dark'],
-            'uu_dai'   => ['label' => 'Ưu Đãi Khách Hàng VIP', 'class' => 'bg-success'],
-            default    => ['label' => 'Dịch Vụ Khác', 'class' => 'bg-secondary'],
+            'uu_dai' => ['label' => 'Ưu Đãi Khách Hàng VIP', 'class' => 'bg-success'],
+            default => ['label' => 'Dịch Vụ Khác', 'class' => 'bg-secondary'],
         };
     }
 }

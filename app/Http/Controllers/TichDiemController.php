@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\KhachHang;
 use App\Models\HangThanhVien;
+use App\Models\KhachHang;
 use App\Models\LichSuDiem;
 use Illuminate\Http\Request;
 
@@ -20,7 +20,7 @@ class TichDiemController extends Controller
         $pointsToNextTier = 0;
         $progressPercent = 0;
 
-        if (!empty($query)) {
+        if (! empty($query)) {
             $customer = KhachHang::where('sdt', $query)
                 ->orWhere('email', $query)
                 ->orWhere('ma_kh', $query)
@@ -59,10 +59,10 @@ class TichDiemController extends Controller
         }
 
         $customer = KhachHang::with('tier')->where('sdt', $phone)->first();
-        if (!$customer) {
+        if (! $customer) {
             return response()->json([
                 'success' => false,
-                'message' => 'Không tìm thấy thông tin khách hàng với số điện thoại này.'
+                'message' => 'Không tìm thấy thông tin khách hàng với số điện thoại này.',
             ]);
         }
 
@@ -74,8 +74,8 @@ class TichDiemController extends Controller
                 'tier' => $customer->tier->ten_hang ?? 'Bạc',
                 'discount' => $customer->tier->ti_le_chiet_khau ?? 0,
                 'points' => $customer->diem_tich_luy,
-                'badge' => $customer->tier->mau_badge ?? 'secondary'
-            ]
+                'badge' => $customer->tier->mau_badge ?? 'secondary',
+            ],
         ]);
     }
 }

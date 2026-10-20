@@ -610,17 +610,17 @@
 
                         <div class="mb-3">
                             <label class="form-label text-secondary small fw-bold">Họ và Tên (*)</label>
-                            <input type="text" id="tdName" class="form-control form-control-custom" required placeholder="Ví dụ: Nguyễn Văn Hoàng">
+                            <input type="text" id="tdName" class="form-control form-control-custom" required placeholder="Ví dụ: Nguyễn Văn Hoàng" value="{{ session('user.name') ?? '' }}">
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label text-secondary small fw-bold">Số Điện Thoại (*)</label>
-                            <input type="tel" id="tdPhone" class="form-control form-control-custom" required placeholder="Ví dụ: 0901 234 567">
+                            <input type="tel" id="tdPhone" class="form-control form-control-custom" required placeholder="Ví dụ: 0901 234 567" value="{{ session('user.phone') ?? '' }}">
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label text-secondary small fw-bold">Email Nhận Lịch Hẹn</label>
-                            <input type="email" id="tdEmail" class="form-control form-control-custom" placeholder="example@gmail.com">
+                            <input type="email" id="tdEmail" class="form-control form-control-custom" placeholder="example@gmail.com" value="{{ session('user.email') ?? '' }}">
                         </div>
 
                         <div class="mb-3">
@@ -1027,7 +1027,14 @@
                 timetableBox.classList.add('pulse-attention');
                 timetableBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-                alert("Quý khách vui lòng chọn 1 khung giờ trong Thời Khóa Biểu (Sáng hoặc Chiều, 1h30/ca) trước khi xác nhận!");
+                if (window.PrimeLuxSync) {
+                    window.PrimeLuxSync.showToast({
+                        title: 'Chọn Khung Giờ',
+                        message: 'Quý khách vui lòng chọn 1 ca lái thử (Sáng hoặc Chiều, 1h30/ca) trên Thời Khóa Biểu trước khi xác nhận!',
+                        icon: 'fa-calendar-week',
+                        type: 'warning'
+                    });
+                }
                 return;
             }
 
@@ -1061,7 +1068,7 @@
 
                 if (result.success) {
                     // Cập nhật thông tin lên modal xác nhận thành công
-                    document.getElementById('resBookingCode').textContent = result.data?.id || 'TD-VIP';
+                    document.getElementById('resBookingCode').textContent = result.data?.code || result.data?.id || 'TD-VIP';
                     document.getElementById('resCustomerName').textContent = payload.ho_ten;
                     document.getElementById('resCarName').textContent = payload.ten_xe;
                     document.getElementById('resShowroom').textContent = payload.showroom;
@@ -1082,6 +1089,30 @@
                     const modal = new bootstrap.Modal(document.getElementById("successModal"));
                     modal.show();
 
+                    // Phát sự kiện realtime đồng bộ sang trang Admin & các tab khác tức thì 0ms
+                    if (window.PrimeLuxSync) {
+                        window.PrimeLuxSync.broadcast('TEST_DRIVE_BOOKED', {
+                            id: result.data?.id,
+                            code: result.data?.code || result.data?.id,
+                            ho_ten: payload.ho_ten,
+                            sdt: payload.sdt,
+                            email: payload.email,
+                            ten_xe: payload.ten_xe,
+                            showroom: payload.showroom,
+                            thoi_gian: payload.thoi_gian,
+                            trang_thai: 'Chờ duyệt',
+                            created_at: result.data?.created_at || 'Vừa xong',
+                            stats: result.stats
+                        });
+
+                        window.PrimeLuxSync.showToast({
+                            title: 'Đặt Lịch Thành Công',
+                            message: `Lịch lái thử xe ${payload.ten_xe} đã được gửi đến ban quản lý Showroom.`,
+                            icon: 'fa-calendar-check',
+                            type: 'success'
+                        });
+                    }
+
                     // Reset form ngoại trừ ngày và xe
                     document.getElementById("tdName").value = '';
                     document.getElementById("tdPhone").value = '';
@@ -1094,16 +1125,54 @@
                         <i class="fa-solid fa-hand-pointer text-warning me-1"></i> Vui lòng chọn ca trên biểu
                     `;
                 } else {
-                    alert("Có lỗi xảy ra: " + (result.message || "Vui lòng thử lại sau."));
+                    if (window.PrimeLuxSync) {
+                        window.PrimeLuxSync.showToast({
+                            title: 'Lỗi Đăng Ký',
+                            message: result.message || 'Vui lòng kiểm tra lại thông tin và thử lại.',
+                            icon: 'fa-triangle-exclamation',
+                            type: 'danger'
+                        });
+                    }
                 }
             } catch (err) {
                 console.error("Test drive booking error:", err);
-                alert("Đã xảy ra lỗi kết nối mạng. Vui lòng kiểm tra và thử lại!");
+                if (window.PrimeLuxSync) {
+                    window.PrimeLuxSync.showToast({
+                        title: 'Lỗi Mạng',
+                        message: 'Đã xảy ra lỗi kết nối mạng. Vui lòng thử lại sau giây lát!',
+                        icon: 'fa-wifi',
+                        type: 'danger'
+                    });
+                }
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = originalBtnHtml;
             }
         });
+
+        // Lắng nghe xe mới được tạo từ trang Quản Trị Kho để thêm ngay vào dropdown
+        if (window.PrimeLuxSync) {
+            window.PrimeLuxSync.on('CAR_ADDED', (car) => {
+                if (!car || !carSelect) return;
+                const carName = car.name || car.ten_xe;
+                const exists = Array.from(carSelect.options).some(opt => opt.value === carName);
+                if (!exists && carName) {
+                    const opt = document.createElement('option');
+                    opt.value = carName;
+                    opt.textContent = `${carName} (${car.priceText || car.gia_text || ''})`;
+                    opt.dataset.brand = car.brand || car.hang_xe || '';
+                    opt.dataset.image = car.image || car.hinh_anh || '';
+                    carSelect.appendChild(opt);
+
+                    window.PrimeLuxSync.showToast({
+                        title: 'Mẫu Xe Mới',
+                        message: `Showroom vừa bổ sung ${carName} vào danh sách lái thử!`,
+                        icon: 'fa-sparkles',
+                        type: 'info'
+                    });
+                }
+            });
+        }
     });
 </script>
 @endpush
