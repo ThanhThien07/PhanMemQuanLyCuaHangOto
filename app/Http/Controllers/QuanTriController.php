@@ -108,7 +108,7 @@ class QuanTriController extends Controller
             'data' => [35, 25, 15, 10, 10, 5],
         ];
 
-        return view('quantri.dashboard', compact(
+        return view('admin.dashboard', compact(
             'cars',
             'customers',
             'invoices',

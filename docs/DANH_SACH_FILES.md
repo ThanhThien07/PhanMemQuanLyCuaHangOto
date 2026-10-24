@@ -23,8 +23,7 @@
 | `AGENTS.md`           | 9.2 KB     | Quy chuẩn phát triển Laravel Boost dành cho AI & Developer                    |
 | `CLAUDE.md`           | 1.4 KB     | Hướng dẫn thiết lập môi trường và quy tắc coding                              |
 | `README.md`           | 3.7 KB     | Tài liệu tổng quan giới thiệu dự án PrimeLux Auto                             |
-| `PROGRESS_CHECKPOINT.md` | 24 KB   | Báo cáo vết tiến độ chi tiết qua từng giai đoạn phát triển                    |
-| `qly_cuahangoto.sql`  | 82 KB      | Bản sao lưu CSDL MySQL gốc phục vụ import nhanh                               |
+| `PROGRESS_CHECKPOINT.md` | 26 KB   | Báo cáo vết tiến độ chi tiết qua từng giai đoạn phát triển                    |
 | `Dockerfile`          | 1.7 KB     | Cấu hình containerization Docker triển khai hệ thống                          |
 | `docker-entrypoint.sh`| 596 B      | Script khởi động container tự động chạy migrate và PHP-FPM                     |
 | `render.yaml`         | 925 B      | Cấu hình blueprint triển khai đám mây (PaaS Render/Cloud)                     |
@@ -42,7 +41,8 @@
 
 ## 3. CONTROLLERS (app/Http/Controllers/)
 
-### A. Controllers Nghiệp Vụ Chính (Core Controllers)
+Hệ thống đã được lọc và loại bỏ hoàn toàn 100% các Controller alias trùng lặp. Toàn bộ 122 routes điều hướng trực tiếp vào 14 Controllers nghiệp vụ chuẩn:
+
 | File                          | Dung lượng | Vai trò nghiệp vụ                                                            |
 |-------------------------------|------------|------------------------------------------------------------------------------|
 | `Controller.php`              | 0.1 KB     | Base Controller kế thừa bởi mọi Controller trong hệ thống                    |
@@ -59,19 +59,6 @@
 | `ThanhToanController.php`     | 18.6 KB    | Cổng thanh toán trực tuyến tiền trả trước (VietQR / MBBank) & tạo hóa đơn    |
 | `SepayWebhookController.php`  | 16.7 KB    | Webhook ngân hàng SePay: xác thực giao dịch, khớp hóa đơn, gửi email tự động |
 | `TradeInController.php`       | 7.3 KB     | Chương trình Thu cũ đổi mới: định giá xe cũ tự động và tiếp nhận hồ sơ       |
-
-### B. Controllers Tương Thích & Alias (Clean Inheritance Proxies)
-| File                          | Dung lượng | Kế thừa từ class chính | Tác dụng                                             |
-|-------------------------------|------------|------------------------|------------------------------------------------------|
-| `HomeController.php`          | 0.2 KB     | `TrangChuController`   | Alias tiếng Anh tương thích chuẩn route `/home`      |
-| `CarController.php`           | 0.2 KB     | `XeController`         | Alias tiếng Anh tương thích chuẩn route `/cars`      |
-| `CarComparisonController.php` | 0.2 KB     | `SoSanhGiaController`  | Alias tiếng Anh tương thích chuẩn route `/compare`   |
-| `TestDriveController.php`     | 0.2 KB     | `LaiThuController`     | Alias tiếng Anh tương thích chuẩn route `/test-drive`|
-| `InvoiceController.php`       | 0.2 KB     | `HoaDonController`     | Alias tiếng Anh tương thích chuẩn route `/invoices`  |
-| `LoyaltyController.php`       | 0.2 KB     | `TichDiemController`   | Alias tiếng Anh tương thích chuẩn route `/loyalty`   |
-| `AuthController.php`          | 0.2 KB     | `DangNhapController`   | Alias tiếng Anh tương thích xác thực tài khoản       |
-| `AdminController.php`         | 0.2 KB     | `QuanTriController`    | Alias tiếng Anh tương thích trang quản trị admin     |
-| `TuVanVienController.php`     | 0.2 KB     | `ConsultantController` | Wrapper tiếng Việt tương thích route `/tuvanvien`    |
 
 ---
 
@@ -168,34 +155,30 @@
 
 ## 8. VIEWS (resources/views/)
 
+Đã lọc và loại bỏ hoàn toàn các views trùng lặp/proxy (`home.blade.php`, `welcome.blade.php`, `invoices.blade.php`, `test-drive.blade.php`, `auth/login.blade.php`, `cars/*`, `loyalty/*`, `tuvanvien/*`, `quantri/*`, `layouts/client.blade.php`, `layouts/app.blade.php`).
+
+Hệ thống view hiện tại gồm đúng 21 templates nghiệp vụ + 2 Master Layouts:
+
 ### A. Giao Diện Người Dùng & Khách Hàng (Customer Front-End)
 | View Path                     | Mô tả giao diện                                                              |
 |-------------------------------|------------------------------------------------------------------------------|
 | `trangchu.blade.php`          | Landing page Showroom PrimeLux: Hero siêu xe, xe mới về, ưu đãi, tin tức     |
-| `home.blade.php`              | Alias gọi `@include('trangchu')`                                             |
-| `welcome.blade.php`           | Alias gọi `@include('trangchu')`                                             |
 | `xe/danhsach.blade.php`       | Kho siêu xe sang trọng, bộ lọc thương hiệu, loại xe, tầm giá                 |
 | `xe/chitiet.blade.php`        | Chi tiết xe: Gallery, thông số động cơ, trả góp 80%, cọc VietQR online       |
 | `xe/sosanh.blade.php`         | Phân tích so sánh giá đa sàn, biểu đồ Chart.js lịch sử biến động 6 tháng     |
-| `cars/` (thư mục alias)       | Chứa `index.blade.php`, `show.blade.php`, `compare.blade.php` gọi sang `xe/` |
 | `laithu.blade.php`            | Form đăng ký lịch lái thử xe VIP, chọn showroom và thời gian hẹn             |
-| `test-drive.blade.php`        | Alias gọi `@include('laithu')`                                               |
 | `hoadon.blade.php`            | Cổng tra cứu hóa đơn bán xe trực tuyến theo mã hóa đơn hoặc số điện thoại     |
-| `invoices.blade.php`          | Alias gọi `@include('hoadon')`                                               |
 | `tichdiem/index.blade.php`    | Cổng thành viên PrimeLux Club, tra cứu tích điểm và tiến độ nâng hạng VIP    |
-| `loyalty/index.blade.php`     | Alias gọi `@include('tichdiem.index')`                                       |
 | `dichvu/index.blade.php`      | Cổng dịch vụ: Đặt lịch bảo dưỡng định kỳ, cứu hộ khẩn cấp, tra sổ bảo hành  |
 | `thanhtoan/tratruoc.blade.php`| Cổng thanh toán trả trước online qua mã VietQR động tự động nhận diện        |
 | `tradein/index.blade.php`     | Cổng định giá xe cũ & nộp hồ sơ Thu cũ đổi mới siêu xe                      |
 | `dangnhap/index.blade.php`    | Trang đăng nhập đa vai trò (Khách VIP, Tư vấn viên, Quản trị viên)          |
 | `dangnhap/register.blade.php` | Trang đăng ký tài khoản thành viên mới nhận ngay hạng Silver                |
-| `auth/login.blade.php`        | Alias gọi `@include('dangnhap.index')`                                       |
 
 ### B. Giao Diện Quản Trị & Nội Bộ (Internal Showroom & Admin)
 | View Path                     | Mô tả giao diện                                                              |
 |-------------------------------|------------------------------------------------------------------------------|
 | `admin/dashboard.blade.php`   | Trung tâm chỉ huy: Thống kê KPI, biểu đồ doanh thu 12 tháng, cơ cấu thương hiệu|
-| `quantri/dashboard.blade.php` | Alias gọi `@include('admin.dashboard')`                                      |
 | `admin/cars-management.blade.php` | Quản lý kho xe: Thêm, sửa thông số, cập nhật giá, xóa và đổi trạng thái xe |
 | `admin/test-drive-list.blade.php` | Quản lý lịch lái thử: Duyệt lịch hẹn, gọi điện, cập nhật trạng thái        |
 | `admin/invoices.blade.php`    | Quản lý hóa đơn: Lọc tìm kiếm, xem chi tiết hợp đồng, đổi trạng thái, gửi mail|
@@ -203,35 +186,30 @@
 | `admin/tradein.blade.php`     | Quản lý hồ sơ thẩm định thu cũ đổi mới từ khách hàng                         |
 | `admin/audit.blade.php`       | Nhật ký kiểm toán an ninh hệ thống và thông báo đa kênh Zalo ZNS / SMS       |
 | `consultant/index.blade.php`  | Bàn trực tư vấn viên SSE Realtime: tiếp nhận tin nhắn khách, chat trực tiếp  |
-| `tuvanvien/index.blade.php`   | Alias gọi `@include('consultant.index')`                                     |
 | `emails/hoadon.blade.php`     | Mẫu email hóa đơn siêu sang gửi tự động tới hộp thư Gmail của khách hàng     |
 
-### C. Layouts (resources/views/layouts/)
+### C. Layouts Chuẩn (resources/views/layouts/)
 | Layout File                   | Mô tả                                                                        |
 |-------------------------------|------------------------------------------------------------------------------|
 | `layouts/giaodien.blade.php`  | Layout chuẩn cho toàn bộ trang Khách Hàng (Navbar, Footer, SEO tags, Chatbox)|
 | `layouts/admin.blade.php`     | Layout chuẩn cho phân hệ Quản Trị Viên (Sidebar menu, Topbar, Flash message)|
-| `layouts/client.blade.php`    | Alias kế thừa `@extends('layouts.giaodien')`                                 |
-| `layouts/app.blade.php`       | Alias kế thừa `@extends('layouts.admin')`                                    |
 
 ---
 
 ## 9. PUBLIC ASSETS (public/)
 
-| Thư mục / File                | Vai trò                                                                      |
-|-------------------------------|------------------------------------------------------------------------------|
-| `public/css/giaodien.css`     | Tệp CSS chính thiết kế phong cách siêu xe PrimeLux (Dark Luxury Theme)       |
-| `public/css/Style.css`        | Bản sao CSS đồng bộ                                                          |
-| `public/css/trolyao.css`      | Tệp CSS tạo kiểu dáng Widget Chatbot tư vấn sang trọng                       |
-| `public/css/chatbot.css`      | Bản sao CSS chatbot đồng bộ                                                  |
-| `public/js/trangchu.js`       | JavaScript xử lý hiệu ứng, bộ lọc xe và tương tác trang chủ                  |
-| `public/js/Index.js`          | Bản sao JavaScript trang chủ đồng bộ                                         |
-| `public/js/trolyao.js`        | JavaScript điều khiển Chatbox: AI Assistant + Live Chat realtime 2 chiều     |
-| `public/js/chatbot.js`        | Bản sao JavaScript chatbox đồng bộ                                           |
-| `public/js/cars-realtime.js`  | Client-side script nhận tín hiệu cập nhật xe thời gian thực                  |
-| `public/image/Logo.png`       | Logo chính thức chuẩn độ phân giải cao của Showroom PrimeLux Auto            |
-| `public/robots.txt`           | Cấu hình hướng dẫn bot tìm kiếm Google/Bing chuẩn SEO                        |
-| `public/sitemap.xml`          | Bản đồ liên kết website chuẩn SEO tự động cập nhật                           |
+Đã dọn dẹp triệt để: loại bỏ hoàn toàn 1.667 tệp template Mazer không sử dụng (`public/assets/`, giải phóng 38MB) và các tệp tài nguyên trùng lặp.
+
+| Thư mục / File                | Kích thước | Vai trò                                                                      |
+|-------------------------------|------------|------------------------------------------------------------------------------|
+| `public/css/giaodien.css`     | 18.6 KB    | CSS phong cách siêu xe PrimeLux (Dark Luxury Theme), dùng chung toàn hệ thống|
+| `public/css/trolyao.css`      | 9.8 KB     | CSS tạo kiểu dáng Widget Chatbot tư vấn sang trọng                           |
+| `public/js/trangchu.js`       | 10.2 KB    | JavaScript xử lý hiệu ứng, bộ lọc xe và tương tác trang chủ                  |
+| `public/js/trolyao.js`        | 30.2 KB    | JavaScript điều khiển Chatbox: AI Assistant + Live Chat realtime 2 chiều     |
+| `public/js/cars-realtime.js`  | 11.0 KB    | Client-side script nhận tín hiệu cập nhật xe thời gian thực                  |
+| `public/image/Logo.png`       | 918 KB     | Logo chính thức chuẩn độ phân giải cao của Showroom PrimeLux Auto            |
+| `public/robots.txt`           | 0.3 KB     | Cấu hình hướng dẫn bot tìm kiếm Google/Bing chuẩn SEO                        |
+| `public/sitemap.xml`          | 3.0 KB     | Bản đồ liên kết website chuẩn SEO tự động cập nhật                           |
 
 ---
 
@@ -254,14 +232,15 @@
 
 ## 11. BẢNG TỔNG HỢP CHỈ SỐ TOÀN BỘ HỆ THỐNG
 
-| Chỉ số hệ thống                    | Số lượng hiện tại | Ghi chú                                                 |
-|------------------------------------|:-----------------:|---------------------------------------------------------|
-| **Tổng số Routes (URL Endpoints)** | **122**           | Bao gồm 100% nghiệp vụ Showroom, Admin, SSE, Webhook    |
-| **Tổng số Controllers**            | **23**            | 14 Core Controllers + 9 Alias Proxies kế thừa sạch      |
-| **Tổng số Eloquent Models**        | **31**            | 20 Core Models + 11 Vietnamese Proxy Models             |
-| **Tổng số Migrations**             | **11**            | Bao phủ toàn bộ 15 bảng cơ sở dữ liệu quan hệ           |
-| **Tổng số Database Seeders**       | **5**             | Khởi tạo 100% dữ liệu chuẩn chỉ với 1 lệnh `db:seed`    |
-| **Tổng số Views Blade**            | **32**            | 23 Views chính thống + 9 Alias Views đồng bộ            |
-| **Số lượng Layouts**               | **4**             | Chuẩn hóa về 2 layout chính: `giaodien` và `admin`      |
-| **Bộ Feature Tests tự động**       | **10 file**       | Thực thi 47 test cases, 291 assertions (100% PASS)       |
-| **Tuân thủ chuẩn Code Style**      | **100%**          | Đạt chuẩn PSR-12 / Laravel Pint tự động                 |
+| Chỉ số hệ thống                    | Số lượng sau khi lọc gọn | Trạng thái / Ghi chú                                   |
+|------------------------------------|:------------------------:|--------------------------------------------------------|
+| **Tổng số Routes (URL Endpoints)** | **122**                  | 100% routes hoạt động, kết nối trực tiếp Core          |
+| **Tổng số Controllers**            | **14**                   | Đã xóa 9 controllers alias trùng lặp                   |
+| **Tổng số Eloquent Models**        | **31**                   | 20 Core Models + 11 Vietnamese Proxy Models            |
+| **Tổng số Migrations**             | **11**                   | Bao phủ toàn bộ 15 bảng cơ sở dữ liệu quan hệ          |
+| **Tổng số Database Seeders**       | **5**                    | Khởi tạo 100% dữ liệu chuẩn chỉ với 1 lệnh `db:seed`   |
+| **Tổng số Views Blade**            | **21**                   | Đã xóa 11 view trùng lặp, giữ đúng view nghiệp vụ thật |
+| **Số lượng Layouts**               | **2**                    | Đã xóa 2 layout thừa, chuẩn hóa về `giaodien` & `admin`|
+| **Public Assets**                  | **8 tệp cốt lõi**        | Đã xóa thư mục `assets/` (1.667 file dead template)   |
+| **Bộ Feature Tests tự động**       | **10 file**              | Thực thi 47 test cases, 291 assertions (100% PASS)      |
+| **Tuân thủ chuẩn Code Style**      | **100%**                 | Đạt chuẩn PSR-12 / Laravel Pint tự động                |

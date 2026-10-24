@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ConsultantController;
 use App\Http\Controllers\DangNhapController;
 use App\Http\Controllers\DichVuController;
 use App\Http\Controllers\HoaDonController;
@@ -11,7 +12,6 @@ use App\Http\Controllers\ThanhToanController;
 use App\Http\Controllers\TichDiemController;
 use App\Http\Controllers\TradeInController;
 use App\Http\Controllers\TrangChuController;
-use App\Http\Controllers\TuVanVienController;
 use App\Http\Controllers\XeController;
 use App\Services\AiConsultantService;
 use Illuminate\Http\Request;
@@ -153,19 +153,19 @@ Route::middleware(['admin.auth'])->group(function () {
 
 // 12. CỔNG TƯ VẤN VIÊN (Bảo vệ bằng advisor.auth middleware)
 Route::middleware(['advisor.auth'])->group(function () {
-    Route::get('/consultant', [TuVanVienController::class, 'index'])->name('consultant.index');
-    Route::get('/tuvanvien', [TuVanVienController::class, 'index'])->name('tuvanvien.index');
-    Route::get('/consultant.html', [TuVanVienController::class, 'index']);
-    Route::post('/consultant/reply', [TuVanVienController::class, 'reply'])->name('consultant.reply');
-    Route::post('/consultant/status', [TuVanVienController::class, 'updateStatus'])->name('consultant.status');
-    Route::get('/api/consultant/realtime-feed', [TuVanVienController::class, 'getRealtimeFeed'])->name('api.consultant.realtime-feed');
-    Route::get('/api/consultant/sse-stream', [TuVanVienController::class, 'sseStream'])->name('api.consultant.sse-stream');
+    Route::get('/consultant', [ConsultantController::class, 'index'])->name('consultant.index');
+    Route::get('/tuvanvien', [ConsultantController::class, 'index'])->name('tuvanvien.index');
+    Route::get('/consultant.html', [ConsultantController::class, 'index']);
+    Route::post('/consultant/reply', [ConsultantController::class, 'reply'])->name('consultant.reply');
+    Route::post('/consultant/status', [ConsultantController::class, 'updateStatus'])->name('consultant.status');
+    Route::get('/api/consultant/realtime-feed', [ConsultantController::class, 'getRealtimeFeed'])->name('api.consultant.realtime-feed');
+    Route::get('/api/consultant/sse-stream', [ConsultantController::class, 'sseStream'])->name('api.consultant.sse-stream');
 });
 
 // API tư vấn (công khai - khách gửi câu hỏi và xem tin nhắn của chính session đó)
-Route::post('/api/consultant/submit-question', [TuVanVienController::class, 'submitQuestion'])->name('api.consultant.submit-question');
-Route::get('/api/consultant/check-reply', [TuVanVienController::class, 'checkReply'])->name('api.consultant.check-reply');
-Route::get('/api/consultant/thread-messages', [TuVanVienController::class, 'getThreadMessages'])->name('api.consultant.thread-messages');
+Route::post('/api/consultant/submit-question', [ConsultantController::class, 'submitQuestion'])->name('api.consultant.submit-question');
+Route::get('/api/consultant/check-reply', [ConsultantController::class, 'checkReply'])->name('api.consultant.check-reply');
+Route::get('/api/consultant/thread-messages', [ConsultantController::class, 'getThreadMessages'])->name('api.consultant.thread-messages');
 
 // 13. DỊCH VỤ - BẢO TRÌ, BẢO HIỂM, CỨU HỘ 24/7
 Route::get('/dich-vu', [DichVuController::class, 'index'])->name('dichvu.index');
