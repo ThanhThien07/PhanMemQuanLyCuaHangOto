@@ -78,124 +78,125 @@ Mỗi công nghệ trong dự án đều đóng một vai trò chuyên biệt t�
 ```text
 PhanMemQuanLyCuaHangOto/
 ├── app/
+│   ├── Console/
+│   │   └── Commands/
+│   │       └── ScrapeMarketPricesCommand.php   # Cronjob tự động cào/cập nhật giá xe 4 sàn ngoài
 │   ├── Http/
-│   │   └── Controllers/
-│   │       ├── Controller.php                  # Base Controller kế thừa bởi mọi Controller
-│   │       ├── TrangChuController.php          # Điều khiển Trang chủ Showroom (Tiếng Việt)
-│   │       ├── HomeController.php              # Trang chủ (Alias Tiếng Anh)
-│   │       ├── XeController.php                # Quản lý hiển thị danh mục xe & chi tiết xe (TV)
-│   │       ├── CarController.php               # Quản lý xe (Alias Tiếng Anh)
-│   │       ├── SoSanhGiaController.php         # So sánh giá xe đa sàn thị trường & API refresh (TV)
-│   │       ├── CarComparisonController.php     # So sánh xe (Alias Tiếng Anh)
-│   │       ├── LaiThuController.php            # Đăng ký lái thử VIP & cập nhật trạng thái (TV)
-│   │       ├── TestDriveController.php         # Lái thử (Alias Tiếng Anh)
-│   │       ├── HoaDonController.php            # Tra cứu hóa đơn bán xe & chi tiết thanh toán (TV)
-│   │       ├── InvoiceController.php           # Hóa đơn (Alias Tiếng Anh)
-│   │       ├── TichDiemController.php          # Cổng PrimeLux Club & Tra cứu tích điểm VIP (TV)
-│   │       ├── LoyaltyController.php           # Điểm thưởng hội viên (Alias Tiếng Anh)
-│   │       ├── DangNhapController.php          # Xác thực đăng nhập 3 vai trò & đăng xuất (TV)
-│   │       ├── AuthController.php              # Xác thực (Alias Tiếng Anh)
-│   │       ├── QuanTriController.php           # Dashboard Quản trị viên & Chỉnh điểm VIP (TV)
-│   │       ├── AdminController.php             # Dashboard Admin (Alias Tiếng Anh)
-│   │       ├── TuVanVienController.php         # Bàn trực tư vấn SSE realtime & trả lời khách (TV)
-│   │       └── ConsultantController.php        # Tư vấn viên (Alias Tiếng Anh)
+│   │   ├── Controllers/
+│   │   │   ├── Controller.php                  # Base Controller kế thừa bởi mọi Controller
+│   │   │   ├── TrangChuController.php          # Điều khiển Trang chủ Showroom (Tiếng Việt)
+│   │   │   ├── HomeController.php              # Kế thừa TrangChuController (Alias Tiếng Anh)
+│   │   │   ├── XeController.php                # Quản lý hiển thị danh mục xe & chi tiết xe (TV)
+│   │   │   ├── CarController.php               # Kế thừa XeController (Alias Tiếng Anh)
+│   │   │   ├── SoSanhGiaController.php         # So sánh giá xe đa sàn & Biểu đồ Chart.js (TV)
+│   │   │   ├── CarComparisonController.php     # Kế thừa SoSanhGiaController (Alias Tiếng Anh)
+│   │   │   ├── LaiThuController.php            # Đăng ký lái thử VIP & thông báo Zalo ZNS/SMS (TV)
+│   │   │   ├── TestDriveController.php         # Kế thừa LaiThuController (Alias Tiếng Anh)
+│   │   │   ├── HoaDonController.php            # Tra cứu hóa đơn bán xe & chi tiết thanh toán (TV)
+│   │   │   ├── InvoiceController.php           # Kế thừa HoaDonController (Alias Tiếng Anh)
+│   │   │   ├── TichDiemController.php          # Cổng PrimeLux Club & Tra cứu tích điểm VIP (TV)
+│   │   │   ├── LoyaltyController.php           # Kế thừa TichDiemController (Alias Tiếng Anh)
+│   │   │   ├── DangNhapController.php          # Đăng nhập 3 vai trò, Đăng ký VIP, Google OAuth (TV)
+│   │   │   ├── AuthController.php              # Kế thừa DangNhapController (Alias Tiếng Anh)
+│   │   │   ├── QuanTriController.php           # Dashboard Quản trị, Kho xe, Hóa đơn email, BI (TV)
+│   │   │   ├── AdminController.php             # Kế thừa QuanTriController (Alias Tiếng Anh)
+│   │   │   ├── ConsultantController.php        # Bàn trực tư vấn SSE realtime & trả lời khách (Core)
+│   │   │   ├── TuVanVienController.php         # Kế thừa ConsultantController (Alias Tiếng Việt)
+│   │   │   ├── DichVuController.php            # Đặt lịch bảo dưỡng, Cứu hộ 24/7 & Sổ bảo hành VIN
+│   │   │   ├── ThanhToanController.php         # Cổng thanh toán trực tuyến tiền trả trước (VietQR)
+│   │   │   ├── SepayWebhookController.php      # Webhook ngân hàng SePay xác thực giao dịch
+│   │   │   └── TradeInController.php           # Thẩm định & tiếp nhận Thu cũ đổi mới siêu xe
+│   │   └── Middleware/
+│   │       ├── AdminAuth.php                   # Bảo vệ phân hệ Admin (Chặn khách vãng lai)
+│   │       └── AdvisorAuth.php                 # Bảo vệ Bàn trực chuyên viên tư vấn
+│   ├── Mail/
+│   │   └── HoaDonXacNhanMail.php               # Mailable gửi hóa đơn điện tử tự động qua Gmail
 │   ├── Models/
-│   │   ├── Xe.php                              # Model Xe (Tiếng Việt - proxy Car)
-│   │   ├── Car.php                             # Model Xe chính thức: formatCar, getAllCars...
-│   │   ├── ThuongHieu.php                      # Model Thương hiệu (Tiếng Việt)
-│   │   ├── Brand.php                           # Model Thương hiệu xe (thuong_hieu)
-│   │   ├── LoaiXe.php                          # Model Kiểu dáng xe (Tiếng Việt)
-│   │   ├── CarType.php                         # Model Kiểu dáng xe (loai_xe)
-│   │   ├── KhachHang.php                       # Model Khách hàng (Tiếng Việt)
-│   │   ├── Customer.php                        # Model Khách hàng & quan hệ Tier/Hóa đơn
-│   │   ├── HangThanhVien.php                   # Model Hạng thành viên VIP (Tiếng Việt)
-│   │   ├── LoyaltyTier.php                     # Model Hạng thành viên & chính sách ưu đãi
-│   │   ├── HoaDon.php                          # Model Hóa đơn bán xe (Tiếng Việt)
-│   │   ├── Invoice.php                         # Model Hóa đơn & liên kết Khách hàng/Chi tiết
-│   │   ├── ChiTietHoaDon.php                   # Model Chi tiết hóa đơn (Tiếng Việt)
-│   │   ├── InvoiceDetail.php                   # Model Chi tiết hóa đơn (ct_hoa_don)
-│   │   ├── LaiThu.php                          # Model Đăng ký lái thử (Tiếng Việt)
-│   │   ├── TestDrive.php                       # Model Lịch lái thử (dang_ky_lai_thu)
-│   │   ├── LichSuDiem.php                      # Model Nhật ký điểm thưởng (Tiếng Việt)
-│   │   ├── PointsHistory.php                   # Model Lịch sử điểm (lich_su_diem)
-│   │   ├── NhatKyChat.php                      # Model Nhật ký chat (Tiếng Việt)
-│   │   ├── ChatLog.php                         # Model Nhật ký chat & SSE realtime (chat_logs)
-│   │   ├── SoSanhGiaXe.php                     # Model So sánh giá xe (Tiếng Việt)
-│   │   ├── CarPriceSource.php                  # Model Nguồn giá đa sàn (car_price_sources)
+│   │   ├── Car.php / Xe.php                    # Model Xe (formatCar, getAllCars, quan hệ sàn)
+│   │   ├── Brand.php / ThuongHieu.php          # Model Thương hiệu xe sang
+│   │   ├── CarType.php / LoaiXe.php            # Model Kiểu dáng xe (Sedan, SUV, EV)
+│   │   ├── Customer.php / KhachHang.php        # Model Khách hàng & quan hệ Tier/Hóa đơn
+│   │   ├── LoyaltyTier.php / HangThanhVien.php # Model Hạng thành viên VIP & ưu đãi chiết khấu
+│   │   ├── Invoice.php / HoaDon.php            # Model Hóa đơn bán xe & liên kết chi tiết
+│   │   ├── InvoiceDetail.php / ChiTietHoaDon.php # Model Chi tiết hóa đơn
+│   │   ├── TestDrive.php / LaiThu.php          # Model Đăng ký lái thử
+│   │   ├── ChatLog.php / NhatKyChat.php        # Model Nhật ký chat & SSE realtime
+│   │   ├── CarPriceSource.php / SoSanhGiaXe.php# Model Nguồn giá đa sàn thị trường
+│   │   ├── DatLichDichVu.php                   # Model Đặt lịch dịch vụ bảo dưỡng & cứu hộ
+│   │   ├── DichVu.php                          # Model Gói dịch vụ showroom
+│   │   ├── SoBaoHanhVin.php                    # Model Sổ bảo hành điện tử chính hãng theo VIN
+│   │   ├── LichSuBaoDuongVin.php               # Model Lịch sử bảo dưỡng theo VIN
+│   │   ├── SepayTransaction.php                # Model Giao dịch chuyển khoản ngân hàng SePay
+│   │   ├── AuditLog.php                        # Model Nhật ký kiểm toán an ninh hệ thống
+│   │   ├── ThongBaoDaKenh.php                  # Model Nhật ký thông báo Zalo ZNS / SMS
+│   │   ├── YeuCauThuDoiXe.php                  # Model Hồ sơ thu cũ đổi mới (Trade-In)
 │   │   └── User.php                            # Model Người dùng hệ thống Laravel
-│   └── Providers/
+│   └── Services/
+│       ├── AiConsultantService.php             # Dịch vụ Trợ lý AI 24/7 trả lời tự động
+│       └── NotificationService.php             # Dịch vụ gửi thông báo Zalo ZNS & SMS
 ├── database/
-│   ├── migrations/
-│   │   ├── 0001_01_01_000000_create_users_table.php
-│   │   ├── 0001_01_01_000001_create_cache_table.php
-│   │   ├── 0001_01_01_000002_create_jobs_table.php
-│   │   ├── 2026_09_23_000001_create_dealership_tables.php              # 10 bảng chính
-│   │   ├── 2026_09_23_000002_add_advisor_fields_to_chat_logs_table.php # Thêm trường tư vấn
-│   │   └── 2026_09_23_000003_create_car_price_sources_table.php       # Bảng giá xe đa sàn
+│   ├── migrations/                             # 11 migration files khởi tạo toàn bộ 15 bảng CSDL
 │   ├── seeders/
-│   │   ├── DatabaseSeeder.php                  # Seeder tổng nạp xe, khách, hạng VIP, hóa đơn
-│   │   └── CarPriceSourceSeeder.php            # Seeder nạp 18 nguồn giá xe đa sàn thị trường
+│   │   ├── DatabaseSeeder.php                  # Seeder tổng (khởi tạo 100% CSDL với 1 lệnh)
+│   │   ├── CarPriceSourceSeeder.php            # Seeder 18 nguồn giá xe đa sàn thị trường
+│   │   ├── ServiceSeeder.php                   # Seeder gói bảo dưỡng & cứu hộ
+│   │   ├── RoadmapDataSeeder.php               # Seeder Sổ bảo hành VIN, Trade-In, Zalo ZNS
+│   │   └── RevenueSeeder.php                   # Seeder doanh thu trống sạch cho Demo
 │   ├── database.sqlite                         # File SQLite database phục vụ dev/test
 │   └── qly_cuahangoto.sql                      # Bản sao lưu SQL database MySQL
 ├── docs/
 │   ├── BAO_CAO_CHI_TIET_TOAN_BO_HE_THONG.md    # Tài liệu kỹ thuật chi tiết nhất toàn hệ thống
-│   ├── BAO_CAO_CHI_TIET_HE_THONG.md            # Báo cáo tổng hợp trước
-│   ├── BAO_CAO_DO_AN.txt                       # Tóm tắt báo cáo đồ án dạng văn bản
-│   ├── DANH_SACH_FILES.md                      # Bảng kê khai danh sách files
+│   ├── DANH_SACH_FILES.md                      # Bảng kê khai danh sách files chuẩn hóa 2026
 │   ├── HUONG_DAN_CAI_DAT.md                    # Hướng dẫn chi tiết các bước cài đặt
-│   └── BaoCao_PhanTichThietKe_XayDung_PhanMemQuanLyCuaHangOto.docx
-├── tai_lieu_bao_cao_doc/                       # FOLDER CHỨA TOÀN BỘ CÁC FILE DOC BÁO CÁO
-│   ├── Mẫu hướng dẫn trình bày báo cáo (4).docx # File hướng dẫn định dạng gốc
-│   ├── HOVATEN_MSSV.docx                       # File mẫu đồ án tham khảo
-│   ├── BaoCao_PhanTichThietKe_XayDung_PhanMemQuanLyCuaHangOto.docx # File báo cáo đồ án mới
-│   └── BAO_CAO_CHI_TIET_TOAN_BO_HE_THONG.md
+│   ├── Bao_Cao_PrimeLux_Auto.docx              # File Word báo cáo đồ án chính thức
+│   └── scripts/build_full_report.py            # Script tự động tạo báo cáo Word từ CSDL
+├── public/
+│   ├── css/                                    # Stylesheet: giaodien.css, trolyao.css
+│   ├── js/                                     # Scripts: trangchu.js, trolyao.js, cars-realtime.js
+│   ├── image/                                  # Assets hình ảnh: Logo.png
+│   ├── robots.txt                              # Hướng dẫn bot công cụ tìm kiếm
+│   └── sitemap.xml                             # Sơ đồ website chuẩn SEO
 ├── resources/
-│   ├── views/
-│   │   ├── layouts/
-│   │   │   └── app.blade.php                   # Layout khung chuẩn (Navbar, Footer, Modal Chat)
-│   │   ├── trangchu.blade.php                  # Giao diện Trang chủ Showroom (Tiếng Việt)
-│   │   ├── home.blade.php                      # Giao diện Trang chủ (Tiếng Anh)
-│   │   ├── xe/
-│   │   │   ├── danhsach.blade.php              # Giao diện Kho xe & Bộ lọc đa tiêu chí
-│   │   │   ├── chitiet.blade.php               # Giao diện Chi tiết xe & Thông số kỹ thuật
-│   │   │   └── sosanh.blade.php                # Giao diện So sánh giá xe đa sàn thị trường
-│   │   ├── cars/                               # Views xe alias Tiếng Anh
-│   │   ├── laithu.blade.php                    # Giao diện Đăng ký lái thử VIP (Tiếng Việt)
-│   │   ├── test-drive.blade.php                # Giao diện Lái thử (Tiếng Anh)
-│   │   ├── hoadon.blade.php                    # Giao diện Tra cứu hóa đơn & Chi tiết (Tiếng Việt)
-│   │   ├── invoices.blade.php                  # Giao diện Hóa đơn (Tiếng Anh)
-│   │   ├── tichdiem/
-│   │   │   └── index.blade.php                 # Giao diện PrimeLux Club & Tra cứu điểm VIP
-│   │   ├── loyalty/                            # Views Loyalty alias Tiếng Anh
-│   │   ├── tuvanvien/
-│   │   │   └── index.blade.php                 # Giao diện Bàn trực chuyên viên tư vấn SSE realtime
-│   │   ├── consultant/                         # Views Consultant alias Tiếng Anh
-│   │   ├── quantri/
-│   │   │   └── dashboard.blade.php             # Giao diện Dashboard Quản trị viên toàn hệ thống
-│   │   ├── admin/                              # Views Admin alias Tiếng Anh
-│   │   ├── dangnhap/
-│   │   │   └── index.blade.php                 # Giao diện Đăng nhập 3 vai trò
-│   │   └── auth/                               # Views Auth alias Tiếng Anh
-│   ├── css/
-│   │   └── app.css                             # Cấu hình styles Tailwind CSS v4 & custom css
-│   └── js/
-│       └── app.js                              # Điểm vào JavaScript chính
+│   └── views/
+│       ├── layouts/
+│       │   ├── giaodien.blade.php              # Layout chính khách hàng (Navbar, Footer, Chatbot)
+│       │   ├── admin.blade.php                 # Layout chính quản trị (Sidebar, Topbar)
+│       │   ├── client.blade.php                # Alias kế thừa layouts.giaodien
+│       │   └── app.blade.php                   # Alias kế thừa layouts.admin
+│       ├── admin/                              # 7 màn hình quản trị Admin toàn diện
+│       │   ├── dashboard.blade.php             # Dashboard trung tâm chỉ huy
+│       │   ├── cars-management.blade.php       # Quản lý kho xe
+│       │   ├── test-drive-list.blade.php       # Quản lý lịch lái thử
+│       │   ├── invoices.blade.php              # Quản lý hóa đơn & gửi lại email
+│       │   ├── payments.blade.php              # Quản lý SePay & giả lập Webhook
+│       │   ├── tradein.blade.php               # Quản lý hồ sơ Thu cũ đổi mới
+│       │   └── audit.blade.php                 # Quản lý nhật ký kiểm toán & ZNS
+│       ├── xe/                                 # 3 màn hình xe: danhsach, chitiet, sosanh
+│       ├── dangnhap/                           # 2 màn hình xác thực: index, register
+│       ├── consultant/                         # Màn hình Bàn trực tư vấn SSE Realtime
+│       ├── dichvu/                             # Cổng dịch vụ bảo dưỡng & cứu hộ
+│       ├── thanhtoan/                          # Cổng thanh toán trả trước online
+│       ├── tichdiem/                           # Cổng hội viên VIP PrimeLux Club
+│       ├── tradein/                            # Cổng thẩm định Thu cũ đổi mới
+│       ├── emails/                             # Template email hóa đơn gửi Gmail
+│       ├── trangchu.blade.php                  # Giao diện Trang chủ Showroom
+│       ├── laithu.blade.php                    # Form đặt lịch lái thử VIP
+│       ├── hoadon.blade.php                    # Cổng tra cứu hóa đơn điện tử
+│       └── [alias views]/                      # Các view alias (@include) tương thích đa ngôn ngữ
 ├── routes/
-│   ├── web.php                                 # Khai báo toàn bộ 56+ Routes ứng dụng web
-│   └── console.php                             # Lệnh artisan console
+│   ├── web.php                                 # Khai báo toàn bộ 122 Routes ứng dụng
+│   └── console.php                             # Tác vụ dòng lệnh định kỳ
 ├── storage/                                    # Thư mục lưu log, session, cache framework
 ├── tests/
-│   └── Feature/
-│       ├── SystemRouteTest.php                 # Bộ test case kiểm thử toàn diện hệ thống
-│       └── ExampleTest.php
-├── .env                                        # Cấu hình biến môi trường ứng dụng
-├── .env.example                                # Bản mẫu cấu hình biến môi trường
+│   └── Feature/                                # 10 bộ Feature Tests tự động (47 test cases)
+├── .env / .env.example                         # Cấu hình biến môi trường
 ├── artisan                                     # Entry point dòng lệnh Artisan của Laravel
-├── composer.json                               # Định nghĩa package PHP và PSR-4 autoload
-├── package.json                                # Định nghĩa package Node.js (Vite, Tailwind)
+├── composer.json / composer.lock               # Định nghĩa package PHP và PSR-4 autoload
+├── package.json / package-lock.json            # Định nghĩa package Node.js (Vite, Tailwind)
 ├── phpunit.xml                                 # Cấu hình kiểm thử tự động PHPUnit
 ├── qly_cuahangoto.sql                          # Bản sao lưu SQL database
 └── vite.config.js                              # File cấu hình build tool Vite
+
 ```
 
 ---

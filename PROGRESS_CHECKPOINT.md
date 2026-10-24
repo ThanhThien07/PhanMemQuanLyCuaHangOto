@@ -154,9 +154,27 @@
 
 ---
 
+### Yêu cầu 11: Lọc và Sắp Xếp Lại Toàn Bộ File Dự Án (Dọn dẹp mã trùng lặp, chuẩn hóa kiến trúc MVC & loại bỏ file rác)
+- **Tình trạng:** [HOÀN TẤT 100%]
+- **Chi tiết thực hiện:**
+  1. **Xóa bỏ trùng lặp và phân kỳ logic ở tầng Controller (Controllers Deduplication):**
+     - Trước đây: Tồn tại 2 bộ Controller song song (Tiếng Việt và Tiếng Anh) với code bị phân kỳ nghiêm trọng (`LaiThuController` có thông báo Zalo ZNS/SMS, KPI, duyệt trạng thái nhưng `TestDriveController` lại thiếu; `DangNhapController` có Google OAuth và Đăng ký VIP nhưng `AuthController` là bản cũ).
+     - Giải pháp chuẩn Clean Architecture: Chuyển đổi toàn bộ 8 Controller Tiếng Anh (`TestDriveController`, `AuthController`, `AdminController`, `CarComparisonController`, `CarController`, `HomeController`, `InvoiceController`, `LoyaltyController`) và `TuVanVienController` thành các Class kế thừa trực tiếp từ Controller xử lý chính thức (`extends`).
+     - Lợi ích: Triệt tiêu 100% mã nguồn trùng lặp, bảo đảm mọi lời gọi qua URL/API hay class alias đều thừa hưởng toàn bộ logic mới nhất mà không lo phân kỳ logic.
+  2. **Chuẩn hóa & Sắp xếp lại tầng Giao diện (Views Cleanup):**
+     - Tập trung toàn bộ giao diện quản trị Admin về thư mục duy nhất [`resources/views/admin/`](file:///e:/btap/laragon/www/PhanMemQuanLyCuaHangOto/resources/views/admin): [`dashboard.blade.php`](file:///e:/btap/laragon/www/PhanMemQuanLyCuaHangOto/resources/views/admin/dashboard.blade.php), [`cars-management.blade.php`](file:///e:/btap/laragon/www/PhanMemQuanLyCuaHangOto/resources/views/admin/cars-management.blade.php), [`test-drive-list.blade.php`](file:///e:/btap/laragon/www/PhanMemQuanLyCuaHangOto/resources/views/admin/test-drive-list.blade.php), [`invoices.blade.php`](file:///e:/btap/laragon/www/PhanMemQuanLyCuaHangOto/resources/views/admin/invoices.blade.php), [`payments.blade.php`](file:///e:/btap/laragon/www/PhanMemQuanLyCuaHangOto/resources/views/admin/payments.blade.php), [`audit.blade.php`](file:///e:/btap/laragon/www/PhanMemQuanLyCuaHangOto/resources/views/admin/audit.blade.php), [`tradein.blade.php`](file:///e:/btap/laragon/www/PhanMemQuanLyCuaHangOto/resources/views/admin/tradein.blade.php).
+     - File [`resources/views/quantri/dashboard.blade.php`](file:///e:/btap/laragon/www/PhanMemQuanLyCuaHangOto/resources/views/quantri/dashboard.blade.php) được rút gọn thành `@include('admin.dashboard')`, giữ tương thích 100%.
+     - Thay thế toàn bộ các file view sao chép trùng lặp ([`test-drive.blade.php`](file:///e:/btap/laragon/www/PhanMemQuanLyCuaHangOto/resources/views/test-drive.blade.php), [`cars/compare.blade.php`](file:///e:/btap/laragon/www/PhanMemQuanLyCuaHangOto/resources/views/cars/compare.blade.php), [`loyalty/index.blade.php`](file:///e:/btap/laragon/www/PhanMemQuanLyCuaHangOto/resources/views/loyalty/index.blade.php), [`tuvanvien/index.blade.php`](file:///e:/btap/laragon/www/PhanMemQuanLyCuaHangOto/resources/views/tuvanvien/index.blade.php), [`auth/login.blade.php`](file:///e:/btap/laragon/www/PhanMemQuanLyCuaHangOto/resources/views/auth/login.blade.php), [`welcome.blade.php`](file:///e:/btap/laragon/www/PhanMemQuanLyCuaHangOto/resources/views/welcome.blade.php)) bằng directive `@include` trỏ về view chính thống tương ứng.
+     - Layouts: Thống nhất [`layouts/client.blade.php`](file:///e:/btap/laragon/www/PhanMemQuanLyCuaHangOto/resources/views/layouts/client.blade.php) mở rộng [`layouts/giaodien.blade.php`](file:///e:/btap/laragon/www/PhanMemQuanLyCuaHangOto/resources/views/layouts/giaodien.blade.php); [`layouts/app.blade.php`](file:///e:/btap/laragon/www/PhanMemQuanLyCuaHangOto/resources/views/layouts/app.blade.php) mở rộng [`layouts/admin.blade.php`](file:///e:/btap/laragon/www/PhanMemQuanLyCuaHangOto/resources/views/layouts/admin.blade.php).
+  3. **Tối ưu hóa Database Seeders:**
+     - Bổ sung [`RoadmapDataSeeder::class`](file:///e:/btap/laragon/www/PhanMemQuanLyCuaHangOto/database/seeders/RoadmapDataSeeder.php) vào [`DatabaseSeeder.php`](file:///e:/btap/laragon/www/PhanMemQuanLyCuaHangOto/database/seeders/DatabaseSeeder.php) để chỉ cần chạy 1 lệnh `php artisan db:seed` là toàn bộ dữ liệu mẫu (Sổ bảo hành VIN, cứu hộ, giá sàn đa nguồn, thương hiệu, ưu đãi VIP) đều được khởi tạo đầy đủ.
+  4. **Định dạng code tự động:** Chạy Laravel Pint chuẩn PSR-12 trên toàn bộ các file sửa đổi.
+
+---
+
 ## 2. KẾT QUẢ KIỂM THỬ HỆ THỐNG
 - **Laravel Pint Code Style:** Đã chạy `vendor/bin/pint --format agent`, 100% file PHP tuân thủ tiêu chuẩn code PSR-12 / Laravel.
-- **PHPUnit Test Suite:** Đã chạy `php artisan test --compact`:
+- **PHPUnit Test Suite:** Đã chạy `vendor/bin/phpunit --no-coverage`:
   - **Tổng số tests:** 47 tests
   - **Số assertion:** 291 assertions
   - **Kết quả:** 47 passed, 0 failed, 0 errors (100% PASS).
@@ -164,3 +182,4 @@
     1. Kiểm tra CSDL sạch dữ liệu mẫu, chỉ giữ 6 siêu xe trong kho (`test_database_has_clean_sample_data_while_keeping_cars`).
     2. Kiểm tra API Tra cứu Hóa đơn: Rỗng khi chưa có đơn, hiển thị dữ liệu thật khi có giao dịch (`test_invoice_lookup_api_returns_not_found_when_empty_and_real_data_after_order`).
     3. Kiểm tra Luồng Realtime 2 chiều: Khách hỏi câu ngoài mẫu -> Tự động nhảy sang Bàn trực -> Tư vấn viên reply -> Tự động nhảy về Chatbox khách hàng mà không cần F5 (`test_two_way_realtime_chat_sync_between_customer_and_advisor`).
+

@@ -94,13 +94,27 @@ class DangNhapController extends Controller
         $account = $request->input('account', '');
         $password = $request->input('password', '');
 
+        $validAdmins = [
+            'admin' => 'admin123',
+            'admin@primelux.vn' => 'admin123',
+            'superadmin' => 'primelux2024',
+        ];
+
+        $validAdvisors = [
+            'tuvanvien@primelux.vn' => ['advisor123', '123456'],
+            'tuvan' => ['advisor123', '123456'],
+            'advisor' => ['advisor123', '123456'],
+        ];
+
+        // Tự động nhận diện vai trò dựa trên tài khoản nhập vào (tránh lỗi khi người dùng quên đổi tab/cổng)
+        if (isset($validAdvisors[$account]) && ! isset($validAdmins[$account])) {
+            $role = 'advisor';
+        } elseif (isset($validAdmins[$account]) && ! isset($validAdvisors[$account])) {
+            $role = 'admin';
+        }
+
         // --- ADMIN ---
         if ($role === 'admin') {
-            $validAdmins = [
-                'admin' => 'admin123',
-                'admin@primelux.vn' => 'admin123',
-                'superadmin' => 'primelux2024',
-            ];
 
             if (isset($validAdmins[$account]) && $validAdmins[$account] === $password) {
                 session([
@@ -122,13 +136,13 @@ class DangNhapController extends Controller
 
         // --- ADVISOR ---
         if ($role === 'advisor') {
-            $validAdvisors = [
-                'tuvanvien@primelux.vn' => 'advisor123',
-                'tuvan' => 'advisor123',
-                'advisor' => 'advisor123',
-            ];
+            $isAdvisorMatch = isset($validAdvisors[$account]) && (
+                is_array($validAdvisors[$account])
+                    ? in_array($password, $validAdvisors[$account])
+                    : $validAdvisors[$account] === $password
+            );
 
-            if (isset($validAdvisors[$account]) && $validAdvisors[$account] === $password) {
+            if ($isAdvisorMatch) {
                 session([
                     'user' => [
                         'name' => 'Chuyên Viên Tư Vấn',

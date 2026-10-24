@@ -117,6 +117,41 @@
             margin-top: 25px;
             font-size: 12.5px;
         }
+
+        .role-tab-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
+            font-size: 12.5px;
+            padding: 9px 4px;
+            transition: all 0.2s ease;
+        }
+
+        .role-tab-btn:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .role-tab-btn.active#tabCustomer {
+            background: rgba(234, 179, 8, 0.15);
+            border-color: #eab308;
+            color: #fbbf24;
+            font-weight: 700;
+        }
+
+        .role-tab-btn.active#tabAdvisor {
+            background: rgba(6, 182, 212, 0.15);
+            border-color: #06b6d4;
+            color: #22d3ee;
+            font-weight: 700;
+        }
+
+        .role-tab-btn.active#tabAdmin {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: #ef4444;
+            color: #fca5a5;
+            font-weight: 700;
+        }
     </style>
 </head>
 
@@ -139,12 +174,42 @@
     <div class="login-container">
         <div class="login-card">
             <!-- HEADER -->
-            <div class="text-center mb-4">
+            <div class="text-center mb-3">
                 <span class="badge bg-warning bg-opacity-20 text-warning border border-warning px-3 py-1 mb-2 d-inline-block" id="portalBadge">
                     <i class="fa-solid fa-crown me-1"></i> HỘI VIÊN PRIMELUX CLUB
                 </span>
                 <h3 class="fw-bold mb-1 text-white" id="loginTitle">Đăng Nhập Khách Hàng</h3>
                 <p class="text-secondary small mb-0" id="loginSubtitle">Đăng nhập tài khoản để tra cứu đặc quyền & điểm thưởng VIP</p>
+            </div>
+
+            <!-- 3 TABS CHỌN VAI TRÒ ĐĂNG NHẬP -->
+            <div class="row g-2 mb-3">
+                <div class="col-4">
+                    <button type="button" class="btn w-100 py-2 text-center rounded-3 role-tab-btn active" id="tabCustomer" onclick="switchPortal('customer')">
+                        <i class="fa-solid fa-crown d-block mb-1"></i>
+                        <span class="small fw-semibold d-block">Khách Hàng</span>
+                    </button>
+                </div>
+                <div class="col-4">
+                    <button type="button" class="btn w-100 py-2 text-center rounded-3 role-tab-btn" id="tabAdvisor" onclick="switchPortal('advisor')">
+                        <i class="fa-solid fa-headset d-block mb-1"></i>
+                        <span class="small fw-semibold d-block">Tư Vấn Viên</span>
+                    </button>
+                </div>
+                <div class="col-4">
+                    <button type="button" class="btn w-100 py-2 text-center rounded-3 role-tab-btn" id="tabAdmin" onclick="switchPortal('admin')">
+                        <i class="fa-solid fa-shield-halved d-block mb-1"></i>
+                        <span class="small fw-semibold d-block">Quản Trị</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- GỢI Ý TÀI KHOẢN MẪU (CLICK ĐỂ TỰ ĐIỀN) -->
+            <div class="alert py-2 px-3 mb-3 rounded-3" id="demoHintBox" style="background: rgba(255,255,255,0.05); border: 1px dashed rgba(255,255,255,0.2); font-size: 12.5px; cursor: pointer;" onclick="fillDemoCredentials()" title="Bấm vào đây để tự động điền thông tin">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span id="demoHintText"><i class="fa-solid fa-key me-1 text-warning"></i> <strong>Tài khoản mẫu:</strong> <code>0901234567</code> | MK: <code>123456</code></span>
+                    <span class="badge bg-secondary bg-opacity-75 text-white" style="font-size: 10px;">Bấm để điền</span>
+                </div>
             </div>
 
             {{-- THÔNG BÁO LỖI / THÀNH CÔNG --}}
@@ -218,58 +283,100 @@
                     <i class="fa-solid fa-user-plus me-1"></i> Đăng Ký Thành Viên PrimeLux Club Mới
                 </a>
             </div>
-
-            <!-- CỔNG NHÂN SỰ & QUẢN TRỊ (CHUYỂN CHẾ ĐỘ KÍN ĐÁO) -->
-            <div class="staff-portal-toggle">
-                <span class="text-secondary" id="staffToggleText">Dành cho Cán bộ Nhân viên Showroom:</span><br>
-                <a href="javascript:void(0)" class="text-info fw-bold text-decoration-none" id="staffSwitchLink" onclick="toggleStaffPortal()">
-                    <i class="fa-solid fa-lock me-1"></i> Chuyển sang Cổng Nhân Viên & Quản Trị
-                </a>
-            </div>
         </div>
     </div>
 
-    <!-- SCRIPT CHUYỂN ĐỔI GIAO DIỆN KHÁCH HÀNG / NHÂN VIÊN -->
+    <!-- SCRIPT CHUYỂN ĐỔI GIAO DIỆN & TỰ ĐỘNG ĐIỀN DEMO -->
     <script>
-        let isStaffMode = false;
+        let currentRole = 'customer';
 
-        function setCustomerMode() {
-            isStaffMode = false;
-            document.getElementById('selectedRole').value = 'customer';
-            document.getElementById('portalBadge').className = 'badge bg-warning bg-opacity-20 text-warning border border-warning px-3 py-1 mb-2 d-inline-block';
-            document.getElementById('portalBadge').innerHTML = '<i class="fa-solid fa-crown me-1"></i> HỘI VIÊN PRIMELUX CLUB';
-            document.getElementById('loginTitle').innerText = 'Đăng Nhập Khách Hàng';
-            document.getElementById('loginSubtitle').innerText = 'Đăng nhập tài khoản để tra cứu đặc quyền & điểm thưởng VIP';
-            document.getElementById('accountLabel').innerText = 'Email / Số Điện Thoại';
-            document.getElementById('accountInput').placeholder = 'Nhập email hoặc SĐT...';
-            document.getElementById('googleLoginSection').style.display = 'block';
-            document.getElementById('registerSection').style.display = 'block';
-            document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-right-to-bracket me-2"></i> Đăng Nhập Hội Viên';
-            document.getElementById('staffToggleText').innerText = 'Dành cho Cán bộ Nhân viên Showroom:';
-            document.getElementById('staffSwitchLink').innerHTML = '<i class="fa-solid fa-lock me-1"></i> Chuyển sang Cổng Nhân Viên & Quản Trị';
-        }
+        const demoCredentials = {
+            customer: {
+                account: '0901234567',
+                password: '123456',
+                hint: '<i class="fa-solid fa-key me-1 text-warning"></i> <strong>Tài khoản mẫu:</strong> <code>0901234567</code> (hoặc <code>khachhang@gmail.com</code>) | MK: <code>123456</code>'
+            },
+            advisor: {
+                account: 'tuvanvien@primelux.vn',
+                password: 'advisor123',
+                hint: '<i class="fa-solid fa-headset me-1 text-info"></i> <strong>Tài khoản mẫu:</strong> <code>tuvanvien@primelux.vn</code> | MK: <code>advisor123</code>'
+            },
+            admin: {
+                account: 'admin',
+                password: 'admin123',
+                hint: '<i class="fa-solid fa-shield-halved me-1 text-danger"></i> <strong>Tài khoản mẫu:</strong> <code>admin</code> | MK: <code>admin123</code>'
+            }
+        };
 
-        function setStaffMode(role = 'admin') {
-            isStaffMode = true;
+        function switchPortal(role) {
+            currentRole = role;
             document.getElementById('selectedRole').value = role;
-            document.getElementById('portalBadge').className = 'badge bg-danger bg-opacity-20 text-danger border border-danger px-3 py-1 mb-2 d-inline-block';
-            document.getElementById('portalBadge').innerHTML = '<i class="fa-solid fa-shield-halved me-1"></i> KHU VỰC NỘI BỘ SHOWROOM';
-            document.getElementById('loginTitle').innerText = role === 'admin' ? 'Đăng Nhập Quản Trị Viên' : 'Đăng Nhập Bàn Tư Vấn';
-            document.getElementById('loginSubtitle').innerText = 'Hệ thống xác thực nhân viên nghiệp vụ PrimeLux Auto Showroom';
-            document.getElementById('accountLabel').innerText = 'Tài Khoản / Email Nội Bộ';
-            document.getElementById('accountInput').placeholder = 'Nhập tên đăng nhập hoặc email nội bộ...';
-            document.getElementById('googleLoginSection').style.display = 'none';
-            document.getElementById('registerSection').style.display = 'none';
-            document.getElementById('submitBtn').innerHTML = '<i class="fa-solid fa-shield-halved me-2"></i> Đăng Nhập Nội Bộ';
-            document.getElementById('staffToggleText').innerText = 'Quý khách muốn tra cứu điểm thưởng?';
-            document.getElementById('staffSwitchLink').innerHTML = '<i class="fa-solid fa-user me-1"></i> Quay lại Đăng Nhập Khách Hàng VIP';
+
+            // Cập nhật giao diện tab
+            document.querySelectorAll('.role-tab-btn').forEach(btn => btn.classList.remove('active'));
+            if (role === 'customer') document.getElementById('tabCustomer').classList.add('active');
+            if (role === 'advisor') document.getElementById('tabAdvisor').classList.add('active');
+            if (role === 'admin') document.getElementById('tabAdmin').classList.add('active');
+
+            // Cập nhật gợi ý tài khoản mẫu
+            if (demoCredentials[role]) {
+                document.getElementById('demoHintText').innerHTML = demoCredentials[role].hint;
+            }
+
+            const badge = document.getElementById('portalBadge');
+            const title = document.getElementById('loginTitle');
+            const subtitle = document.getElementById('loginSubtitle');
+            const accountLabel = document.getElementById('accountLabel');
+            const accountInput = document.getElementById('accountInput');
+            const inputIcon = document.getElementById('inputIcon');
+            const submitBtn = document.getElementById('submitBtn');
+            const googleSec = document.getElementById('googleLoginSection');
+            const regSec = document.getElementById('registerSection');
+
+            if (role === 'customer') {
+                badge.className = 'badge bg-warning bg-opacity-20 text-warning border border-warning px-3 py-1 mb-2 d-inline-block';
+                badge.innerHTML = '<i class="fa-solid fa-crown me-1"></i> HỘI VIÊN PRIMELUX CLUB';
+                title.innerText = 'Đăng Nhập Khách Hàng';
+                subtitle.innerText = 'Đăng nhập tài khoản để tra cứu đặc quyền & điểm thưởng VIP';
+                accountLabel.innerText = 'Email / Số Điện Thoại';
+                accountInput.placeholder = 'Nhập email hoặc SĐT (VD: 0901234567)...';
+                inputIcon.className = 'fa-solid fa-envelope';
+                googleSec.style.display = 'block';
+                regSec.style.display = 'block';
+                submitBtn.className = 'btn btn-accent-gold w-100 py-2.5';
+                submitBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket me-2"></i> Đăng Nhập Hội Viên';
+            } else if (role === 'advisor') {
+                badge.className = 'badge bg-info bg-opacity-20 text-info border border-info px-3 py-1 mb-2 d-inline-block';
+                badge.innerHTML = '<i class="fa-solid fa-headset me-1"></i> BÀN TƯ VẤN TRỰC TUYẾN (REALTIME)';
+                title.innerText = 'Đăng Nhập Tư Vấn Viên';
+                subtitle.innerText = 'Cổng tiếp nhận và hỗ trợ tư vấn khách hàng trực tiếp';
+                accountLabel.innerText = 'Tài Khoản / Email Tư Vấn Viên';
+                accountInput.placeholder = 'tuvanvien@primelux.vn';
+                inputIcon.className = 'fa-solid fa-headset text-info';
+                googleSec.style.display = 'none';
+                regSec.style.display = 'none';
+                submitBtn.className = 'btn btn-info text-white w-100 py-2.5 fw-bold';
+                submitBtn.innerHTML = '<i class="fa-solid fa-headset me-2"></i> Vào Bàn Tư Vấn Realtime';
+            } else if (role === 'admin') {
+                badge.className = 'badge bg-danger bg-opacity-20 text-danger border border-danger px-3 py-1 mb-2 d-inline-block';
+                badge.innerHTML = '<i class="fa-solid fa-shield-halved me-1"></i> KHU VỰC QUẢN TRỊ NỘI BỘ';
+                title.innerText = 'Đăng Nhập Quản Trị Viên';
+                subtitle.innerText = 'Quản trị hệ thống kho xe, hóa đơn, khách hàng & điểm thưởng';
+                accountLabel.innerText = 'Tài Khoản Admin / Email';
+                accountInput.placeholder = 'admin';
+                inputIcon.className = 'fa-solid fa-shield-halved text-danger';
+                googleSec.style.display = 'none';
+                regSec.style.display = 'none';
+                submitBtn.className = 'btn btn-danger w-100 py-2.5 fw-bold';
+                submitBtn.innerHTML = '<i class="fa-solid fa-shield-halved me-2"></i> Đăng Nhập Quản Trị';
+            }
         }
 
-        function toggleStaffPortal() {
-            if (isStaffMode) {
-                setCustomerMode();
-            } else {
-                setStaffMode('admin');
+        function fillDemoCredentials() {
+            const data = demoCredentials[currentRole];
+            if (data) {
+                document.getElementById('accountInput').value = data.account;
+                document.getElementById('passwordInput').value = data.password;
             }
         }
 
@@ -277,10 +384,10 @@
         window.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             const roleParam = urlParams.get('role');
-            if (roleParam === 'admin' || roleParam === 'advisor') {
-                setStaffMode(roleParam);
+            if (roleParam && ['customer', 'advisor', 'admin'].includes(roleParam)) {
+                switchPortal(roleParam);
             } else {
-                setCustomerMode();
+                switchPortal('customer');
             }
         });
     </script>
